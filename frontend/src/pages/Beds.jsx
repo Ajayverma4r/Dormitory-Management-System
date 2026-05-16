@@ -8,13 +8,15 @@ function Beds() {
 
   const [selectedBed, setSelectedBed] = useState(null);
 
+  // FORM STATES
+
   const [bedNumber, setBedNumber] = useState("");
   const [room, setRoom] = useState("");
   const [floor, setFloor] = useState("");
+  const [location, setLocation] = useState("");
   const [status, setStatus] = useState("available");
 
-  // NEW LOCATION STATE
-  const [location, setLocation] = useState("");
+  // BED DATA
 
   const [beds, setBeds] = useState([
     {
@@ -59,10 +61,30 @@ function Beds() {
     },
   ]);
 
+  // ADD BED
+
   const addBed = () => {
 
-    if (!bedNumber || !room || !floor) {
+    if (
+      !bedNumber ||
+      !room ||
+      !floor ||
+      !location
+    ) {
       alert("Please fill all fields");
+      return;
+    }
+
+    // DUPLICATE CHECK
+
+    const existingBed = beds.find(
+      (bed) =>
+        bed.bedNumber.toLowerCase() ===
+        bedNumber.toLowerCase()
+    );
+
+    if (existingBed) {
+      alert("Bed number already exists");
       return;
     }
 
@@ -73,40 +95,65 @@ function Beds() {
       floor,
       location,
       status,
+
       guest: null,
     };
 
     setBeds([...beds, newBed]);
 
+    // RESET FORM
+
     setBedNumber("");
     setRoom("");
     setFloor("");
-    setStatus("available");
     setLocation("");
+    setStatus("available");
   };
+
+  // DELETE BED
 
   const deleteBed = (id) => {
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this bed?"
-  );
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this bed?"
+    );
 
-  if (!confirmDelete) {
-    return;
-  }
+    if (!confirmDelete) {
+      return;
+    }
 
-  const updatedBeds = beds.filter(
-    (bed) => bed.id !== id
-  );
+    const updatedBeds = beds.filter(
+      (bed) => bed.id !== id
+    );
 
-  setBeds(updatedBeds);
+    setBeds(updatedBeds);
 
-  setSelectedBed(null);
-};
+    setSelectedBed(null);
+  };
+
+  // UPDATE BED
+
+  const updateBed = (updatedBed) => {
+
+    const updatedBeds = beds.map((bed) =>
+      bed.id === updatedBed.id
+        ? updatedBed
+        : bed
+    );
+
+    setBeds(updatedBeds);
+
+    setSelectedBed(updatedBed);
+  };
+
   return (
     <div className="flex">
 
+      {/* SIDEBAR */}
+
       <Sidebar />
+
+      {/* MAIN CONTENT */}
 
       <div className="p-5 w-full">
 
@@ -135,6 +182,8 @@ function Beds() {
             gap-4
           ">
 
+            {/* BED NUMBER */}
+
             <input
               type="text"
               placeholder="Bed Number"
@@ -149,6 +198,8 @@ function Beds() {
               "
             />
 
+            {/* ROOM */}
+
             <input
               type="text"
               placeholder="Room"
@@ -162,6 +213,8 @@ function Beds() {
                 rounded-lg
               "
             />
+
+            {/* FLOOR */}
 
             <input
               type="text"
@@ -179,31 +232,33 @@ function Beds() {
 
             {/* LOCATION */}
 
-           <select
-  value={location}
-  onChange={(e) =>
-    setLocation(e.target.value)
-  }
-  className="
-    border
-    p-3
-    rounded-lg
-  "
->
+            <select
+              value={location}
+              onChange={(e) =>
+                setLocation(e.target.value)
+              }
+              className="
+                border
+                p-3
+                rounded-lg
+              "
+            >
 
-  <option value="">
-    Select Location
-  </option>
+              <option value="">
+                Select Location
+              </option>
 
-  <option value="inside">
-    Inside
-  </option>
+              <option value="inside">
+                Inside
+              </option>
 
-  <option value="outside">
-    Outside
-  </option>
+              <option value="outside">
+                Outside
+              </option>
 
-</select>
+            </select>
+
+            {/* STATUS */}
 
             <select
               value={status}
@@ -226,6 +281,8 @@ function Beds() {
             </select>
 
           </div>
+
+          {/* BUTTON */}
 
           <button
             onClick={addBed}
@@ -270,8 +327,11 @@ function Beds() {
         {selectedBed && (
           <BedModal
             bed={selectedBed}
-            closeModal={() => setSelectedBed(null)}
+            closeModal={() =>
+              setSelectedBed(null)
+            }
             deleteBed={deleteBed}
+            updateBed={updateBed}
           />
         )}
 
