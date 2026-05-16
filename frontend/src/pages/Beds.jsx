@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import API from "../services/api";
 
 import Sidebar from "../components/Sidebar";
 import BedCard from "../components/BedCard";
@@ -18,109 +19,108 @@ function Beds() {
 
   // BED DATA
 
-  const [beds, setBeds] = useState([
-    {
-      id: 1,
-      bedNumber: "B101",
-      room: "Room 1",
-      floor: "1st Floor",
-      location: "inside",
-      status: "occupied",
+  const [beds, setBeds] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-      guest: {
-        name: "Rahul Sharma",
-        phone: "9876543210",
-        checkIn: "2026-05-15",
-      },
-    },
+  // FETCH BEDS
 
-    {
-      id: 2,
-      bedNumber: "B102",
-      room: "Room 1",
-      floor: "1st Floor",
-      location: "outside",
-      status: "available",
+  const fetchBeds = async () => {
 
-      guest: null,
-    },
+    try {
 
-    {
-      id: 3,
-      bedNumber: "B103",
-      room: "Room 2",
-      floor: "2nd Floor",
-      location: "inside",
-      status: "occupied",
+      const response = await API.get("/beds");
 
-      guest: {
-        name: "Aman Verma",
-        phone: "9999999999",
-        checkIn: "2026-05-16",
-      },
-    },
-  ]);
+      setBeds(response.data);
+
+    } catch (error) {
+
+      console.log(error);
+    }
+  };
+
+  // LOAD DATA
+
+  useEffect(() => {
+
+    fetchBeds();
+
+  }, []);
 
   // ADD BED
 
-  const addBed = () => {
+  const addBed = async () => {
 
-    if (
-      !bedNumber ||
-      !room ||
-      !floor ||
-      !location
-    ) {
-      alert("Please fill all fields");
-      return;
+    try {
+
+      if (
+        !bedNumber ||
+        !room ||
+        !floor ||
+        !location
+      ) {
+        alert("Please fill all fields");
+        return;
+      }
+
+      // SAVE TO BACKEND
+
+      const response = await API.post(
+        "/beds",
+        {
+          bed_number: bedNumber,
+          room,
+          floor,
+          location,
+          status,
+        }
+      );
+
+      // UPDATE UI
+
+      setBeds([...beds, response.data]);
+
+      // RESET FORM
+
+      setBedNumber("");
+      setRoom("");
+      setFloor("");
+      setLocation("");
+      setStatus("available");
+
+    } catch (error) {
+
+      console.log(error);
+
+      if (
+        error.response &&
+        error.response.data.message
+      ) {
+        alert(error.response.data.message);
+      } else {
+        alert("Server Error");
+      }
     }
-
-    // DUPLICATE CHECK
-
-    const existingBed = beds.find(
-      (bed) =>
-        bed.bedNumber.toLowerCase() ===
-        bedNumber.toLowerCase()
-    );
-
-    if (existingBed) {
-      alert("Bed number already exists");
-      return;
-    }
-
-    const newBed = {
-      id: Date.now(),
-      bedNumber,
-      room,
-      floor,
-      location,
-      status,
-
-      guest: null,
-    };
-
-    setBeds([...beds, newBed]);
-
-    // RESET FORM
-
-    setBedNumber("");
-    setRoom("");
-    setFloor("");
-    setLocation("");
-    setStatus("available");
   };
 
   // DELETE BED
 
-  const deleteBed = (id) => {
+  const deleteBed = async (id) => {
 
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this bed?"
-    );
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this bed?"
+  );
 
-    if (!confirmDelete) {
-      return;
-    }
+  if (!confirmDelete) {
+    return;
+  }
+
+  try {
+
+    // DELETE FROM BACKEND
+
+    await API.delete(`/beds/${id}`);
+
+    // UPDATE UI
 
     const updatedBeds = beds.filter(
       (bed) => bed.id !== id
@@ -129,7 +129,14 @@ function Beds() {
     setBeds(updatedBeds);
 
     setSelectedBed(null);
-  };
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Failed to delete bed");
+  }
+};
 
   // UPDATE BED
 
@@ -157,9 +164,39 @@ function Beds() {
 
       <div className="p-5 w-full">
 
-        <h1 className="text-3xl font-bold">
-          Bed Management
-        </h1>
+        <div className="
+  flex
+  flex-col
+  md:flex-row
+  md:items-center
+  md:justify-between
+  gap-4
+">
+
+  <h1 className="text-3xl font-bold">
+    Bed Management
+  </h1>
+
+  <input
+    type="text"
+    placeholder="Search bed..."
+    value={searchTerm}
+    onChange={(e) =>
+      setSearchTerm(e.target.value)
+    }
+    className="
+      border
+      p-3
+      rounded-lg
+      w-full
+      md:w-72
+      outline-none
+      focus:ring-2
+      focus:ring-blue-400
+    "
+  />
+
+</div>
 
         {/* ADD BED FORM */}
 
@@ -303,24 +340,32 @@ function Beds() {
 
         {/* BED GRID */}
 
-        <div className="
-          grid
-          grid-cols-1
-          md:grid-cols-3
-          lg:grid-cols-5
-          gap-5
-          mt-5
-        ">
+        {/* BED GRID */}
 
-          {beds.map((bed) => (
-            <BedCard
-              key={bed.id}
-              bed={bed}
-              onClick={setSelectedBed}
-            />
-          ))}
+<div className="
+  grid
+  grid-cols-2
+  md:grid-cols-4
+  lg:grid-cols-7
+  gap-4
+  mt-5
+">
 
-        </div>
+  {beds
+    .filter((bed) =>
+      bed.bed_number
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .map((bed) => (
+      <BedCard
+        key={bed.id}
+        bed={bed}
+        onClick={setSelectedBed}
+      />
+    ))}
+
+</div>
 
         {/* MODAL */}
 

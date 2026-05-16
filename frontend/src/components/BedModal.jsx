@@ -21,13 +21,17 @@ function BedModal({
     bed.guest?.checkIn || ""
   );
 
+  const [status, setStatus] = useState(
+  bed.status || "available"
+  );
+
   if (!bed) return null;
 
   const handleSave = () => {
 
     const updatedBed = {
       ...bed,
-
+        status: status,
       guest: {
         name: guestName,
         phone: guestPhone,
@@ -58,9 +62,29 @@ function BedModal({
           <strong>Location:</strong> {bed.location}
         </p>
 
-        <p>
-          <strong>Status:</strong> {bed.status}
-        </p>
+       <p>
+  <strong>Status:</strong>
+
+  {isEditing ? (
+    <select
+      value={status}
+      onChange={(e) =>
+        setStatus(e.target.value)
+      }
+      style={inputStyle}
+    >
+      <option value="available">
+        Available
+      </option>
+
+      <option value="occupied">
+        Occupied
+      </option>
+    </select>
+  ) : (
+    ` ${bed.status}`
+  )}
+</p>
 
         {/* GUEST DETAILS */}
 
