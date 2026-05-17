@@ -5,3 +5,24 @@ body {
   font-family: Arial, sans-serif;
   background: #f3f4f6;
 }
+
+
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-section,
+  .print-section * {
+    visibility: visible;
+  }
+
+  .print-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+}

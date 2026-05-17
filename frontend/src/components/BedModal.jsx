@@ -13,6 +13,10 @@ function BedModal({
     bed.guest?.name || ""
   );
 
+  const [empId, setEmpId] = useState(
+  bed.guest?.empId || ""
+  );
+
   const [guestPhone, setGuestPhone] = useState(
     bed.guest?.phone || ""
   );
@@ -22,33 +26,81 @@ function BedModal({
   );
 
   const [status, setStatus] = useState(
-  bed.status || "available"
+    bed.status || "available"
   );
 
   if (!bed) return null;
 
   const handleSave = () => {
 
-    const updatedBed = {
-      ...bed,
-        status: status,
-      guest: {
+  // VALIDATION
+  if (
+  guestPhone &&
+  guestPhone.length !== 10
+ ) {
+
+  alert(
+    "Please enter correct phone number"
+  );
+
+  return;
+}
+
+  if (
+    status === "occupied" &&
+    (
+      !guestName ||
+      !empId ||
+      !guestPhone ||
+      !checkIn
+    )
+  ) {
+
+    alert(
+      "Please fill all guest details for occupied bed"
+    );
+
+    return;
+  }
+
+  const updatedBed = {
+    ...bed,
+    status: status,
+
+    guest:
+  status === "occupied"
+    ? {
         name: guestName,
+        empId: empId,
         phone: guestPhone,
         checkIn: checkIn,
-      },
-    };
-
-    updateBed(updatedBed);
-
-    setIsEditing(false);
+      }
+        : null,
   };
 
+  updateBed(updatedBed);
+
+  setIsEditing(false);
+};
+
   return (
+
     <div style={overlayStyle}>
+
       <div style={modalStyle}>
 
-        <h2>{bed.bedNumber}</h2>
+        {/* BED NUMBER */}
+
+        <h2
+          style={{
+            marginBottom: "10px",
+            fontSize: "20px",
+          }}
+        >
+          {bed.bedNumber}
+        </h2>
+
+        {/* BED DETAILS */}
 
         <p>
           <strong>Room:</strong> {bed.room}
@@ -62,157 +114,258 @@ function BedModal({
           <strong>Location:</strong> {bed.location}
         </p>
 
-       <p>
-  <strong>Status:</strong>
+        <p>
+          <strong>Status:</strong>
+
+          {isEditing ? (
+
+            <select
+              value={status}
+              onChange={(e) =>
+                setStatus(e.target.value)
+              }
+              style={inputStyle}
+            >
+
+              <option value="available">
+                Available
+              </option>
+
+              <option value="occupied">
+                Occupied
+              </option>
+
+            </select>
+
+          ) : (
+            ` ${bed.status}`
+          )}
+
+        </p>
+
+        
+
+       {/* GUEST DETAILS */}
+
+       
+
+{status === "occupied" && (
+
+  <>
+
+    <hr style={{ margin: "10px 0" }} />
+
+    <h3
+      style={{
+        marginBottom: "8px",
+        fontSize: "16px",
+      }}
+    >
+      Person Details
+    </h3>
+
+    {/* NAME */}
+
+    <p>
+      <strong>Name:</strong>
+
+      {isEditing ? (
+
+        <input
+          type="text"
+          value={guestName}
+          onChange={(e) =>
+            setGuestName(e.target.value)
+          }
+          style={inputStyle}
+        />
+
+      ) : (
+        ` ${guestName || "No Guest"}`
+      )}
+
+    </p>
+
+    {/* EMP ID */}
+
+ <p>
+  <strong>Emp ID:</strong>
 
   {isEditing ? (
-    <select
-      value={status}
+
+    <input
+      type="text"
+      value={empId}
       onChange={(e) =>
-        setStatus(e.target.value)
+        setEmpId(
+          e.target.value.toUpperCase()
+        )
       }
       style={inputStyle}
-    >
-      <option value="available">
-        Available
-      </option>
+    />
 
-      <option value="occupied">
-        Occupied
-      </option>
-    </select>
   ) : (
-    ` ${bed.status}`
+    ` ${empId || "-"}`
   )}
-</p>
 
-        {/* GUEST DETAILS */}
+    </p>
 
-        <hr style={{ margin: "15px 0" }} />
+    {/* PHONE */}
 
-        <h3>Guest Details</h3>
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    marginTop: "8px",
+  }}
+>
 
-        {/* NAME */}
+  <strong>Phone:</strong>
 
-        <p>
-          <strong>Name:</strong>
+  {isEditing ? (
 
-          {isEditing ? (
-            <input
-              type="text"
-              value={guestName}
-              onChange={(e) =>
-                setGuestName(e.target.value)
-              }
-              style={inputStyle}
-            />
-          ) : (
-            ` ${guestName || "No Guest"}`
-          )}
-        </p>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        marginLeft: "8px",
+        gap: "8px",
+      }}
+    >
 
-        {/* PHONE */}
+      <span
+        style={{
+          fontSize: "13px",
+          fontWeight: "bold",
+        }}
+      >
+        +91
+      </span>
 
-        <p>
-          <strong>Phone:</strong>
+      <input
+        type="text"
+        value={guestPhone}
+        onChange={(e) =>
+          setGuestPhone(
+            e.target.value.replace(/\D/g, "")
+          )
+        }
+        maxLength={10}
+        placeholder="xxxxxxxxxxx"
+        style={{
+          ...inputStyle,
+          marginLeft: "0px",
+          width: "130px",
+        }}
+      />
 
-          {isEditing ? (
-            <input
-              type="text"
-              value={guestPhone}
-              onChange={(e) =>
-                setGuestPhone(e.target.value)
-              }
-              style={inputStyle}
-            />
-          ) : (
-            ` ${guestPhone || "-"}`
-          )}
-        </p>
+    </div>
 
-        {/* CHECKIN */}
+  ) : (
 
-        <p>
-          <strong>Check In:</strong>
+    guestPhone
+      ? ` +91 ${guestPhone}`
+      : "-"
 
-          {isEditing ? (
-            <input
-              type="date"
-              value={checkIn}
-              onChange={(e) =>
-                setCheckIn(e.target.value)
-              }
-              style={inputStyle}
-            />
-          ) : (
-            ` ${checkIn || "-"}`
-          )}
-        </p>
+  )}
+
+</div>
+
+    {/* CHECK IN */}
+
+    <p>
+      <strong>Check In:</strong>
+
+      {isEditing ? (
+
+        <input
+          type="date"
+          value={checkIn}
+          onChange={(e) =>
+            setCheckIn(e.target.value)
+          }
+          style={inputStyle}
+        />
+
+      ) : (
+        ` ${checkIn || "-"}`
+      )}
+
+    </p>
+
+  </>
+
+)}
 
         {/* BUTTONS */}
 
         <div
-  style={{
-    display: "flex",
-    gap: "10px",
-    marginTop: "20px",
-    flexWrap: "wrap",
-  }}
->
+          style={{
+            display: "flex",
+            gap: "8px",
+            marginTop: "15px",
+            flexWrap: "wrap",
+          }}
+        >
 
-  {/* EDIT / SAVE */}
+          {/* EDIT / SAVE */}
 
-  {isEditing ? (
-    <button
-      onClick={handleSave}
-      style={{
-        ...buttonStyle,
-        background: "#2563eb",
-      }}
-    >
-      Save
-    </button>
-  ) : (
-    <button
-      onClick={() =>
-        setIsEditing(true)
-      }
-      style={{
-        ...buttonStyle,
-        background: "#f59e0b",
-      }}
-    >
-      Edit
-    </button>
-  )}
+          {isEditing ? (
 
-  {/* DELETE */}
+            <button
+              onClick={handleSave}
+              style={{
+                ...buttonStyle,
+                background: "#2563eb",
+              }}
+            >
+              Save
+            </button>
 
-  <button
-    onClick={() => deleteBed(bed.id)}
-    style={{
-      ...buttonStyle,
-      background: "#dc2626",
-    }}
-  >
-    Delete
-  </button>
+          ) : (
 
-  {/* CLOSE */}
+            <button
+              onClick={() =>
+                setIsEditing(true)
+              }
+              style={{
+                ...buttonStyle,
+                background: "#f59e0b",
+              }}
+            >
+              Edit
+            </button>
 
-  <button
-    onClick={closeModal}
-    style={{
-      ...buttonStyle,
-      background: "#111827",
-    }}
-  >
-    Close
-  </button>
+          )}
 
-</div>
+          {/* DELETE */}
+
+          <button
+            onClick={() => deleteBed(bed.id)}
+            style={{
+              ...buttonStyle,
+              background: "#dc2626",
+            }}
+          >
+            Delete
+          </button>
+
+          {/* CLOSE */}
+
+          <button
+            onClick={closeModal}
+            style={{
+              ...buttonStyle,
+              background: "#111827",
+            }}
+          >
+            Close
+          </button>
+
+        </div>
 
       </div>
+
     </div>
   );
 }
@@ -231,22 +384,25 @@ const overlayStyle = {
 
 const modalStyle = {
   background: "white",
-  padding: "25px",
-  borderRadius: "12px",
-  width: "400px",
+  padding: "15px",
+  borderRadius: "10px",
+  width: "320px",
+  fontSize: "14px",
 };
 
 const buttonStyle = {
-  padding: "10px 15px",
+  padding: "6px 10px",
   border: "none",
   color: "white",
   cursor: "pointer",
   borderRadius: "5px",
+  fontSize: "13px",
 };
 
 const inputStyle = {
-  marginLeft: "10px",
-  padding: "5px",
+  marginLeft: "8px",
+  padding: "3px",
+  fontSize: "13px",
 };
 
 export default BedModal;

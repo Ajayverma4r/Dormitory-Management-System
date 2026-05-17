@@ -6,14 +6,13 @@ function BedCard({ bed, onClick }) {
       onClick={() => onClick(bed)}
       className={`
         cursor-pointer
-        rounded-xl
+        rounded-md
         border
-        p-4
+        p-1
         text-center
         shadow-sm
         transition-all
-        duration-300
-        hover:scale-105
+        duration-200
 
         ${
           bed.status === "available"
@@ -32,9 +31,10 @@ function BedCard({ bed, onClick }) {
       {/* BED NUMBER */}
 
       <h2 className="
-        text-2xl
-        font-bold
+        text-sm
+        font-semibold
         text-black
+        leading-tight
       ">
         {bed.bed_number}
       </h2>
@@ -43,9 +43,9 @@ function BedCard({ bed, onClick }) {
 
       <p
         className={`
-          mt-2
-          text-lg
-          font-medium
+          mt-0.5
+          text-[10px]
+          font-normal
 
           ${
             bed.status === "available"
@@ -61,9 +61,9 @@ function BedCard({ bed, onClick }) {
 
       <p
         className={`
-          mt-2
-          text-sm
-          font-medium
+          mt-0.5
+          text-[10px]
+          font-normal
 
           ${
             bed.location === "inside"

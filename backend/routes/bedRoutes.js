@@ -84,6 +84,62 @@ router.post("/", async (req, res) => {
 });
 
 
+// UPDATE BED
+
+router.put("/:id", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const {
+      status,
+      guest_name,
+      emp_id,
+      guest_phone,
+      check_in,
+    } = req.body;
+
+    const updatedBed = await pool.query(
+
+      `
+      UPDATE beds
+
+      SET
+        status = $1,
+        guest_name = $2,
+        emp_id = $3,
+        guest_phone = $4,
+        check_in = $5
+
+      WHERE id = $6
+
+      RETURNING *
+      `,
+
+      [
+        status,
+        guest_name,
+        emp_id,
+        guest_phone,
+        check_in,
+        id,
+      ]
+    );
+
+    res.json(updatedBed.rows[0]);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
+
 // DELETE BED
 
 router.delete("/:id", async (req, res) => {

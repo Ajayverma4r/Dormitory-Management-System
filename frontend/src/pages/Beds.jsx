@@ -15,28 +15,45 @@ function Beds() {
   const [room, setRoom] = useState("");
   const [floor, setFloor] = useState("");
   const [location, setLocation] = useState("");
-  const [status, setStatus] = useState("available");
+  const [status, setStatus] = useState("");
 
   // BED DATA
 
   const [beds, setBeds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+
+  const [locationFilter, setLocationFilter] = useState("");
 
   // FETCH BEDS
 
-  const fetchBeds = async () => {
+ const fetchBeds = async () => {
 
-    try {
+  try {
 
-      const response = await API.get("/beds");
+    const response = await API.get("/beds");
 
-      setBeds(response.data);
+    const formattedBeds = response.data.map(
+      (bed) => ({
 
-    } catch (error) {
+        ...bed,
 
-      console.log(error);
-    }
-  };
+        guest: {
+          name: bed.guest_name,
+          empId: bed.emp_id,
+          phone: bed.guest_phone,
+          checkIn: bed.check_in,
+        },
+      })
+    );
+
+    setBeds(formattedBeds);
+
+  } catch (error) {
+
+    console.log(error);
+  }
+};
 
   // LOAD DATA
 
@@ -62,8 +79,6 @@ function Beds() {
         return;
       }
 
-      // SAVE TO BACKEND
-
       const response = await API.post(
         "/beds",
         {
@@ -75,11 +90,7 @@ function Beds() {
         }
       );
 
-      // UPDATE UI
-
       setBeds([...beds, response.data]);
-
-      // RESET FORM
 
       setBedNumber("");
       setRoom("");
@@ -106,24 +117,82 @@ function Beds() {
 
   const deleteBed = async (id) => {
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this bed?"
-  );
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this bed?"
+    );
 
-  if (!confirmDelete) {
-    return;
-  }
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+
+      await API.delete(`/beds/${id}`);
+
+      const updatedBeds = beds.filter(
+        (bed) => bed.id !== id
+      );
+
+      setBeds(updatedBeds);
+
+      setSelectedBed(null);
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert("Failed to delete bed");
+    }
+  };
+
+  // UPDATE BED
+
+const updateBed = async (updatedBed) => {
 
   try {
 
-    // DELETE FROM BACKEND
+    const response = await API.put(
 
-    await API.delete(`/beds/${id}`);
+      `/beds/${updatedBed.id}`,
 
-    // UPDATE UI
+      {
+        status: updatedBed.status,
 
-    const updatedBeds = beds.filter(
-      (bed) => bed.id !== id
+        guest_name:
+          updatedBed.guest?.name || "",
+
+        emp_id:
+          updatedBed.guest?.empId || "",
+
+        guest_phone:
+          updatedBed.guest?.phone || "",
+
+        check_in:
+          updatedBed.guest?.checkIn || "",
+      }
+    );
+
+    const updatedBeds = beds.map((bed) =>
+
+      bed.id === updatedBed.id
+        ? {
+            ...response.data,
+
+            guest: {
+              name:
+                response.data.guest_name,
+
+              empId:
+                response.data.emp_id,
+
+              phone:
+                response.data.guest_phone,
+
+              checkIn:
+                response.data.check_in,
+            },
+          }
+        : bed
     );
 
     setBeds(updatedBeds);
@@ -134,26 +203,12 @@ function Beds() {
 
     console.log(error);
 
-    alert("Failed to delete bed");
+    alert("Failed to update bed");
   }
 };
 
-  // UPDATE BED
-
-  const updateBed = (updatedBed) => {
-
-    const updatedBeds = beds.map((bed) =>
-      bed.id === updatedBed.id
-        ? updatedBed
-        : bed
-    );
-
-    setBeds(updatedBeds);
-
-    setSelectedBed(updatedBed);
-  };
-
   return (
+
     <div className="flex">
 
       {/* SIDEBAR */}
@@ -162,53 +217,120 @@ function Beds() {
 
       {/* MAIN CONTENT */}
 
-      <div className="p-5 w-full">
+      <div className="p-2 w-full text-sm">
+
+        {/* HEADER */}
 
         <div className="
-  flex
-  flex-col
-  md:flex-row
-  md:items-center
-  md:justify-between
-  gap-4
-">
+          flex
+          flex-col
+          md:flex-row
+          md:items-center
+          md:justify-between
+          gap-2
+        ">
 
-  <h1 className="text-3xl font-bold">
-    Bed Management
-  </h1>
+          <div className="w-full text-center">
 
-  <input
-    type="text"
-    placeholder="Search bed..."
-    value={searchTerm}
-    onChange={(e) =>
-      setSearchTerm(e.target.value)
-    }
-    className="
-      border
-      p-3
-      rounded-lg
-      w-full
-      md:w-72
-      outline-none
-      focus:ring-2
-      focus:ring-blue-400
-    "
-  />
+            <h1
+              className="
+                text-2xl
+                font-bold
+                mb-1
+              "
+            >
+              Bed Management
+            </h1>
 
-</div>
+          </div>
+
+          {/* SEARCH */}
+
+          <input
+            type="text"
+            placeholder="Search bed..."
+            value={searchTerm}
+            onChange={(e) =>
+              setSearchTerm(e.target.value)
+            }
+            className="
+              border
+              p-1.5
+              rounded-md
+              w-full
+              md:w-56
+              outline-none
+              focus:ring-1
+              focus:ring-blue-400
+            "
+          />
+
+          <select
+         value={statusFilter}
+         onChange={(e) =>
+         setStatusFilter(e.target.value)
+         }
+         className="
+         border
+       p-1.5
+       rounded-md
+        "
+        >
+
+  <option value="">
+    All Status
+  </option>
+
+  <option value="available">
+    Available
+  </option>
+
+  <option value="occupied">
+    Occupied
+  </option>
+
+</select>
+
+<select
+  value={locationFilter}
+  onChange={(e) =>
+    setLocationFilter(e.target.value)
+  }
+  className="
+    border
+    p-1.5
+    rounded-md
+  "
+>
+
+  <option value="">
+    All Location
+  </option>
+
+  <option value="inside">
+    Inside
+  </option>
+
+  <option value="outside">
+    Outside
+  </option>
+
+</select>
+
+        </div>
+
 
         {/* ADD BED FORM */}
 
         <div className="
           bg-white
-          p-5
-          rounded-xl
-          shadow-md
-          mt-5
+          p-2
+          rounded-lg
+          shadow-sm
+          mt-2
         ">
 
-          <h2 className="text-xl font-bold mb-5">
+          <h2 className="text-lg font-bold mb-2">
             Add New Bed
           </h2>
 
@@ -216,7 +338,7 @@ function Beds() {
             grid
             grid-cols-1
             md:grid-cols-5
-            gap-4
+            gap-2
           ">
 
             {/* BED NUMBER */}
@@ -225,13 +347,15 @@ function Beds() {
               type="text"
               placeholder="Bed Number"
               value={bedNumber}
-              onChange={(e) =>
-                setBedNumber(e.target.value)
-              }
+             onChange={(e) =>
+              setBedNumber(
+              e.target.value.toUpperCase()
+                 )
+                }
               className="
                 border
-                p-3
-                rounded-lg
+                p-1.5
+                rounded-md
               "
             />
 
@@ -242,12 +366,14 @@ function Beds() {
               placeholder="Room"
               value={room}
               onChange={(e) =>
-                setRoom(e.target.value)
+             setRoom(
+               e.target.value.toUpperCase()
+              )
               }
               className="
                 border
-                p-3
-                rounded-lg
+                p-1.5
+                rounded-md
               "
             />
 
@@ -257,15 +383,19 @@ function Beds() {
               type="text"
               placeholder="Floor"
               value={floor}
-              onChange={(e) =>
-                setFloor(e.target.value)
+             onChange={(e) =>
+             setFloor(
+             e.target.value.toUpperCase()
+             )
               }
               className="
                 border
-                p-3
-                rounded-lg
+                p-1.5
+                rounded-md
               "
             />
+
+            
 
             {/* LOCATION */}
 
@@ -276,8 +406,8 @@ function Beds() {
               }
               className="
                 border
-                p-3
-                rounded-lg
+                p-1.5
+                rounded-md
               "
             >
 
@@ -298,24 +428,30 @@ function Beds() {
             {/* STATUS */}
 
             <select
-              value={status}
-              onChange={(e) =>
-                setStatus(e.target.value)
-              }
-              className="
-                border
-                p-3
-                rounded-lg
-              "
-            >
-              <option value="available">
-                Available
-              </option>
+  value={status}
+  onChange={(e) =>
+    setStatus(e.target.value)
+  }
+  className="
+    border
+    p-1.5
+    rounded-md
+  "
+>
 
-              <option value="occupied">
-                Occupied
-              </option>
-            </select>
+  <option value="">
+    Status
+  </option>
+
+  <option value="available">
+    Available
+  </option>
+
+  <option value="occupied">
+    Occupied
+  </option>
+
+</select>
 
           </div>
 
@@ -324,48 +460,63 @@ function Beds() {
           <button
             onClick={addBed}
             className="
-              mt-5
+              mt-2
               bg-blue-600
               text-white
-              px-5
-              py-3
-              rounded-lg
+              px-3
+              py-1.5
+              rounded-md
               hover:bg-blue-700
             "
           >
-            Add Bed
+            Create New Bed
           </button>
 
         </div>
 
         {/* BED GRID */}
 
-        {/* BED GRID */}
+        <div className="
+          grid
+          grid-cols-2
+          md:grid-cols-5
+          lg:grid-cols-9
+          gap-2
+          mt-3
+          justify-center
+        ">
 
-<div className="
-  grid
-  grid-cols-2
-  md:grid-cols-4
-  lg:grid-cols-7
-  gap-4
-  mt-5
-">
+         {beds
+  .filter((bed) => {
 
-  {beds
-    .filter((bed) =>
+    const matchesSearch =
       bed.bed_number
         .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    )
-    .map((bed) => (
-      <BedCard
-        key={bed.id}
-        bed={bed}
-        onClick={setSelectedBed}
-      />
-    ))}
+        .includes(searchTerm.toLowerCase());
 
-</div>
+    const matchesStatus =
+      statusFilter === "" ||
+      bed.status === statusFilter;
+
+    const matchesLocation =
+      locationFilter === "" ||
+      bed.location === locationFilter;
+
+    return (
+      matchesSearch &&
+      matchesStatus &&
+      matchesLocation
+    );
+  })
+  .map((bed) => (
+              <BedCard
+                key={bed.id}
+                bed={bed}
+                onClick={setSelectedBed}
+              />
+            ))}
+
+        </div>
 
         {/* MODAL */}
 
