@@ -84,6 +84,9 @@ function Dashboard() {
   h-screen
   overflow-y-auto
   text-sm
+  md:ml-64
+  mt-14
+  md:mt-0
 ">
 
         {/* TITLE */}

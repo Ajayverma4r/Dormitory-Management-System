@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { useState } from "react";
 
 function BedModal({
@@ -39,7 +40,7 @@ function BedModal({
   guestPhone.length !== 10
  ) {
 
-  alert(
+  toast.error(
     "Please enter correct phone number"
   );
 
@@ -56,7 +57,7 @@ function BedModal({
     )
   ) {
 
-    alert(
+    toast.error(
       "Please fill all guest details for occupied bed"
     );
 
@@ -288,7 +289,19 @@ function BedModal({
         />
 
       ) : (
-        ` ${checkIn || "-"}`
+        ` ${
+  checkIn
+    ? new Date(checkIn)
+        .toLocaleDateString(
+          "en-IN",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }
+        )
+    : "-"
+}`
       )}
 
     </p>

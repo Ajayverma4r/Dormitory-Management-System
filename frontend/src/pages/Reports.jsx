@@ -170,11 +170,15 @@ function Reports() {
       {/* MAIN */}
 
       <div className="
-        p-2
-        w-full
-        overflow-y-auto
-        text-sm
-      ">
+  p-2
+  w-full
+  overflow-y-auto
+  text-sm
+  md:ml-64
+  mt-14
+  md:mt-0
+  overflow-x-hidden
+">
 
         {/* TITLE */}
 

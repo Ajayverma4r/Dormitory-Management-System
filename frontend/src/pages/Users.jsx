@@ -1,0 +1,594 @@
+import toast from "react-hot-toast";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import API from "../services/api";
+
+import Sidebar from "../components/Sidebar";
+
+function Users() {
+
+  const [users, setUsers] =
+    useState([]);
+
+  // FORM STATES
+
+  const [username, setUsername] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [role, setRole] =
+    useState("staff");
+
+  // FETCH USERS
+
+  const fetchUsers = async () => {
+
+    try {
+
+      const response =
+        await API.get(
+          "/auth/users"
+        );
+
+      setUsers(response.data);
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Failed to fetch users"
+      );
+    }
+  };
+
+  useEffect(() => {
+
+    fetchUsers();
+
+  }, []);
+
+  // CREATE USER
+
+  const createUser = async () => {
+
+    try {
+
+      // VALIDATION
+
+      if (
+        !username ||
+        !password
+      ) {
+
+        toast.error(
+          "Please fill all fields"
+        );
+
+        return;
+      }
+
+      // PASSWORD VALIDATION
+
+      if (password.length < 6) {
+
+        toast.error(
+          "Password must be at least 6 characters"
+        );
+
+        return;
+      }
+
+      // API CALL
+
+      await API.post(
+        "/auth/register",
+        {
+          username,
+          password,
+          role,
+        }
+      );
+
+      toast.success(
+        "User created successfully"
+      );
+
+      // RESET
+
+      setUsername("");
+
+      setPassword("");
+
+      setRole("staff");
+
+      fetchUsers();
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Failed to create user"
+      );
+    }
+  };
+
+  // DELETE USER
+
+  const deleteUser = async (id) => {
+
+    // CURRENT USER
+
+    const currentUser =
+      JSON.parse(
+        localStorage.getItem("user")
+      );
+
+    // PREVENT SELF DELETE
+
+    if (currentUser.id === id) {
+
+      toast.error(
+        "You cannot delete your own account"
+      );
+
+      return;
+    }
+
+    // CONFIRM
+
+    const confirmDelete =
+      window.confirm(
+        "Delete this user?"
+      );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+
+      await API.delete(
+        `/auth/users/${id}`
+      );
+
+      toast.success(
+        "User deleted successfully"
+      );
+
+      fetchUsers();
+
+    } catch (error) {
+
+      console.log(error);
+
+      toast.error(
+        "Failed to delete user"
+      );
+    }
+  };
+
+  return (
+
+    <div className="flex">
+
+      {/* SIDEBAR */}
+
+      <Sidebar />
+
+      {/* MAIN */}
+
+      <div className="
+  p-5
+  w-full
+  md:ml-64
+  mt-14
+  md:mt-0
+  overflow-x-hidden
+">
+
+        {/* TITLE */}
+
+        <h1 className="
+          text-3xl
+          font-bold
+          mb-5
+        ">
+          User Management
+        </h1>
+
+        {/* CREATE USER */}
+
+        <div className="
+          bg-white
+          p-4
+          rounded-xl
+          shadow-sm
+          mb-5
+        ">
+
+          <h2 className="
+            text-xl
+            font-bold
+            mb-4
+          ">
+            Create User
+          </h2>
+
+          <div className="
+            grid
+            grid-cols-1
+            md:grid-cols-4
+            gap-3
+          ">
+
+            {/* USERNAME */}
+
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) =>
+                setUsername(
+                  e.target.value
+                )
+              }
+              className="
+                border
+                p-3
+                rounded-md
+              "
+            />
+
+            {/* PASSWORD */}
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) =>
+                setPassword(
+                  e.target.value
+                )
+              }
+              className="
+                border
+                p-3
+                rounded-md
+              "
+            />
+
+            {/* ROLE */}
+
+            <select
+              value={role}
+              onChange={(e) =>
+                setRole(
+                  e.target.value
+                )
+              }
+              className="
+                border
+                p-3
+                rounded-md
+              "
+            >
+
+              <option value="staff">
+                Staff
+              </option>
+
+              <option value="admin">
+                Admin
+              </option>
+
+            </select>
+
+            {/* BUTTON */}
+
+            <button
+              onClick={createUser}
+              className="
+                bg-blue-600
+                text-white
+                rounded-md
+                hover:bg-blue-700
+              "
+            >
+              Create User
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* USER TABLE */}
+
+        <div className="
+          bg-white
+          rounded-xl
+          shadow-sm
+          overflow-x-auto
+        ">
+
+          <table className="
+            w-full
+            border-collapse
+          ">
+
+            {/* HEADER */}
+
+            <thead className="
+              bg-gray-100
+            ">
+
+              <tr>
+
+                <th className="
+                  p-3
+                  text-left
+                ">
+                  ID
+                </th>
+
+                <th className="
+                  p-3
+                  text-left
+                ">
+                  Username
+                </th>
+
+                <th className="
+                  p-3
+                  text-left
+                ">
+                  Role
+                </th>
+
+                <th className="
+                  p-3
+                  text-left
+                ">
+                  Action
+                </th>
+
+              </tr>
+
+            </thead>
+
+            {/* BODY */}
+
+            <tbody>
+
+              {users.map((user) => (
+
+                <tr
+                  key={user.id}
+                  className="
+                    border-b
+                  "
+                >
+
+                  {/* ID */}
+
+                  <td className="p-3">
+                    {user.id}
+                  </td>
+
+                  {/* USERNAME */}
+
+                  <td className="p-3">
+                    {user.username}
+                  </td>
+
+                  {/* ROLE */}
+
+                  <td className="p-3">
+
+                    <span className={`
+                      px-2
+                      py-1
+                      rounded-full
+                      text-xs
+                      font-medium
+
+                      ${
+                        user.role === "admin"
+
+                        ? "bg-red-100 text-red-700"
+
+                        : "bg-blue-100 text-blue-700"
+                      }
+                    `}>
+
+                      {user.role}
+
+                    </span>
+
+                  </td>
+
+                  {/* ACTIONS */}
+
+                  <td className="
+                    p-3
+                    flex
+                    gap-2
+                    flex-wrap
+                  ">
+
+                    {/* CHANGE PASSWORD */}
+
+                    <button
+                      onClick={async () => {
+
+                        const newPassword =
+                          prompt(
+                            "Enter new password"
+                          );
+
+                        if (!newPassword) {
+                          return;
+                        }
+
+                        // VALIDATION
+
+                        if (
+                          newPassword.length < 6
+                        ) {
+
+                          toast.error(
+                            "Password must be at least 6 characters"
+                          );
+
+                          return;
+                        }
+
+                        try {
+
+                          await API.put(
+
+                            `/auth/users/${user.id}/password`,
+
+                            {
+                              password:
+                                newPassword,
+                            }
+                          );
+
+                          toast.success(
+                            "Password updated successfully"
+                          );
+
+                        } catch (error) {
+
+                          console.log(error);
+
+                          toast.error(
+                            "Failed to update password"
+                          );
+                        }
+                      }}
+
+                      className="
+                        bg-yellow-500
+                        text-white
+                        px-3
+                        py-1
+                        rounded-md
+                        hover:bg-yellow-600
+                      "
+                    >
+                      Password
+                    </button>
+
+                    {/* CHANGE ROLE */}
+
+                    <button
+                      onClick={async () => {
+
+                        const newRole =
+                          prompt(
+                            "Enter role: admin or staff"
+                          );
+
+                        if (
+                          !newRole ||
+                          (
+                            newRole !== "admin" &&
+                            newRole !== "staff"
+                          )
+                        ) {
+
+                          toast.error(
+                            "Invalid role"
+                          );
+
+                          return;
+                        }
+
+                        try {
+
+                          await API.put(
+
+                            `/auth/users/${user.id}/role`,
+
+                            {
+                              role:
+                                newRole,
+                            }
+                          );
+
+                          toast.success(
+                            "Role updated successfully"
+                          );
+
+                          fetchUsers();
+
+                        } catch (error) {
+
+                          console.log(error);
+
+                          toast.error(
+                            "Failed to update role"
+                          );
+                        }
+                      }}
+
+                      className="
+                        bg-indigo-600
+                        text-white
+                        px-3
+                        py-1
+                        rounded-md
+                        hover:bg-indigo-700
+                      "
+                    >
+                      Role
+                    </button>
+
+                    {/* DELETE */}
+
+                    <button
+                      onClick={() =>
+                        deleteUser(
+                          user.id
+                        )
+                      }
+                      className="
+                        bg-red-600
+                        text-white
+                        px-3
+                        py-1
+                        rounded-md
+                        hover:bg-red-700
+                      "
+                    >
+                      Delete
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+export default Users;

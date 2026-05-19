@@ -29,17 +29,64 @@ router.get("/", async (req, res) => {
 
 // ADD BED
 
+// ADD BED
+
 router.post("/", async (req, res) => {
 
   try {
 
-    const {
+    let {
       bed_number,
       room,
       floor,
       location,
       status,
+      guest_name,
+      emp_id,
+      guest_phone,
+      check_in,
     } = req.body;
+
+    // UPPERCASE
+
+    bed_number = bed_number.toUpperCase();
+
+    room = room.toUpperCase();
+
+    floor = floor.toUpperCase();
+
+    // VALIDATION
+
+    if (status === "occupied") {
+
+      if (
+        !guest_name ||
+        !emp_id ||
+        !guest_phone ||
+        !check_in
+      ) {
+
+        return res.status(400).json({
+          message:
+            "All staff details required",
+        });
+      }
+    }
+
+    // AVAILABLE → CLEAR DATA
+
+    if (status === "available") {
+
+      guest_name = null;
+
+      emp_id = null;
+
+      guest_phone = null;
+
+      check_in = null;
+    }
+
+    // CHECK EXISTING
 
     const existingBed = await pool.query(
       "SELECT * FROM beds WHERE bed_number=$1",
@@ -53,29 +100,60 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // INSERT
+
     const newBed = await pool.query(
+
       `
       INSERT INTO beds
-      (bed_number, room, floor, location, status)
+      (
+        bed_number,
+        room,
+        floor,
+        location,
+        status,
+        guest_name,
+        emp_id,
+        guest_phone,
+        check_in
+      )
 
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES
+      (
+        $1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9
+      )
 
       RETURNING *
       `,
+
       [
         bed_number,
         room,
         floor,
         location,
         status,
+        guest_name,
+        emp_id,
+        guest_phone,
+        check_in,
       ]
     );
 
-    res.status(201).json(newBed.rows[0]);
+    res.status(201).json(
+      newBed.rows[0]
+    );
 
   } catch (error) {
 
-    console.log(error.message);
+    console.log(error);
 
     res.status(500).json({
       message: "Server Error",

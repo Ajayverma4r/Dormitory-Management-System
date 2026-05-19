@@ -4,6 +4,7 @@ import API from "../services/api";
 import Sidebar from "../components/Sidebar";
 import BedCard from "../components/BedCard";
 import BedModal from "../components/BedModal";
+import toast from "react-hot-toast";
 
 function Beds() {
 
@@ -16,6 +17,21 @@ function Beds() {
   const [floor, setFloor] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState("");
+
+  const [showGuestModal, setShowGuestModal] =
+  useState(false);
+
+const [guestName, setGuestName] =
+  useState("");
+
+const [guestPhone, setGuestPhone] =
+  useState("");
+ 
+  const [empId, setEmpId] =
+  useState("");
+
+const [checkIn, setCheckIn] =
+  useState("");
 
   // BED DATA
 
@@ -67,52 +83,168 @@ function Beds() {
 
   const addBed = async () => {
 
-    try {
+  try {
 
-      if (
-        !bedNumber ||
-        !room ||
-        !floor ||
-        !location
-      ) {
-        alert("Please fill all fields");
-        return;
+    if (
+      !bedNumber ||
+      !room ||
+      !floor ||
+      !location
+    ) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    // DUPLICATE CHECK
+
+    const existingBed = beds.find(
+      (bed) =>
+        bed.bed_number?.toLowerCase() ===
+        bedNumber.toLowerCase()
+    );
+
+    if (existingBed) {
+      toast.error("Bed number already exists");
+      return;
+    }
+
+    // IF OCCUPIED → OPEN GUEST MODAL
+
+    if (status === "occupied") {
+
+      setShowGuestModal(true);
+
+      return;
+    }
+
+    // CREATE AVAILABLE BED
+
+    const response = await API.post(
+      "/beds",
+      {
+        bed_number: bedNumber,
+        room,
+        floor,
+        location,
+        status,
       }
+    );
 
-      const response = await API.post(
-        "/beds",
-        {
-          bed_number: bedNumber,
-          room,
-          floor,
-          location,
-          status,
-        }
+    setBeds([...beds, response.data]);
+
+    resetForm();
+
+  } catch (error) {
+
+    console.log(error);
+
+    toast.error("Server Error");
+  }
+};
+
+const resetForm = () => {
+
+  setBedNumber("");
+  setRoom("");
+  setFloor("");
+  setLocation("");
+  setStatus("available");
+
+  setGuestName("");
+  setGuestPhone("");
+  setEmpId("");
+  setCheckIn("");
+};
+
+const saveOccupiedBed = async () => {
+
+  try {
+
+    // VALIDATION
+
+    if (
+      !guestName ||
+      !empId ||
+      !guestPhone ||
+      !checkIn
+    ) {
+
+      toast.error(
+        "Please fill all details"
       );
 
-      setBeds([...beds, response.data]);
-
-      setBedNumber("");
-      setRoom("");
-      setFloor("");
-      setLocation("");
-      setStatus("available");
-
-    } catch (error) {
-
-      console.log(error);
-
-      if (
-        error.response &&
-        error.response.data.message
-      ) {
-        alert(error.response.data.message);
-      } else {
-        alert("Server Error");
-      }
+      return;
     }
-  };
 
+    // PHONE VALIDATION
+
+    if (guestPhone.length !== 10) {
+
+      toast.error(
+        "Phone number must be exactly 10 digits"
+      );
+
+      return;
+    }
+
+    // SAVE BED
+
+    const response = await API.post(
+      "/beds",
+      {
+        bed_number: bedNumber,
+        room,
+        floor,
+        location,
+        status,
+
+        guest_name: guestName,
+
+        emp_id: empId,
+
+        guest_phone: guestPhone,
+
+        check_in: checkIn,
+      }
+    );
+
+    // FORMAT RESPONSE
+
+    const formattedBed = {
+
+      ...response.data,
+
+      guest: {
+        name:
+          response.data.guest_name,
+
+        empId:
+          response.data.emp_id,
+
+        phone:
+          response.data.guest_phone,
+
+        checkIn:
+          response.data.check_in,
+      },
+    };
+
+    setBeds([
+      ...beds,
+      formattedBed,
+    ]);
+
+    setShowGuestModal(false);
+
+    resetForm();
+
+  } catch (error) {
+
+    console.log(error);
+
+    toast.error("Server Error");
+  }
+};
   // DELETE BED
 
   const deleteBed = async (id) => {
@@ -141,7 +273,7 @@ function Beds() {
 
       console.log(error);
 
-      alert("Failed to delete bed");
+      toast.error("Failed to delete bed");
     }
   };
 
@@ -156,20 +288,34 @@ const updateBed = async (updatedBed) => {
       `/beds/${updatedBed.id}`,
 
       {
-        status: updatedBed.status,
+  room: updatedBed.room,
 
-        guest_name:
-          updatedBed.guest?.name || "",
+  floor: updatedBed.floor,
 
-        emp_id:
-          updatedBed.guest?.empId || "",
+  location: updatedBed.location,
 
-        guest_phone:
-          updatedBed.guest?.phone || "",
+  status: updatedBed.status,
 
-        check_in:
-          updatedBed.guest?.checkIn || "",
-      }
+  guest_name:
+    updatedBed.status === "available"
+      ? null
+      : updatedBed.guest?.name || null,
+
+  emp_id:
+    updatedBed.status === "available"
+      ? null
+      : updatedBed.guest?.empId || null,
+
+  guest_phone:
+    updatedBed.status === "available"
+      ? null
+      : updatedBed.guest?.phone || null,
+
+  check_in:
+    updatedBed.status === "available"
+      ? null
+      : updatedBed.guest?.checkIn || null,
+}
     );
 
     const updatedBeds = beds.map((bed) =>
@@ -203,7 +349,7 @@ const updateBed = async (updatedBed) => {
 
     console.log(error);
 
-    alert("Failed to update bed");
+    toast.error("Failed to update bed");
   }
 };
 
@@ -217,7 +363,15 @@ const updateBed = async (updatedBed) => {
 
       {/* MAIN CONTENT */}
 
-      <div className="p-2 w-full text-sm">
+      <div className="
+  p-2
+  w-full
+  text-sm
+  md:ml-64
+  mt-14
+  md:mt-0
+  overflow-x-hidden
+">
 
         {/* HEADER */}
 
@@ -473,6 +627,152 @@ const updateBed = async (updatedBed) => {
           </button>
 
         </div>
+
+        {/* GUEST MODAL */}
+
+{/* GUEST MODAL */}
+
+{showGuestModal && (
+
+  <div className="
+    fixed
+    inset-0
+    bg-black/50
+    flex
+    justify-center
+    items-center
+    z-50
+  ">
+
+    <div className="
+      bg-white
+      p-6
+      rounded-xl
+      w-[400px]
+      shadow-xl
+    ">
+
+      <h2 className="
+        text-2xl
+        font-bold
+        mb-5
+      ">
+        Person Details
+      </h2>
+
+      <div className="flex flex-col gap-4">
+
+        {/* GUEST NAME */}
+
+        <input
+          type="text"
+          placeholder="Person Name"
+          value={guestName}
+          onChange={(e) =>
+            setGuestName(e.target.value)
+          }
+          className="
+            border
+            p-3
+            rounded-lg
+          "
+        />
+
+        {/* PHONE */}
+
+       <input
+  type="text"
+  placeholder="Phone Number"
+  value={guestPhone}
+  onChange={(e) => {
+
+    const value =
+      e.target.value.replace(/\D/g, "");
+
+    if (value.length <= 10) {
+      setGuestPhone(value);
+    }
+  }}
+  className="
+    border
+    p-3
+    rounded-lg
+  "
+/>
+
+        {/* EMP ID */}
+
+        <input
+          type="text"
+          placeholder="EMP ID"
+          value={empId}
+          onChange={(e) =>
+            setEmpId(e.target.value)
+          }
+          className="
+            border
+            p-3
+            rounded-lg
+          "
+        />
+
+        {/* CHECK IN */}
+
+        <input
+          type="date"
+          value={checkIn}
+          onChange={(e) =>
+            setCheckIn(e.target.value)
+          }
+          className="
+            border
+            p-3
+            rounded-lg
+          "
+        />
+
+      </div>
+
+      <div className="
+        flex
+        gap-3
+        mt-5
+      ">
+
+        <button
+          onClick={saveOccupiedBed}
+          className="
+            bg-blue-600
+            text-white
+            px-5
+            py-2
+            rounded-lg
+          "
+        >
+          Save
+        </button>
+
+        <button
+          onClick={() =>
+            setShowGuestModal(false)
+          }
+          className="
+            bg-gray-600
+            text-white
+            px-5
+            py-2
+            rounded-lg
+          "
+        >
+          Cancel
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
         {/* BED GRID */}
 
