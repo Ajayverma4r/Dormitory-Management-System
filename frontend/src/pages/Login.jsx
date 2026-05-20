@@ -1,10 +1,14 @@
+import bgImage from "../assets/bg.jpg";
+
+import logo from "../assets/logo.png";
+
+import leoniaLogo from "../assets/Leonia.webp";
+
 import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
 import API from "../services/api";
-
-import toast from "react-hot-toast";
 
 
 function Login() {
@@ -17,6 +21,10 @@ function Login() {
   const [password, setPassword] =
     useState("");
 
+  const [error, setError] =
+    useState("");
+
+
   const handleLogin = async (e) => {
 
     e.preventDefault();
@@ -25,128 +33,286 @@ function Login() {
 
       const response =
         await API.post(
+
           "/auth/login",
+
           {
             username,
             password,
           }
         );
 
-      // SAVE TOKEN
-
       localStorage.setItem(
+
         "token",
+
         response.data.token
       );
 
-      // SAVE USER
-
       localStorage.setItem(
+
         "user",
+
         JSON.stringify(
           response.data.user
         )
       );
 
-      toast.success("Login Success");
-
       navigate("/dashboard");
 
     } catch (error) {
 
-      console.log(error);
-
-      toast.error("Invalid Credentials");
+      setError(
+        error.response?.data?.message
+        ||
+        "Login Failed"
+      );
     }
   };
 
+
   return (
 
-    <div className="
-      flex
-      justify-center
-      items-center
-      h-screen
-      bg-gray-100
-    ">
+    <div
+  className="
+    min-h-screen
+    flex
+    items-center
+    justify-center
+    p-4
+    bg-cover
+    bg-center
+    relative
+  "
 
-      <form
-        onSubmit={handleLogin}
-        className="
-          bg-white
-          p-8
-          rounded-xl
-          shadow-md
-          w-96
-        "
-      >
+  style={{
+    backgroundImage:
+      `url(${bgImage})`
+  }}
+>
 
-        <h1 className="
-          text-3xl
-          font-bold
+  <div className="
+  absolute
+  inset-0
+  bg-black/40
+  backdrop-blur-[2px]
+"></div>
+
+{/* LEONIA LOGO */}
+
+<img
+  src={leoniaLogo}
+
+  alt="Leonia"
+
+  className="
+    absolute
+    top-5
+    left-6
+    w-44
+    object-contain
+    drop-shadow-lg
+    select-none
+  "
+/>
+
+      {/* LOGIN CARD */}
+
+      <div className="
+        relative z-10
+        w-full
+        max-w-sm
+        bg-white/70
+        backdrop-blur-xl
+        border
+        border-white/30
+        shadow-2xl
+        rounded-3xl
+        p-2
+      ">
+
+        {/* TITLE */}
+
+        <div className="
           text-center
-          mb-6
+          mb-8
         ">
-          Login
-        </h1>
 
-        {/* USERNAME */}
+          <h1 className="
+  text-2xl
+  font-bold
+  text-gray-800
+  whitespace-nowrap
+">
+  Leonia Holistic Destination
+</h1>
 
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) =>
-            setUsername(e.target.value)
-          }
-          className="
-            w-full
-            border
+          <p className="
+            text-gray-500
+            mt-2
+          ">
+            Bed Management System
+          </p>
+
+        </div>
+
+        
+
+        {/* ERROR */}
+
+        {error && (
+
+          <div className="
+            bg-red-100
+            text-red-600
             p-3
-            rounded-md
+            rounded-xl
+            text-sm
             mb-4
-            outline-none
-          "
-          required
-        />
+            text-center
+          ">
 
-        {/* PASSWORD */}
+            {error}
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
+          </div>
+        )}
+
+        {/* FORM */}
+
+        <form
+          onSubmit={handleLogin}
           className="
-            w-full
-            border
-            p-3
-            rounded-md
-            mb-4
-            outline-none
-          "
-          required
-        />
-
-        {/* BUTTON */}
-
-        <button
-          type="submit"
-          className="
-            w-full
-            bg-blue-600
-            text-white
-            py-3
-            rounded-md
-            hover:bg-blue-700
-          "
+  flex
+  flex-col
+  gap-6
+  mt-6
+"
         >
-          Login
-        </button>
 
-      </form>
+          {/* USERNAME */}
+
+          <input
+            type="text"
+
+            placeholder="Username"
+
+            value={username}
+
+            onChange={(e) =>
+              setUsername(
+                e.target.value
+              )
+            }
+
+            required
+
+            className="
+  w-full
+  px-4
+  py-2
+  rounded-2xl
+  bg-white/60
+  backdrop-blur-md
+  border
+  border-white/30
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  transition-all
+  text-gray-700
+  placeholder:text-gray-400
+"
+          />
+
+          {/* PASSWORD */}
+
+          <input
+            type="password"
+
+            placeholder="Password"
+
+            value={password}
+
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+
+            required
+
+           className="
+  w-full
+  px-4
+  py-2
+  rounded-2xl
+  bg-white/60
+  backdrop-blur-md
+  border
+  border-white/30
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  transition-all
+  text-gray-700
+  placeholder:text-gray-400
+"
+          />
+
+          {/* BUTTON */}
+
+          <button
+            type="submit"
+
+            className="
+  w-full
+  py-2
+  rounded-2xl
+  bg-gradient-to-r
+  from-blue-500
+  via-indigo-500
+  to-purple-500
+  text-white
+  font-semibold
+  text-lg
+  shadow-lg
+  hover:scale-[1.02]
+  hover:shadow-2xl
+  transition-all
+  duration-300
+"
+          >
+
+            Login
+
+          </button>
+
+        </form>
+
+      </div>
+
+      {/* WATERMARK LOGO */}
+
+<img
+  src={logo}
+
+  alt="Ajay Verma"
+
+  className="
+    absolute
+    bottom-4
+    right-6
+    w-39
+    opacity-10
+    hover:opacity-30
+    transition-all
+    duration-300
+    select-none
+    pointer-events-none
+  "
+/>
 
     </div>
   );
