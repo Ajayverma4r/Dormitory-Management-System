@@ -1,4 +1,5 @@
 const express = require("express");
+
 const pool = require("../config/db");
 
 const router = express.Router();
@@ -29,8 +30,6 @@ router.get("/", async (req, res) => {
 
 // ADD BED
 
-// ADD BED
-
 router.post("/", async (req, res) => {
 
   try {
@@ -41,6 +40,7 @@ router.post("/", async (req, res) => {
       floor,
       location,
       status,
+      gender_type,
       guest_name,
       emp_id,
       guest_phone,
@@ -57,6 +57,18 @@ router.post("/", async (req, res) => {
 
     // VALIDATION
 
+    if (
+      !gender_type
+    ) {
+
+      return res.status(400).json({
+        message:
+          "Please select dormitory type",
+      });
+    }
+
+    // OCCUPIED VALIDATION
+
     if (status === "occupied") {
 
       if (
@@ -68,12 +80,12 @@ router.post("/", async (req, res) => {
 
         return res.status(400).json({
           message:
-            "All staff details required",
+            "All guest details required",
         });
       }
     }
 
-    // AVAILABLE → CLEAR DATA
+    // AVAILABLE → CLEAR GUEST DATA
 
     if (status === "available") {
 
@@ -86,66 +98,80 @@ router.post("/", async (req, res) => {
       check_in = null;
     }
 
-    // CHECK EXISTING
+    // CHECK EXISTING BED
 
-    const existingBed = await pool.query(
-      "SELECT * FROM beds WHERE bed_number=$1",
-      [bed_number]
-    );
+    const existingBed =
+      await pool.query(
 
-    if (existingBed.rows.length > 0) {
+        `
+        SELECT *
+        FROM beds
+        WHERE bed_number=$1
+        `,
+
+        [bed_number]
+      );
+
+    if (
+      existingBed.rows.length > 0
+    ) {
 
       return res.status(400).json({
-        message: "Bed already exists",
+        message:
+          "Bed already exists",
       });
     }
 
-    // INSERT
+    // INSERT BED
 
-    const newBed = await pool.query(
+    const newBed =
+      await pool.query(
 
-      `
-      INSERT INTO beds
-      (
-        bed_number,
-        room,
-        floor,
-        location,
-        status,
-        guest_name,
-        emp_id,
-        guest_phone,
-        check_in
-      )
+        `
+        INSERT INTO beds
+        (
+          bed_number,
+          room,
+          floor,
+          location,
+          status,
+          gender_type,
+          guest_name,
+          emp_id,
+          guest_phone,
+          check_in
+        )
 
-      VALUES
-      (
-        $1,
-        $2,
-        $3,
-        $4,
-        $5,
-        $6,
-        $7,
-        $8,
-        $9
-      )
+        VALUES
+        (
+          $1,
+          $2,
+          $3,
+          $4,
+          $5,
+          $6,
+          $7,
+          $8,
+          $9,
+          $10
+        )
 
-      RETURNING *
-      `,
+        RETURNING *
+        `,
 
-      [
-        bed_number,
-        room,
-        floor,
-        location,
-        status,
-        guest_name,
-        emp_id,
-        guest_phone,
-        check_in,
-      ]
-    );
+        [
+          bed_number,
+          room,
+          floor,
+          location,
+          status,
+          gender_type,
+          guest_name,
+          emp_id,
+          guest_phone,
+          check_in,
+        ]
+      );
 
     res.status(201).json(
       newBed.rows[0]
@@ -168,44 +194,60 @@ router.put("/:id", async (req, res) => {
 
   try {
 
-    const { id } = req.params;
+    const { id } =
+      req.params;
 
     const {
+      room,
+      floor,
+      location,
       status,
+      gender_type,
       guest_name,
       emp_id,
       guest_phone,
       check_in,
     } = req.body;
 
-    const updatedBed = await pool.query(
+    const updatedBed =
+      await pool.query(
 
-      `
-      UPDATE beds
+        `
+        UPDATE beds
 
-      SET
-        status = $1,
-        guest_name = $2,
-        emp_id = $3,
-        guest_phone = $4,
-        check_in = $5
+        SET
+          room = $1,
+          floor = $2,
+          location = $3,
+          status = $4,
+          gender_type = $5,
+          guest_name = $6,
+          emp_id = $7,
+          guest_phone = $8,
+          check_in = $9
 
-      WHERE id = $6
+        WHERE id = $10
 
-      RETURNING *
-      `,
+        RETURNING *
+        `,
 
-      [
-        status,
-        guest_name,
-        emp_id,
-        guest_phone,
-        check_in,
-        id,
-      ]
+        [
+          room,
+          floor,
+          location,
+          status,
+          gender_type,
+          guest_name,
+          emp_id,
+          guest_phone,
+          check_in,
+          id,
+        ]
+      );
+
+    res.json(
+      updatedBed.rows[0]
     );
-
-    res.json(updatedBed.rows[0]);
 
   } catch (error) {
 
@@ -224,15 +266,22 @@ router.delete("/:id", async (req, res) => {
 
   try {
 
-    const { id } = req.params;
+    const { id } =
+      req.params;
 
     await pool.query(
-      "DELETE FROM beds WHERE id = $1",
+
+      `
+      DELETE FROM beds
+      WHERE id = $1
+      `,
+
       [id]
     );
 
     res.json({
-      message: "Bed deleted successfully",
+      message:
+        "Bed deleted successfully",
     });
 
   } catch (error) {

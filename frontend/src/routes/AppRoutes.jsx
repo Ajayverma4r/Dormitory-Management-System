@@ -23,11 +23,53 @@ function ProtectedRoute({ children }) {
   const token =
     localStorage.getItem("token");
 
-  return token
-    ? children
-    : <Navigate to="/" />;
-}
+  // NO TOKEN
 
+  if (!token) {
+
+    return <Navigate to="/" />;
+  }
+
+  try {
+
+    // DECODE TOKEN
+
+    const payload = JSON.parse(
+
+      atob(
+        token.split(".")[1]
+      )
+    );
+
+    // CHECK EXPIRY
+
+    const isExpired =
+
+      payload.exp * 1000 <
+      Date.now();
+
+    if (isExpired) {
+
+      // REMOVE TOKEN
+
+      localStorage.removeItem(
+        "token"
+      );
+
+      localStorage.removeItem(
+        "user"
+      );
+
+      return <Navigate to="/" />;
+    }
+
+  } catch (error) {
+
+    return <Navigate to="/" />;
+  }
+
+  return children;
+}
 
 function AppRoutes() {
 
@@ -71,15 +113,26 @@ function AppRoutes() {
         {/* BEDS */}
 
         <Route
-          path="/beds"
-          element={
-            <ProtectedRoute>
+  path="/boys"
+  element={
+    <ProtectedRoute>
 
-              <Beds />
+      <Beds type="boys" />
 
-            </ProtectedRoute>
-          }
-        />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/girls"
+  element={
+    <ProtectedRoute>
+
+      <Beds type="girls" />
+
+    </ProtectedRoute>
+  }
+/>
 
         {/* REPORTS */}
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 import {
   FaBars,
@@ -124,59 +124,157 @@ function Sidebar() {
           gap-5
         ">
 
-          <Link
+          <NavLink
             to="/dashboard"
             onClick={() =>
               setOpen(false)
             }
-            className="
-              text-lg
-              hover:text-blue-300
-            "
+            className={({ isActive }) =>
+
+  `
+  px-3
+  py-2
+  rounded-lg
+  transition
+
+  ${
+
+    isActive
+
+      ? "bg-blue-600 text-white"
+
+      : "hover:bg-gray-700"
+  }
+`
+}
           >
             Dashboard
-          </Link>
+          </NavLink>
 
-          <Link
-            to="/beds"
-            onClick={() =>
-              setOpen(false)
-            }
-            className="
-              text-lg
-              hover:text-blue-300
-            "
-          >
-            Beds
-          </Link>
+          <div>
 
-          <Link
+  <h2 className="
+    text-lg
+    font-semibold
+    mb-2
+  ">
+    Beds
+  </h2>
+
+  <div className="
+    flex
+    flex-col
+    gap-2
+    ml-4
+  ">
+
+    <NavLink
+      to="/boys"
+      className={({ isActive }) =>
+
+  `
+  px-3
+  py-2
+  rounded-lg
+  transition
+
+  ${
+
+    isActive
+
+      ? "bg-blue-600 text-white"
+
+      : "hover:bg-gray-700"
+  }
+`
+}
+    >
+      Boys Dormitory
+    </NavLink>
+
+    <NavLink
+      to="/girls"
+      className={({ isActive }) =>
+
+  `
+  px-3
+  py-2
+  rounded-lg
+  transition
+
+  ${
+
+    isActive
+
+      ? "bg-pink-400 text-white"
+
+      : "hover:bg-pink-100"
+  }
+`
+}
+    >
+      Girls Dormitory
+    </NavLink>
+
+  </div>
+
+</div>
+
+          <NavLink
             to="/reports"
             onClick={() =>
               setOpen(false)
             }
-            className="
-              text-lg
-              hover:text-blue-300
-            "
+           className={({ isActive }) =>
+
+  `
+  px-3
+  py-2
+  rounded-lg
+  transition
+
+  ${
+
+    isActive
+
+      ? "bg-blue-600 text-white"
+
+      : "hover:bg-gray-700"
+  }
+`
+}
           >
             Reports
-          </Link>
+          </NavLink>
 
           {user?.role === "admin" && (
 
-            <Link
+            <NavLink
               to="/users"
               onClick={() =>
                 setOpen(false)
               }
-              className="
-                text-lg
-                hover:text-blue-300
-              "
+              className={({ isActive }) =>
+
+  `
+  px-3
+  py-2
+  rounded-lg
+  transition
+
+  ${
+
+    isActive
+
+      ? "bg-blue-600 text-white"
+
+      : "hover:bg-gray-700"
+  }
+`
+}
             >
               Users
-            </Link>
+            </NavLink>
 
           )}
 

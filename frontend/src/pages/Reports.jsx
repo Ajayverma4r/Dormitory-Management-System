@@ -11,6 +11,7 @@ function Reports() {
 
   const [statusFilter, setStatusFilter] = useState("");
 
+  const [genderFilter, setGenderFilter] = useState("");
   // FETCH DATA
 
   const fetchBeds = async () => {
@@ -35,6 +36,18 @@ function Reports() {
 
   // EXPORT CSV
 
+  const reportTitle =
+
+  genderFilter === "boys"
+
+    ? "Boys Dormitory Report"
+
+    : genderFilter === "girls"
+
+      ? "Girls Dormitory Report"
+
+      : "All Dormitory Report";
+
   const exportCSV = () => {
 
     // FILTERED DATA
@@ -50,6 +63,7 @@ function Reports() {
           )
 
         ||
+        
 
         bed.guest_name
           ?.toLowerCase()
@@ -65,16 +79,27 @@ function Reports() {
             searchTerm.toLowerCase()
           );
 
+          const matchesGender =
+
+  genderFilter === "" ||
+
+  bed.gender_type === genderFilter;
+
+
       const matchesStatus =
 
         statusFilter === "" ||
 
         bed.status === statusFilter;
 
-      return (
-        matchesSearch &&
-        matchesStatus
-      );
+    return (
+
+  matchesSearch &&
+
+  matchesStatus &&
+
+  matchesGender
+);
     });
 
     // HEADERS
@@ -114,13 +139,17 @@ function Reports() {
 
     const csvContent = [
 
-      headers.join(","),
+  [reportTitle],
 
-      ...rows.map((row) =>
-        row.join(",")
-      ),
+  [],
 
-    ].join("\n");
+  headers.join(","),
+
+  ...rows.map((row) =>
+    row.join(",")
+  ),
+
+].join("\n");
 
     // DOWNLOAD
 
@@ -148,7 +177,7 @@ function Reports() {
 
     const originalTitle = document.title;
 
-    document.title = "Dormitory Report";
+    document.title = reportTitle;
 
     window.print();
 
@@ -250,6 +279,36 @@ function Reports() {
 
           </select>
 
+          {/*gender Filter */}
+
+          <select
+  value={genderFilter}
+  onChange={(e) =>
+    setGenderFilter(
+      e.target.value
+    )
+  }
+  className="
+    border
+    p-2
+    rounded-md
+  "
+>
+
+  <option value="">
+    All Dormitory
+  </option>
+
+  <option value="boys">
+    Boys Dormitory
+  </option>
+
+  <option value="girls">
+    Girls Dormitory
+  </option>
+
+</select>
+
           {/* EXPORT */}
 
           <button
@@ -283,6 +342,17 @@ function Reports() {
           </button>
 
         </div>
+
+        <h2 className="
+  text-xl
+  font-bold
+  mb-3
+  text-center
+">
+
+  {reportTitle}
+
+</h2>
 
         {/* TABLE */}
 
@@ -368,6 +438,12 @@ function Reports() {
                         searchTerm.toLowerCase()
                       );
 
+                      const matchesGender =
+
+  genderFilter === "" ||
+
+  bed.gender_type === genderFilter;
+
                   const matchesStatus =
 
                     statusFilter === "" ||
@@ -375,9 +451,13 @@ function Reports() {
                     bed.status === statusFilter;
 
                   return (
-                    matchesSearch &&
-                    matchesStatus
-                  );
+
+  matchesSearch &&
+
+  matchesStatus &&
+
+  matchesGender
+);
                 })
 
                 .map((bed) => (

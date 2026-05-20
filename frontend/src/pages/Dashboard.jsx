@@ -7,6 +7,8 @@ function Dashboard() {
 
   const [beds, setBeds] = useState([]);
 
+  const [recentFilter, setRecentFilter ] = useState("");
+
   // FETCH DATA
 
   const fetchBeds = async () => {
@@ -49,6 +51,64 @@ function Dashboard() {
     (bed) => bed.location === "outside"
   ).length;
 
+  // BOYS / GIRLS
+
+const boysBeds = beds.filter(
+
+  (bed) =>
+    bed.gender_type === "boys"
+
+).length;
+
+const girlsBeds = beds.filter(
+
+  (bed) =>
+    bed.gender_type === "girls"
+
+).length;
+
+// TOTAL OCCUPANCY
+
+const totalOccupied =
+  beds.filter(
+
+    (bed) =>
+      bed.status === "occupied"
+
+  ).length;
+
+
+// BOYS OCCUPANCY
+
+const boysOccupied =
+  beds.filter(
+
+    (bed) =>
+
+      bed.gender_type === "boys"
+
+      &&
+
+      bed.status === "occupied"
+
+  ).length;
+
+
+// GIRLS OCCUPANCY
+
+const girlsOccupied =
+  beds.filter(
+
+    (bed) =>
+
+      bed.gender_type === "girls"
+
+      &&
+
+      bed.status === "occupied"
+
+  ).length;
+
   // OCCUPANCY %
 
   const occupancyRate =
@@ -60,10 +120,39 @@ function Dashboard() {
 
   // RECENT OCCUPIED
 
-  const occupiedList = beds.filter(
-    (bed) => bed.status === "occupied"
-  );
+ const occupiedList = beds
 
+  .filter((bed) => {
+
+    const isOccupied =
+
+      bed.status === "occupied";
+
+    const matchesDormitory =
+
+      recentFilter === ""
+
+      ||
+
+      bed.gender_type ===
+      recentFilter;
+
+    return (
+      isOccupied &&
+      matchesDormitory
+    );
+  })
+
+  // NEWEST FIRST
+
+  .sort(
+    (a, b) => b.id - a.id
+  )
+
+  // ONLY 50
+
+  .slice(0, 50);
+  
   return (
 
    <div className="
@@ -100,217 +189,338 @@ function Dashboard() {
           Dashboard
         </h1>
 
-        {/* STATS */}
-
-        <div className="
-          grid
-          grid-cols-2
-          md:grid-cols-5
-          gap-3
-        ">
-
-          {/* TOTAL */}
-
-          <div className="
-            bg-blue-100
-            p-2
-            rounded-xl
-            text-center
-            shadow-sm
-            hover:scale-105
-            transition-all
-            duration-300
-          ">
-
-            <h2 className="font-semibold">
-              Total Beds
-            </h2>
-
-            <p className="
-              text-2xl
-              font-bold
-              text-blue-700
-            ">
-              {totalBeds}
-            </p>
-
-          </div>
-
-          {/* AVAILABLE */}
-
-          <div className="
-            bg-green-100
-            p-2
-            rounded-xl
-            text-center
-            shadow-sm
-            hover:scale-105
-            transition-all
-            duration-300
-          ">
-
-            <h2 className="font-semibold">
-              Available
-            </h2>
-
-            <p className="
-              text-2xl
-              font-bold
-              text-green-700
-            ">
-              {availableBeds}
-            </p>
-
-          </div>
-
-          {/* OCCUPIED */}
-
-          <div className="
-            bg-red-100
-            p-2
-            rounded-xl
-            text-center
-            shadow-sm
-            hover:scale-105
-            transition-all
-            duration-300
-          ">
-
-            <h2 className="font-semibold">
-              Occupied
-            </h2>
-
-            <p className="
-              text-2xl
-              font-bold
-              text-red-700
-            ">
-              {occupiedBeds}
-            </p>
-
-          </div>
-
-          {/* INSIDE */}
-
-          <div className="
-            bg-indigo-100
-            p-2
-            rounded-xl
-            text-center
-            shadow-sm
-            hover:scale-105
-            transition-all
-            duration-300
-          ">
-
-            <h2 className="font-semibold">
-              Inside
-            </h2>
-
-            <p className="
-              text-2xl
-              font-bold
-              text-indigo-700
-            ">
-              {insideBeds}
-            </p>
-
-          </div>
-
-          {/* OUTSIDE */}
-
-          <div className="
-            bg-orange-100
-            p-2
-            rounded-xl
-            text-center
-            shadow-sm
-            hover:scale-105
-            transition-all
-            duration-300
-          ">
-
-            <h2 className="font-semibold">
-              Outside
-            </h2>
-
-            <p className="
-              text-2xl
-              font-bold
-              text-orange-700
-            ">
-              {outsideBeds}
-            </p>
-
-          </div>
-
-        </div>
-
-        {/* OCCUPANCY RATE */}
-
-        {/* OCCUPANCY RATE */}
-
-<div className="
-  mt-6
-  bg-white
-  p-6
-  rounded-xl
-  shadow-sm
+       <div className="
   flex
-  flex-col
-  items-center
   justify-center
+  gap-8
+  mt-10
+  flex-wrap
 ">
 
-  <h2 className="
-    text-xl
-    font-bold
-    mb-5
+  {/* TOTAL */}
+
+  <div className="
+    bg-white
+    p-5
+    rounded-2xl
+    shadow-md
+    w-72
+    text-center
   ">
-    Occupancy Rate
-  </h2>
 
-  <div className="relative w-40 h-40">
+    <h2 className="
+      text-lg
+      font-bold
+      mb-4
+    ">
+      Total Occupancy
+    </h2>
 
-    {/* OUTER CIRCLE */}
+    <div className="
+      relative
+      w-40
+      h-40
+      mx-auto
+    ">
 
-    <div
-      className="
-       w-40
-h-40
-        rounded-full
-        flex
-        items-center
-        justify-center
-      "
-      style={{
-        background: `conic-gradient(
-          #2563eb ${occupancyRate * 3.6}deg,
-          #e5e7eb 0deg
-        )`,
-      }}
-    >
+      <svg
+        className="
+          w-40
+          h-40
+          -rotate-90
+        "
+      >
 
-      {/* INNER CIRCLE */}
+        <circle
+          cx="80"
+          cy="80"
+          r="65"
+          stroke="#EDE9FE"
+          strokeWidth="12"
+          fill="none"
+        />
+
+        <circle
+          cx="80"
+          cy="80"
+          r="65"
+          stroke="#7C3AED"
+          strokeWidth="12"
+          fill="none"
+
+          strokeDasharray={
+            2 * Math.PI * 65
+          }
+
+          strokeDashoffset={
+            2 * Math.PI * 65 *
+
+            (
+              1 -
+              totalOccupied /
+              (totalBeds || 1)
+            )
+          }
+
+          strokeLinecap="round"
+        />
+
+      </svg>
 
       <div className="
-        w-28
-        h-28
-        bg-white
-        rounded-full
+        absolute
+        inset-0
         flex
+        flex-col
         items-center
         justify-center
-        shadow-inner
       ">
 
-        <span className="
-          text-2xl
+        <p className="
+          text-4xl
+          font-bold
+          text-purple-600
+        ">
+
+          {Math.round(
+            (
+              totalOccupied /
+              (totalBeds || 1)
+            ) * 100
+          )}%
+
+        </p>
+
+        <p className="
+          text-sm
+          text-gray-500
+        ">
+
+          {totalOccupied}/{totalBeds}
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* BOYS */}
+
+  <div className="
+    bg-white
+    p-5
+    rounded-2xl
+    shadow-md
+    w-72
+    text-center
+  ">
+
+    <h2 className="
+      text-lg
+      font-bold
+      text-blue-700
+      mb-4
+    ">
+      Boys Occupancy
+    </h2>
+
+    <div className="
+      relative
+      w-40
+      h-40
+      mx-auto
+    ">
+
+      <svg
+        className="
+          w-40
+          h-40
+          -rotate-90
+        "
+      >
+
+        <circle
+          cx="80"
+          cy="80"
+          r="65"
+          stroke="#DBEAFE"
+          strokeWidth="12"
+          fill="none"
+        />
+
+        <circle
+          cx="80"
+          cy="80"
+          r="65"
+          stroke="#2563EB"
+          strokeWidth="12"
+          fill="none"
+
+          strokeDasharray={
+            2 * Math.PI * 65
+          }
+
+          strokeDashoffset={
+            2 * Math.PI * 65 *
+
+            (
+              1 -
+              boysOccupied /
+              (boysBeds || 1)
+            )
+          }
+
+          strokeLinecap="round"
+        />
+
+      </svg>
+
+      <div className="
+        absolute
+        inset-0
+        flex
+        flex-col
+        items-center
+        justify-center
+      ">
+
+        <p className="
+          text-4xl
           font-bold
           text-blue-600
         ">
-          {occupancyRate}%
-        </span>
+
+          {Math.round(
+            (
+              boysOccupied /
+              (boysBeds || 1)
+            ) * 100
+          )}%
+
+        </p>
+
+        <p className="
+          text-sm
+          text-gray-500
+        ">
+
+          {boysOccupied}/{boysBeds}
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  {/* GIRLS */}
+
+  <div className="
+    bg-white
+    p-5
+    rounded-2xl
+    shadow-md
+    w-72
+    text-center
+  ">
+
+    <h2 className="
+      text-lg
+      font-bold
+      text-pink-600
+      mb-4
+    ">
+      Girls Occupancy
+    </h2>
+
+    <div className="
+      relative
+      w-40
+      h-40
+      mx-auto
+    ">
+
+      <svg
+        className="
+          w-40
+          h-40
+          -rotate-90
+        "
+      >
+
+        <circle
+          cx="80"
+          cy="80"
+          r="65"
+          stroke="#FBCFE8"
+          strokeWidth="12"
+          fill="none"
+        />
+
+        <circle
+          cx="80"
+          cy="80"
+          r="65"
+          stroke="#EC4899"
+          strokeWidth="12"
+          fill="none"
+
+          strokeDasharray={
+            2 * Math.PI * 65
+          }
+
+          strokeDashoffset={
+            2 * Math.PI * 65 *
+
+            (
+              1 -
+              girlsOccupied /
+              (girlsBeds || 1)
+            )
+          }
+
+          strokeLinecap="round"
+        />
+
+      </svg>
+
+      <div className="
+        absolute
+        inset-0
+        flex
+        flex-col
+        items-center
+        justify-center
+      ">
+
+        <p className="
+          text-4xl
+          font-bold
+          text-pink-600
+        ">
+
+          {Math.round(
+            (
+              girlsOccupied /
+              (girlsBeds || 1)
+            ) * 100
+          )}%
+
+        </p>
+
+        <p className="
+          text-sm
+          text-gray-500
+        ">
+
+          {girlsOccupied}/{girlsBeds}
+
+        </p>
 
       </div>
 
@@ -319,6 +529,7 @@ h-40
   </div>
 
 </div>
+          
 
         {/* RECENT OCCUPIED */}
 
@@ -330,13 +541,58 @@ h-40
           shadow-sm
         ">
 
-          <h2 className="
-            text-xl
-            font-bold
-            mb-3
-          ">
-            Recent Occupied Beds
-          </h2>
+         <div className="
+  flex
+  justify-between
+  items-center
+  mb-3
+">
+
+  <h2 className="
+    text-xl
+    font-bold
+  ">
+    Recent Occupied Beds
+  </h2>
+
+  <select
+    value={recentFilter}
+    onChange={(e) =>
+      setRecentFilter(
+        e.target.value
+      )
+    }
+    className="
+ bg-white/70 backdrop-blur-md
+  backdrop-blur-md
+  border
+  border-gray-200
+  rounded-xl
+  px-3
+  py-1.5
+  text-sm
+  shadow-sm
+  outline-none
+  hover:bg-white/80
+  transition-all
+"
+  >
+
+    <option value="">
+      All
+    </option>
+
+    <option value="boys">
+      Boys
+    </option>
+
+    <option value="girls">
+      Girls
+    </option>
+
+  </select>
+
+</div>
 
           <div className="space-y-2">
 

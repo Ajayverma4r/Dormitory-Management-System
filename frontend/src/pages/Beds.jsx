@@ -6,7 +6,7 @@ import BedCard from "../components/BedCard";
 import BedModal from "../components/BedModal";
 import toast from "react-hot-toast";
 
-function Beds() {
+function Beds({ type }) {
 
   const [selectedBed, setSelectedBed] = useState(null);
 
@@ -17,6 +17,7 @@ function Beds() {
   const [floor, setFloor] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState("");
+  const [genderType, setGenderType] = useState("");
 
   const [showGuestModal, setShowGuestModal] =
   useState(false);
@@ -40,6 +41,11 @@ const [checkIn, setCheckIn] =
   const [statusFilter, setStatusFilter] = useState("");
 
   const [locationFilter, setLocationFilter] = useState("");
+
+  const [currentPage, setCurrentPage] =
+  useState(1);
+
+const bedsPerPage = 40;
 
   // FETCH BEDS
 
@@ -78,6 +84,16 @@ const [checkIn, setCheckIn] =
     fetchBeds();
 
   }, []);
+
+  useEffect(() => {
+
+  setCurrentPage(1);
+
+}, [
+  searchTerm,
+  statusFilter,
+  locationFilter,
+]);
 
   // ADD BED
 
@@ -127,6 +143,7 @@ const [checkIn, setCheckIn] =
         floor,
         location,
         status,
+        gender_type: type,
       }
     );
 
@@ -197,7 +214,7 @@ const saveOccupiedBed = async () => {
         floor,
         location,
         status,
-
+        gender_type: type,
         guest_name: guestName,
 
         emp_id: empId,
@@ -296,6 +313,8 @@ const updateBed = async (updatedBed) => {
 
   status: updatedBed.status,
 
+  gender_type: updatedBed.gender_type,
+
   guest_name:
     updatedBed.status === "available"
       ? null
@@ -352,6 +371,61 @@ const updateBed = async (updatedBed) => {
     toast.error("Failed to update bed");
   }
 };
+
+    // FILTERED BEDS
+
+const filteredBeds = beds.filter((bed) => {
+
+  const matchesSearch =
+    bed.bed_number
+      ?.toLowerCase()
+      .includes(
+        searchTerm.toLowerCase()
+      );
+
+  const matchesStatus =
+    statusFilter === "" ||
+    bed.status === statusFilter;
+
+  const matchesLocation =
+    locationFilter === "" ||
+    bed.location === locationFilter;
+
+ return (
+
+  bed.gender_type === type &&
+
+  matchesSearch &&
+
+  matchesStatus &&
+
+  matchesLocation
+);
+});
+
+
+// PAGINATION
+
+const indexOfLastBed =
+  currentPage * bedsPerPage;
+
+const indexOfFirstBed =
+  indexOfLastBed - bedsPerPage;
+
+const currentBeds =
+  filteredBeds.slice(
+    indexOfFirstBed,
+    indexOfLastBed
+  );
+
+const totalPages =
+  Math.max(
+    1,
+    Math.ceil(
+      filteredBeds.length /
+      bedsPerPage
+    )
+  );
 
   return (
 
@@ -517,7 +591,7 @@ const updateBed = async (updatedBed) => {
 
             <input
               type="text"
-              placeholder="Room"
+              placeholder="Hall"
               value={room}
               onChange={(e) =>
              setRoom(
@@ -580,6 +654,7 @@ const updateBed = async (updatedBed) => {
             </select>
 
             {/* STATUS */}
+
 
             <select
   value={status}
@@ -786,37 +861,102 @@ const updateBed = async (updatedBed) => {
           justify-center
         ">
 
-         {beds
-  .filter((bed) => {
+        {currentBeds.map((bed) => (
 
-    const matchesSearch =
-      bed.bed_number
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+  <BedCard
+    key={bed.id}
+    bed={bed}
+    onClick={setSelectedBed}
+  />
 
-    const matchesStatus =
-      statusFilter === "" ||
-      bed.status === statusFilter;
-
-    const matchesLocation =
-      locationFilter === "" ||
-      bed.location === locationFilter;
-
-    return (
-      matchesSearch &&
-      matchesStatus &&
-      matchesLocation
-    );
-  })
-  .map((bed) => (
-              <BedCard
-                key={bed.id}
-                bed={bed}
-                onClick={setSelectedBed}
-              />
-            ))}
+))}
 
         </div>
+
+        {/* PAGINATION styling */}
+
+{/* PAGINATION */}
+
+<div className="
+  flex
+  justify-center
+  items-center
+  gap-3
+  mt-8
+  mb-4
+">
+
+  {/* PREV */}
+
+  <button
+    disabled={currentPage === 1}
+
+    onClick={() =>
+      setCurrentPage(
+        currentPage - 1
+      )
+    }
+
+    className="
+      px-4
+      py-2
+      rounded-full
+      border
+      bg-white
+      shadow-sm
+      hover:bg-gray-100
+      disabled:opacity-40
+      transition
+    "
+  >
+    ← Prev
+  </button>
+
+  {/* PAGE NUMBER */}
+
+  <div className="
+    px-5
+    py-2
+    rounded-full
+    bg-blue-600
+    text-white
+    font-semibold
+    shadow-md
+  ">
+
+    {currentPage} / {totalPages}
+
+  </div>
+
+  {/* NEXT */}
+
+  <button
+    disabled={
+      currentPage === totalPages
+    }
+
+    onClick={() =>
+      setCurrentPage(
+        currentPage + 1
+      )
+    }
+
+    className="
+      px-4
+      py-2
+      rounded-full
+      border
+      bg-white
+      shadow-sm
+      hover:bg-gray-100
+      disabled:opacity-40
+      transition
+    "
+  >
+    Next →
+  </button>
+
+</div>
 
         {/* MODAL */}
 
