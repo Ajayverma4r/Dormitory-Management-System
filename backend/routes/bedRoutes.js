@@ -45,6 +45,11 @@ router.post("/", async (req, res) => {
       emp_id,
       guest_phone,
       check_in,
+      department,
+      fan,
+      mattress,
+      plywood,
+
     } = req.body;
 
     // UPPERCASE
@@ -139,7 +144,11 @@ router.post("/", async (req, res) => {
           guest_name,
           emp_id,
           guest_phone,
-          check_in
+          check_in,
+          department,
+          fan,
+          mattress,
+          plywood
         )
 
         VALUES
@@ -153,24 +162,46 @@ router.post("/", async (req, res) => {
           $7,
           $8,
           $9,
-          $10
+          $10,
+          $11,
+          $12,
+          $13,
+          $14
         )
 
         RETURNING *
         `,
 
-        [
-          bed_number,
-          room,
-          floor,
-          location,
-          status,
-          gender_type,
-          guest_name,
-          emp_id,
-          guest_phone,
-          check_in,
-        ]
+       [
+        bed_number,
+
+        room,
+
+        floor,
+
+        location,
+
+        status,
+
+        gender_type,
+
+        guest_name,
+
+        emp_id,
+
+        guest_phone,
+
+        check_in,
+
+        department,
+
+        fan,
+
+        mattress,
+
+        plywood,
+      ]
+
       );
 
     res.status(201).json(
@@ -207,6 +238,10 @@ router.put("/:id", async (req, res) => {
       emp_id,
       guest_phone,
       check_in,
+      department,
+      fan,
+      mattress,
+      plywood,
     } = req.body;
 
     const updatedBed =
@@ -215,34 +250,68 @@ router.put("/:id", async (req, res) => {
         `
         UPDATE beds
 
-        SET
-          room = $1,
-          floor = $2,
-          location = $3,
-          status = $4,
-          gender_type = $5,
-          guest_name = $6,
-          emp_id = $7,
-          guest_phone = $8,
-          check_in = $9
+          SET
+            room = $1,
 
-        WHERE id = $10
+            floor = $2,
+
+            location = $3,
+
+            status = $4,
+
+            gender_type = $5,
+
+            guest_name = $6,
+
+            emp_id = $7,
+
+            guest_phone = $8,
+
+            check_in = $9,
+
+            department = $10,
+
+            fan = $11,
+
+            mattress = $12,
+
+            plywood = $13
+
+          WHERE id = $14
+
 
         RETURNING *
         `,
 
-        [
-          room,
-          floor,
-          location,
-          status,
-          gender_type,
-          guest_name,
-          emp_id,
-          guest_phone,
-          check_in,
-          id,
-        ]
+       [
+  room,
+
+  floor,
+
+  location,
+
+  status,
+
+  gender_type,
+
+  guest_name,
+
+  emp_id,
+
+  guest_phone,
+
+  check_in,
+
+  department,
+
+  fan,
+
+  mattress,
+
+  plywood,
+
+  id,
+]
       );
 
     res.json(

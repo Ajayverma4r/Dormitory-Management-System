@@ -8,6 +8,16 @@ import toast from "react-hot-toast";
 
 function Beds({ type }) {
 
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  const isAdmin =
+    user?.role === "admin";
+
+  const isStaff =
+    user?.role === "staff";
+
   const [selectedBed, setSelectedBed] = useState(null);
 
   // FORM STATES
@@ -33,6 +43,22 @@ const [guestPhone, setGuestPhone] =
 
 const [checkIn, setCheckIn] =
   useState("");
+
+  const [department,
+  setDepartment] =
+  useState("");
+
+const [fan,
+  setFan] =
+  useState(false);
+
+const [mattress,
+  setMattress] =
+  useState(false);
+
+const [plywood,
+  setPlywood] =
+  useState(false);
 
   // BED DATA
 
@@ -144,6 +170,10 @@ const bedsPerPage = 40;
         location,
         status,
         gender_type: type,
+        department,
+        fan,
+        mattress,
+        plywood
       }
     );
 
@@ -171,6 +201,10 @@ const resetForm = () => {
   setGuestPhone("");
   setEmpId("");
   setCheckIn("");
+  setDepartment("");
+  setFan(false);
+  setMattress(false);
+  setPlywood(false);
 };
 
 const saveOccupiedBed = async () => {
@@ -183,6 +217,7 @@ const saveOccupiedBed = async () => {
       !guestName ||
       !empId ||
       !guestPhone ||
+      
       !checkIn
     ) {
 
@@ -222,7 +257,15 @@ const saveOccupiedBed = async () => {
         guest_phone: guestPhone,
 
         check_in: checkIn,
-      }
+
+        department,
+
+        fan,
+
+        mattress,
+
+        plywood,
+        }
     );
 
     // FORMAT RESPONSE
@@ -334,8 +377,22 @@ const updateBed = async (updatedBed) => {
     updatedBed.status === "available"
       ? null
       : updatedBed.guest?.checkIn || null,
+
+      department:
+  updatedBed.department,
+
+fan:
+  updatedBed.fan,
+
+mattress:
+  updatedBed.mattress,
+
+plywood:
+  updatedBed.plywood,
 }
     );
+
+    
 
     const updatedBeds = beds.map((bed) =>
 
@@ -549,7 +606,7 @@ const totalPages =
 
 
         {/* ADD BED FORM */}
-
+  {isAdmin && (
         <div className="
           bg-white
           p-2
@@ -702,8 +759,8 @@ const totalPages =
           </button>
 
         </div>
-
-        {/* GUEST MODAL */}
+)}
+     
 
 {/* GUEST MODAL */}
 
@@ -791,6 +848,51 @@ const totalPages =
           "
         />
 
+        {/* DEPARTMENT */}
+
+<select
+
+  value={department}
+
+  onChange={(e) =>
+    setDepartment(
+      e.target.value
+    )
+  }
+
+  className="
+    border
+    p-3
+    rounded-lg
+  "
+>
+
+  <option value="">
+    Select Department
+  </option>
+
+  <option value="IT">
+    IT
+  </option>
+
+  <option value="HR">
+    HR
+  </option>
+
+  <option value="Finance">
+    Finance
+  </option>
+
+  <option value="Operations">
+    Operations
+  </option>
+
+  <option value="Management">
+    Management
+  </option>
+
+</select>
+
         {/* CHECK IN */}
 
         <input
@@ -805,6 +907,101 @@ const totalPages =
             rounded-lg
           "
         />
+
+        {/* PROVIDED AMENITIES */}
+
+<div>
+
+  <p className="
+    font-semibold
+    mb-2
+  ">
+    Provided Amenities
+  </p>
+
+  <div className="
+    flex
+    gap-4
+    flex-wrap
+  ">
+
+    {/* FAN */}
+
+    <label className="
+      flex
+      items-center
+      gap-2
+    ">
+
+      <input
+        type="checkbox"
+
+        checked={fan}
+
+        onChange={(e) =>
+          setFan(
+            e.target.checked
+          )
+        }
+      />
+
+      Fan
+
+    </label>
+
+
+    {/* MATTRESS */}
+
+    <label className="
+      flex
+      items-center
+      gap-2
+    ">
+
+      <input
+        type="checkbox"
+
+        checked={mattress}
+
+        onChange={(e) =>
+          setMattress(
+            e.target.checked
+          )
+        }
+      />
+
+      Mattress
+
+    </label>
+
+
+    {/* PLYWOOD */}
+
+    <label className="
+      flex
+      items-center
+      gap-2
+    ">
+
+      <input
+        type="checkbox"
+
+        checked={plywood}
+
+        onChange={(e) =>
+          setPlywood(
+            e.target.checked
+          )
+        }
+      />
+
+      Plywood
+
+    </label>
+
+  </div>
+
+</div>
 
       </div>
 
@@ -968,6 +1165,8 @@ const totalPages =
             }
             deleteBed={deleteBed}
             updateBed={updateBed}
+            isAdmin={isAdmin}
+            isStaff={isStaff}
           />
         )}
 

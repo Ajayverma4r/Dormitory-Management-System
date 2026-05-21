@@ -2,6 +2,8 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 
 function BedModal({
+  isAdmin,
+  isStaff,
   bed,
   closeModal,
   deleteBed,
@@ -12,6 +14,30 @@ function BedModal({
 
   const [guestName, setGuestName] = useState(
     bed.guest?.name || ""
+  );
+
+  const [department,
+  setDepartment] =
+  useState(
+    bed.department || ""
+  );
+
+const [fan,
+  setFan] =
+  useState(
+    bed.fan || false
+  );
+
+const [mattress,
+  setMattress] =
+  useState(
+    bed.mattress || false
+  );
+
+const [plywood,
+  setPlywood] =
+  useState(
+    bed.plywood || false
   );
 
   const [empId, setEmpId] = useState(
@@ -53,7 +79,8 @@ function BedModal({
       !guestName ||
       !empId ||
       !guestPhone ||
-      !checkIn
+      !checkIn ||
+      !department
     )
   ) {
 
@@ -67,7 +94,11 @@ function BedModal({
   const updatedBed = {
     ...bed,
     status: status,
-
+    department,
+    fan,
+    mattress,
+    plywood,
+    
     guest:
   status === "occupied"
     ? {
@@ -104,7 +135,7 @@ function BedModal({
         {/* BED DETAILS */}
 
         <p>
-          <strong>Room:</strong> {bed.room}
+          <strong>Hall:</strong> {bed.room}
         </p>
 
         <p>
@@ -272,6 +303,168 @@ function BedModal({
 
 </div>
 
+{/* DEPARTMENT */}
+
+<p>
+
+  <strong>Department:</strong>
+
+  {isEditing ? (
+
+    <select
+      value={department}
+
+      onChange={(e) =>
+        setDepartment(
+          e.target.value
+        )
+      }
+
+      style={{
+        ...inputStyle,
+        width: "170px",
+      }}
+    >
+
+      <option value="">
+        Select
+      </option>
+
+      <option value="IT">
+        IT
+      </option>
+
+      <option value="HR">
+        HR
+      </option>
+
+      <option value="Finance">
+        Finance
+      </option>
+
+      <option value="Operations">
+        Operations
+      </option>
+
+      <option value="Management">
+        Management
+      </option>
+
+    </select>
+
+  ) : (
+
+    ` ${department || "-"}`
+
+  )}
+
+</p>
+
+
+{/* PROVIDED AMENITIES */}
+
+<div
+  style={{
+    marginTop: "10px",
+  }}
+>
+
+  <strong>
+    Provided Amenities:
+  </strong>
+
+  {isEditing ? (
+
+    <div
+      style={{
+        display: "flex",
+        gap: "12px",
+        marginTop: "8px",
+        flexWrap: "wrap",
+      }}
+    >
+
+      <label>
+
+        <input
+          type="checkbox"
+
+          checked={fan}
+
+          onChange={(e) =>
+            setFan(
+              e.target.checked
+            )
+          }
+        />
+
+        {" "}Fan
+
+      </label>
+
+
+      <label>
+
+        <input
+          type="checkbox"
+
+          checked={mattress}
+
+          onChange={(e) =>
+            setMattress(
+              e.target.checked
+            )
+          }
+        />
+
+        {" "}Mattress
+
+      </label>
+
+
+      <label>
+
+        <input
+          type="checkbox"
+
+          checked={plywood}
+
+          onChange={(e) =>
+            setPlywood(
+              e.target.checked
+            )
+          }
+        />
+
+        {" "}Plywood
+
+      </label>
+
+    </div>
+
+  ) : (
+
+    <div
+      style={{
+        marginTop: "5px",
+      }}
+    >
+
+      {fan && "Fan "}
+      {mattress && "Mattress "}
+      {plywood && "Plywood "}
+
+      {!fan &&
+       !mattress &&
+       !plywood &&
+       "-"}
+
+    </div>
+
+  )}
+
+</div>
+
     {/* CHECK IN */}
 
     <p>
@@ -352,7 +545,7 @@ function BedModal({
           )}
 
           {/* DELETE */}
-
+{isAdmin && (
           <button
             onClick={() => deleteBed(bed.id)}
             style={{
@@ -362,6 +555,7 @@ function BedModal({
           >
             Delete
           </button>
+          )}
 
           {/* CLOSE */}
 

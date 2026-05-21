@@ -12,9 +12,20 @@ function Reports() {
   const [statusFilter, setStatusFilter] = useState("");
 
   const [genderFilter, setGenderFilter] = useState("");
+
+  const [currentPage,
+  setCurrentPage] =
+  useState(1);
+
+  const [isPrinting,
+  setIsPrinting] =
+  useState(false);
+
+  const rowsPerPage = 40;
   // FETCH DATA
 
   const fetchBeds = async () => {
+
 
     try {
 
@@ -102,6 +113,7 @@ function Reports() {
 );
     });
 
+
     // HEADERS
 
     const headers = [
@@ -175,14 +187,98 @@ function Reports() {
 
   const printReport = () => {
 
-    const originalTitle = document.title;
+  setIsPrinting(true);
 
-    document.title = reportTitle;
+  setTimeout(() => {
+
+    const originalTitle =
+      document.title;
+
+    document.title =
+      reportTitle;
 
     window.print();
 
-    document.title = originalTitle;
-  };
+    document.title =
+      originalTitle;
+
+    setIsPrinting(false);
+
+  }, 300);
+};
+
+  // FILTERED DATA
+
+const filteredBeds = beds.filter((bed) => {
+
+  const matchesSearch =
+
+    bed.bed_number
+      ?.toLowerCase()
+      .includes(
+        searchTerm.toLowerCase()
+      )
+
+    ||
+
+    bed.guest_name
+      ?.toLowerCase()
+      .includes(
+        searchTerm.toLowerCase()
+      )
+
+    ||
+
+    bed.emp_id
+      ?.toLowerCase()
+      .includes(
+        searchTerm.toLowerCase()
+      );
+
+  const matchesGender =
+
+    genderFilter === "" ||
+
+    bed.gender_type ===
+    genderFilter;
+
+  const matchesStatus =
+
+    statusFilter === "" ||
+
+    bed.status === statusFilter;
+
+  return (
+
+    matchesSearch &&
+
+    matchesStatus &&
+
+    matchesGender
+  );
+});
+
+
+// PAGINATION
+
+const totalPages = Math.ceil(
+  filteredBeds.length /
+  rowsPerPage
+);
+
+const startIndex =
+
+  (currentPage - 1) *
+  rowsPerPage;
+
+const currentBeds =
+
+  filteredBeds.slice(
+
+    startIndex,
+
+    startIndex + rowsPerPage
+  );
 
   return (
 
@@ -374,6 +470,10 @@ function Reports() {
             <thead className="bg-gray-100">
 
               <tr>
+              
+              <th className="p-3 text-left">
+  S.No
+</th>
 
                 <th className="p-3 text-left">
                   Bed
@@ -407,141 +507,169 @@ function Reports() {
 
             </thead>
 
+        
             {/* BODY */}
 
             <tbody>
 
-              {beds
-                .filter((bed) => {
+              {(
+  isPrinting
+    ? filteredBeds
+    : currentBeds
+).map(
 
-                  const matchesSearch =
+  
+  (bed, index) => (
 
-                    bed.bed_number
-                      ?.toLowerCase()
-                      .includes(
-                        searchTerm.toLowerCase()
-                      )
+    <tr
+      key={bed.id}
+      className="
+        border-b
+        hover:bg-gray-50
+      "
+    >
 
-                    ||
+      {/* SERIAL */}
 
-                    bed.guest_name
-                      ?.toLowerCase()
-                      .includes(
-                        searchTerm.toLowerCase()
-                      )
+      <td className="p-3">
 
-                    ||
+        {startIndex + index + 1}
 
-                    bed.emp_id
-                      ?.toLowerCase()
-                      .includes(
-                        searchTerm.toLowerCase()
-                      );
+      </td>
 
-                      const matchesGender =
+      {/* BED */}
 
-  genderFilter === "" ||
+      <td className="p-3">
+        {bed.bed_number}
+      </td>
 
-  bed.gender_type === genderFilter;
+      {/* ROOM */}
 
-                  const matchesStatus =
+      <td className="p-3">
+        {bed.room}
+      </td>
 
-                    statusFilter === "" ||
+      {/* FLOOR */}
 
-                    bed.status === statusFilter;
+      <td className="p-3">
+        {bed.floor}
+      </td>
 
-                  return (
+      {/* STATUS */}
 
-  matchesSearch &&
+      <td className="p-3">
 
-  matchesStatus &&
+        <span className={`
+          px-2
+          py-1
+          rounded-full
+          text-xs
+          font-medium
 
-  matchesGender
-);
-                })
+          ${
+            bed.status === "available"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }
+        `}>
 
-                .map((bed) => (
+          {bed.status}
 
-                  <tr
-                    key={bed.id}
-                    className="
-                      border-b
-                      hover:bg-gray-50
-                    "
-                  >
+        </span>
 
-                    {/* BED */}
+      </td>
 
-                    <td className="p-3">
-                      {bed.bed_number}
-                    </td>
+      {/* NAME */}
 
-                    {/* ROOM */}
+      <td className="p-3">
+        {bed.guest_name || "-"}
+      </td>
 
-                    <td className="p-3">
-                      {bed.room}
-                    </td>
+      {/* EMP ID */}
 
-                    {/* FLOOR */}
+      <td className="p-3">
+        {bed.emp_id || "-"}
+      </td>
 
-                    <td className="p-3">
-                      {bed.floor}
-                    </td>
+      {/* CONTACT */}
 
-                    {/* STATUS */}
+      <td className="p-3">
 
-                    <td className="p-3">
+        {bed.guest_phone
+          ? `+91 ${bed.guest_phone}`
+          : "-"
+        }
 
-                      <span className={`
-                        px-2
-                        py-1
-                        rounded-full
-                        text-xs
-                        font-medium
+      </td>
 
-                        ${
-                          bed.status === "available"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }
-                      `}>
-
-                        {bed.status}
-
-                      </span>
-
-                    </td>
-
-                    {/* NAME */}
-
-                    <td className="p-3">
-                      {bed.guest_name || "-"}
-                    </td>
-
-                    {/* EMP ID */}
-
-                    <td className="p-3">
-                      {bed.emp_id || "-"}
-                    </td>
-
-                    {/* CONTACT */}
-
-                    <td className="p-3">
-
-                      {bed.guest_phone
-                        ? `+91 ${bed.guest_phone}`
-                        : "-"
-                      }
-
-                    </td>
-
-                  </tr>
-
-                ))}
+    </tr>
+))}
 
             </tbody>
 
           </table>
+
+
+          <div className="
+  flex
+  justify-center
+  items-center
+  gap-4
+  p-4
+">
+
+  <button
+    disabled={currentPage === 1}
+
+    onClick={() =>
+      setCurrentPage(
+        currentPage - 1
+      )
+    }
+
+    className="
+      px-4
+      py-2
+      rounded-xl
+      bg-gray-200
+      disabled:opacity-50
+    "
+  >
+    Prev
+  </button>
+
+  <span className="
+    font-medium
+  ">
+
+    Page {currentPage}
+    of {totalPages}
+
+  </span>
+
+  <button
+    disabled={
+      currentPage === totalPages
+    }
+
+    onClick={() =>
+      setCurrentPage(
+        currentPage + 1
+      )
+    }
+
+    className="
+      px-4
+      py-2
+      rounded-xl
+      bg-gray-200
+      disabled:opacity-50
+    "
+  >
+    Next
+  </button>
+
+</div>
 
         </div>
 
