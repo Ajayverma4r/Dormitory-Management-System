@@ -14,11 +14,17 @@ function BedCard({ bed, onClick }) {
         transition-all
         duration-200
 
-        ${
-          bed.status === "available"
-            ? "bg-green-50 border-green-300"
-            : "bg-red-50 border-red-300"
-        }
+       ${
+  bed.status === "available"
+
+    ? "bg-green-50 border-green-300"
+
+    : bed.status === "under_maintenance"
+
+    ? "bg-yellow-50 border-yellow-400"
+
+    : "bg-red-50 border-red-300"
+}
 
         ${
           bed.location === "outside"
@@ -47,11 +53,17 @@ function BedCard({ bed, onClick }) {
           text-[10px]
           font-normal
 
-          ${
-            bed.status === "available"
-              ? "text-green-700"
-              : "text-red-600"
-          }
+         ${
+  bed.status === "available"
+
+    ? "text-green-700"
+
+    : bed.status === "under_maintenance"
+
+    ? "text-yellow-600"
+
+    : "text-red-600"
+}
         `}
       >
         {bed.status}

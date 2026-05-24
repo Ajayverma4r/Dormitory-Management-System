@@ -204,6 +204,66 @@ router.post("/", async (req, res) => {
 
       );
 
+       // INSERT INTO BED HISTORY
+
+if (status === "occupied") {
+
+  await pool.query(
+
+    `
+    INSERT INTO bed_history
+    (
+      bed_id,
+      bed_number,
+      guest_name,
+      emp_id,
+      guest_phone,
+      department,
+      fan,
+      mattress,
+      plywood,
+      check_in
+    )
+
+    VALUES
+    (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5,
+      $6,
+      $7,
+      $8,
+      $9,
+      $10
+    )
+    `,
+
+    [
+      newBed.rows[0].id,
+
+      bed_number,
+
+      guest_name,
+
+      emp_id,
+
+      guest_phone,
+
+      department,
+
+      fan,
+
+      mattress,
+
+      plywood,
+
+      check_in,
+    ]
+  );
+}
+
     res.status(201).json(
       newBed.rows[0]
     );
@@ -242,6 +302,14 @@ router.put("/:id", async (req, res) => {
       fan,
       mattress,
       plywood,
+      maintenance_fan,
+maintenance_mattress,
+maintenance_plywood,
+maintenance_bed,
+maintenance_electrical,
+maintenance_cleaning,
+maintenance_others,
+maintenance_comment,
     } = req.body;
 
     const updatedBed =
@@ -251,39 +319,55 @@ router.put("/:id", async (req, res) => {
         UPDATE beds
 
           SET
-            room = $1,
+  room = $1,
 
-            floor = $2,
+  floor = $2,
 
-            location = $3,
+  location = $3,
 
-            status = $4,
+  status = $4,
 
-            gender_type = $5,
+  gender_type = $5,
 
-            guest_name = $6,
+  guest_name = $6,
 
-            emp_id = $7,
+  emp_id = $7,
 
-            guest_phone = $8,
+  guest_phone = $8,
 
-            check_in = $9,
+  check_in = $9,
 
-            department = $10,
+  department = $10,
 
-            fan = $11,
+  fan = $11,
 
-            mattress = $12,
+  mattress = $12,
 
-            plywood = $13
+  plywood = $13,
 
-          WHERE id = $14
+  maintenance_fan = $14,
+
+  maintenance_mattress = $15,
+
+  maintenance_plywood = $16,
+
+  maintenance_bed = $17,
+
+  maintenance_electrical = $18,
+
+  maintenance_cleaning = $19,
+
+  maintenance_others = $20,
+
+  maintenance_comment = $21
+
+WHERE id = $22
 
 
         RETURNING *
         `,
 
-       [
+      [
   room,
 
   floor,
@@ -309,6 +393,22 @@ router.put("/:id", async (req, res) => {
   mattress,
 
   plywood,
+
+  maintenance_fan,
+
+  maintenance_mattress,
+
+  maintenance_plywood,
+
+  maintenance_bed,
+
+  maintenance_electrical,
+
+  maintenance_cleaning,
+
+  maintenance_others,
+
+  maintenance_comment,
 
   id,
 ]

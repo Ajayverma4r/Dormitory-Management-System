@@ -36,7 +36,7 @@ function App() {
       logout,
 
       60 * 60 * 1000
-      // 15 MINUTES
+      // 60 MINUTES
     );
   };
 

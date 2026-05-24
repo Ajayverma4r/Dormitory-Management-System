@@ -327,7 +327,8 @@ const saveOccupiedBed = async () => {
 
       setBeds(updatedBeds);
 
-      setSelectedBed(null);
+     setSelectedBed(null);
+
 
     } catch (error) {
 
@@ -389,8 +390,34 @@ mattress:
 
 plywood:
   updatedBed.plywood,
+
+  maintenance_fan:
+  updatedBed.maintenance_fan,
+
+maintenance_mattress:
+  updatedBed.maintenance_mattress,
+
+maintenance_plywood:
+  updatedBed.maintenance_plywood,
+
+maintenance_bed:
+  updatedBed.maintenance_bed,
+
+maintenance_electrical:
+  updatedBed.maintenance_electrical,
+
+maintenance_cleaning:
+  updatedBed.maintenance_cleaning,
+
+maintenance_others:
+  updatedBed.maintenance_others,
+
+maintenance_comment:
+  updatedBed.maintenance_comment,
 }
     );
+
+    
 
     
 
@@ -419,7 +446,23 @@ plywood:
 
     setBeds(updatedBeds);
 
-    setSelectedBed(null);
+    setSelectedBed({
+  ...response.data,
+
+  guest: {
+    name:
+      response.data.guest_name,
+
+    empId:
+      response.data.emp_id,
+
+    phone:
+      response.data.guest_phone,
+
+    checkIn:
+      response.data.check_in,
+  },
+});
 
   } catch (error) {
 
@@ -433,12 +476,29 @@ plywood:
 
 const filteredBeds = beds.filter((bed) => {
 
-  const matchesSearch =
-    bed.bed_number
-      ?.toLowerCase()
-      .includes(
-        searchTerm.toLowerCase()
-      );
+ const matchesSearch =
+
+  bed.bed_number
+    ?.toLowerCase()
+    .includes(
+      searchTerm.toLowerCase()
+    )
+
+  ||
+
+  bed.guest?.name
+    ?.toLowerCase()
+    .includes(
+      searchTerm.toLowerCase()
+    )
+
+  ||
+
+  bed.guest?.empId
+    ?.toLowerCase()
+    .includes(
+      searchTerm.toLowerCase()
+    );
 
   const matchesStatus =
     statusFilter === "" ||
@@ -533,7 +593,7 @@ const totalPages =
 
           <input
             type="text"
-            placeholder="Search bed..."
+            placeholder="Search bed/EmpId/Name..."
             value={searchTerm}
             onChange={(e) =>
               setSearchTerm(e.target.value)
@@ -570,9 +630,10 @@ const totalPages =
     Available
   </option>
 
-  <option value="occupied">
-    Occupied
-  </option>
+  <option value="occupied">Occupied</option>
+  <option value="under_maintenance">
+  Under Maintenance
+</option>
 
 </select>
 
@@ -715,9 +776,30 @@ const totalPages =
 
             <select
   value={status}
-  onChange={(e) =>
-    setStatus(e.target.value)
-  }
+
+  onChange={(e) => {
+
+    const newStatus =
+      e.target.value;
+
+    setStatus(newStatus);
+
+    // RESET ONLY USER DETAILS
+
+    setGuestName("");
+
+    setGuestPhone("");
+
+    setEmpId("");
+
+    setDepartment("");
+
+    setCheckIn("");
+
+    // DO NOT RESET AMENITIES
+
+  }}
+
   className="
     border
     p-1.5
@@ -740,6 +822,8 @@ const totalPages =
 </select>
 
           </div>
+
+          
 
           {/* BUTTON */}
 

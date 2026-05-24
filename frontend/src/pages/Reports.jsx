@@ -372,6 +372,9 @@ const currentBeds =
             <option value="occupied">
               Occupied
             </option>
+            <option value="under_maintenance">
+  Under Maintenance
+</option>
 
           </select>
 
@@ -480,28 +483,78 @@ const currentBeds =
                 </th>
 
                 <th className="p-3 text-left">
-                  Room
-                </th>
 
-                <th className="p-3 text-left">
-                  Floor
-                </th>
+  {statusFilter ===
+  "under_maintenance"
+
+    ? "Room / Hall"
+
+    : "Room"}
+
+</th>
+
+<th className="p-3 text-left">
+
+  {statusFilter ===
+  "under_maintenance"
+
+    ? "Floor / Row"
+
+    : "Floor"}
+
+</th>
 
                 <th className="p-3 text-left">
                   Status
                 </th>
 
-                <th className="p-3 text-left">
-                  Name
-                </th>
+               {statusFilter !== "under_maintenance" && (
 
-                <th className="p-3 text-left">
-                  Emp ID
-                </th>
+  <>
 
-                <th className="p-3 text-left">
-                  Contact
-                </th>
+    <th className="p-3 text-left">
+      Name
+    </th>
+
+    <th className="p-3 text-left">
+      Emp ID
+    </th>
+
+    <th className="p-3 text-left">
+      Contact
+    </th>
+
+  </>
+
+)}
+
+{statusFilter === "under_maintenance" && (
+
+  <>
+
+    <th className="p-3 text-left">
+      Fan
+    </th>
+
+    <th className="p-3 text-left">
+      Mattress
+    </th>
+
+    <th className="p-3 text-left">
+      Electrical
+    </th>
+
+    <th className="p-3 text-left">
+      Plywood
+    </th>
+
+    <th className="p-3 text-left">
+      Comments
+    </th>
+
+  </>
+
+)}
 
               </tr>
 
@@ -521,13 +574,14 @@ const currentBeds =
   
   (bed, index) => (
 
-    <tr
-      key={bed.id}
-      className="
-        border-b
-        hover:bg-gray-50
-      "
-    >
+   <tr
+  key={bed.id}
+  className="
+    border-b
+    hover:bg-gray-50
+    align-middle
+  "
+>
 
       {/* SERIAL */}
 
@@ -545,15 +599,19 @@ const currentBeds =
 
       {/* ROOM */}
 
-      <td className="p-3">
-        {bed.room}
-      </td>
+      <td
+  className="p-3 align-middle"
+>
+  {bed.room}
+</td>
 
       {/* FLOOR */}
 
-      <td className="p-3">
-        {bed.floor}
-      </td>
+      <td
+  className="p-3 align-middle"
+>
+  {bed.floor}
+</td>
 
       {/* STATUS */}
 
@@ -581,26 +639,120 @@ const currentBeds =
 
       {/* NAME */}
 
-      <td className="p-3">
-        {bed.guest_name || "-"}
-      </td>
+   {statusFilter !== "under_maintenance" && (
 
-      {/* EMP ID */}
+  <>
 
-      <td className="p-3">
-        {bed.emp_id || "-"}
-      </td>
+    {/* NAME */}
 
-      {/* CONTACT */}
+    <td className="p-3">
+      {bed.guest_name || "-"}
+    </td>
 
-      <td className="p-3">
+    {/* EMP ID */}
 
-        {bed.guest_phone
-          ? `+91 ${bed.guest_phone}`
-          : "-"
-        }
+    <td className="p-3">
+      {bed.emp_id || "-"}
+    </td>
 
-      </td>
+    {/* CONTACT */}
+
+    <td className="p-3">
+
+      {bed.guest_phone
+        ? `+91 ${bed.guest_phone}`
+        : "-"
+      }
+
+    </td>
+
+  </>
+
+)}
+
+{statusFilter === "under_maintenance" && (
+
+  <>
+
+    {/* FAN */}
+
+    <td
+      className="p-3 font-bold"
+      style={{
+        color:
+          bed.maintenance_fan
+            ? "green"
+            : "red",
+      }}
+    >
+      {bed.maintenance_fan
+        ? "✔"
+        : "✖"}
+    </td>
+
+    {/* MATTRESS */}
+
+    <td
+      className="p-3 font-bold"
+      style={{
+        color:
+          bed.maintenance_mattress
+            ? "green"
+            : "red",
+      }}
+    >
+      {bed.maintenance_mattress
+        ? "✔"
+        : "✖"}
+    </td>
+
+    {/* ELECTRICAL */}
+
+    <td
+      className="p-3 font-bold"
+      style={{
+        color:
+          bed.maintenance_electrical
+            ? "green"
+            : "red",
+      }}
+    >
+      {bed.maintenance_electrical
+        ? "✔"
+        : "✖"}
+    </td>
+
+    {/* PLYWOOD */}
+
+    <td
+      className="p-3 font-bold"
+      style={{
+        color:
+          bed.maintenance_plywood
+            ? "green"
+            : "red",
+      }}
+    >
+      {bed.maintenance_plywood
+        ? "✔"
+        : "✖"}
+    </td>
+
+    {/* COMMENTS */}
+
+   <td
+  className="p-3"
+  style={{
+    maxWidth: "220px",
+    wordBreak: "break-word",
+    whiteSpace: "pre-wrap",
+  }}
+>
+  {bed.maintenance_comment || "-"}
+</td>
+  </>
+
+)}
 
     </tr>
 ))}
