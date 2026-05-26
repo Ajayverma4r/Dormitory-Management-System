@@ -13,6 +13,16 @@ function Reports() {
 
   const [genderFilter, setGenderFilter] = useState("");
 
+  const [
+  roomFilter,
+  setRoomFilter
+] = useState("");
+
+const [
+  floorFilter,
+  setFloorFilter
+] = useState("");
+
   const [currentPage,
   setCurrentPage] =
   useState(1);
@@ -103,13 +113,29 @@ function Reports() {
 
         bed.status === statusFilter;
 
+        const matchesRoom =
+
+  roomFilter === "" ||
+
+  bed.room === roomFilter;
+
+const matchesFloor =
+
+  floorFilter === "" ||
+
+  bed.floor === floorFilter;
+
     return (
 
   matchesSearch &&
 
   matchesStatus &&
 
-  matchesGender
+  matchesGender &&
+
+  matchesRoom &&
+
+  matchesFloor
 );
     });
 
@@ -320,7 +346,8 @@ const currentBeds =
 
         <div className="
           flex
-          flex-col
+          flex-wrap
+          items-center
           md:flex-row
           gap-2
           mb-3
@@ -335,14 +362,22 @@ const currentBeds =
             onChange={(e) =>
               setSearchTerm(e.target.value)
             }
-            className="
-              border
-              p-2
-              rounded-md
-              outline-none
-              w-full
-              md:w-72
-            "
+           className="
+  h-10
+  min-w-[170px]
+  bg-white
+  border
+  border-gray-200
+  px-3
+  rounded-xl
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  appearance-none
+  cursor-pointer
+"
           />
 
           {/* FILTER */}
@@ -353,12 +388,21 @@ const currentBeds =
               setStatusFilter(e.target.value)
             }
             className="
-              border
-              p-2
-              rounded-md
-              w-full
-              md:w-48
-            "
+  h-10
+  min-w-[170px]
+  bg-white
+  border
+  border-gray-200
+  px-3
+  rounded-xl
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  appearance-none
+  cursor-pointer
+"
           >
 
             <option value="">
@@ -387,11 +431,22 @@ const currentBeds =
       e.target.value
     )
   }
-  className="
-    border
-    p-2
-    rounded-md
-  "
+className="
+  h-10
+  min-w-[170px]
+  bg-white
+  border
+  border-gray-200
+  px-3
+  rounded-xl
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  appearance-none
+  cursor-pointer
+"
 >
 
   <option value="">
@@ -408,18 +463,194 @@ const currentBeds =
 
 </select>
 
+  {/* ROOM FILTER */}
+
+<select
+  value={roomFilter}
+
+  onChange={(e) => {
+
+    setRoomFilter(
+      e.target.value
+    );
+
+    setFloorFilter("");
+  }}
+
+className="
+  h-10
+  min-w-[170px]
+  bg-white
+  border
+  border-gray-200
+  px-3
+  rounded-xl
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  appearance-none
+  cursor-pointer
+"
+>
+
+  <option value="">
+    All Hall / Room
+  </option>
+
+  <option value="HALL1">
+    Hall1
+  </option>
+
+  <option value="HALL2">
+    Hall2
+  </option>
+
+  <option value="HALL3">
+    Hall3
+  </option>
+
+  <option value="HALL4">
+    Hall4
+  </option>
+
+  <option value="ROOM1">
+    Room1
+  </option>
+
+  <option value="ROOM2">
+    Room2
+  </option>
+
+  <option value="ROOM3">
+    Room3
+  </option>
+
+  <option value="ROOM4">
+    Room4
+  </option>
+
+  <option value="SUPERMARKET">
+    Supermarket
+  </option>
+
+  <option value="OTHERS">
+    Others
+  </option>
+
+</select>
+
+{/* FLOOR FILTER */}
+
+<select
+  value={floorFilter}
+
+  onChange={(e) =>
+    setFloorFilter(
+      e.target.value
+    )
+  }
+
+ className="
+  h-10
+  min-w-[170px]
+  bg-white
+  border
+  border-gray-200
+  px-3
+  rounded-xl
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-300
+  appearance-none
+  cursor-pointer
+"
+>
+
+  <option value="">
+    All Floor / Row
+  </option>
+
+  {/* HALL */}
+
+  {roomFilter.startsWith("HALL") && (
+
+    <>
+
+      <option value="ROW1">
+        Row1
+      </option>
+
+      <option value="ROW2">
+        Row2
+      </option>
+
+      <option value="ROW3">
+        Row3
+      </option>
+
+      <option value="ROW4">
+        Row4
+      </option>
+
+    </>
+
+  )}
+
+  {/* ROOM */}
+
+  {roomFilter.startsWith("ROOM") && (
+
+    <>
+
+      <option value="FLOOR1">
+        Floor1
+      </option>
+
+      <option value="FLOOR2">
+        Floor2
+      </option>
+
+      <option value="FLOOR3">
+        Floor3
+      </option>
+
+    </>
+
+  )}
+
+  {/* OTHERS */}
+
+  {(roomFilter === "SUPERMARKET" ||
+    roomFilter === "OTHERS") && (
+
+    <option value="OTHERS">
+      Others
+    </option>
+
+  )}
+
+</select>
+
           {/* EXPORT */}
 
           <button
             onClick={exportCSV}
-            className="
-              bg-green-600
-              text-white
-              px-4
-              py-2
-              rounded-md
-              hover:bg-green-700
-            "
+          className="
+  bg-green-500/90
+  backdrop-blur-md
+  text-white
+  px-4
+  py-1.5
+  rounded-xl
+  text-sm
+  shadow-md
+  hover:bg-green-600
+  transition-all
+"
           >
             Export CSV
           </button>
@@ -428,14 +659,19 @@ const currentBeds =
 
           <button
             onClick={printReport}
-            className="
-              bg-blue-600
-              text-white
-              px-4
-              py-2
-              rounded-md
-              hover:bg-blue-700
-            "
+           className="
+  bg-blue-500/90
+  backdrop-blur-md
+  text-white
+  text-right
+  px-4
+  py-1.5
+  rounded-xl
+  text-sm
+  shadow-md
+  hover:bg-blue-600
+  transition-all
+"
           >
             Print Report
           </button>

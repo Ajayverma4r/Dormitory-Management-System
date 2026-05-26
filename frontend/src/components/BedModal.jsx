@@ -231,12 +231,52 @@ maintenance_comment:
         {/* BED DETAILS */}
 
         <p>
-          <strong>Hall:</strong> {bed.room}
-        </p>
 
-        <p>
-          <strong>Floor:</strong> {bed.floor}
-        </p>
+  <strong>
+
+    {bed.room?.startsWith("HALL")
+
+      ? "Hall"
+
+      : bed.room?.startsWith("ROOM")
+
+      ? "Room"
+
+      : "Area"}
+
+    :
+
+  </strong>
+
+  {" "}
+
+  {bed.room}
+
+</p>
+
+<p>
+
+  <strong>
+
+    {bed.room?.startsWith("HALL")
+
+      ? "Row"
+
+      : bed.room?.startsWith("ROOM")
+
+      ? "Floor"
+
+      : "Type"}
+
+    :
+
+  </strong>
+
+  {" "}
+
+  {bed.floor}
+
+</p>
 
         <p>
           <strong>Location:</strong> {bed.location}

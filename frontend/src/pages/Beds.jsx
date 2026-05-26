@@ -6,6 +6,24 @@ import BedCard from "../components/BedCard";
 import BedModal from "../components/BedModal";
 import toast from "react-hot-toast";
 
+
+const hallRoomOptions = [
+
+  "HALL1",
+  "HALL2",
+  "HALL3",
+  "HALL4",
+
+  "ROOM1",
+  "ROOM2",
+  "ROOM3",
+  "ROOM4",
+
+  "SUPERMARKET",
+
+  "OTHERS",
+];
+
 function Beds({ type }) {
 
   const user = JSON.parse(
@@ -67,9 +85,11 @@ const [plywood,
   const [statusFilter, setStatusFilter] = useState("");
 
   const [locationFilter, setLocationFilter] = useState("");
+  const [roomFilter, setRoomFilter] = useState("");
 
-  const [currentPage, setCurrentPage] =
-  useState(1);
+  const [floorFilter, setFloorFilter] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
 
 const bedsPerPage = 40;
 
@@ -119,6 +139,8 @@ const bedsPerPage = 40;
   searchTerm,
   statusFilter,
   locationFilter,
+roomFilter,
+floorFilter,
 ]);
 
   // ADD BED
@@ -508,6 +530,18 @@ const filteredBeds = beds.filter((bed) => {
     locationFilter === "" ||
     bed.location === locationFilter;
 
+    const matchesRoom =
+
+  roomFilter === "" ||
+
+  bed.room === roomFilter;
+
+const matchesFloor =
+
+  floorFilter === "" ||
+
+  bed.floor === floorFilter;
+
  return (
 
   bed.gender_type === type &&
@@ -516,7 +550,11 @@ const filteredBeds = beds.filter((bed) => {
 
   matchesStatus &&
 
-  matchesLocation
+  matchesLocation &&
+
+matchesRoom &&
+
+matchesFloor
 );
 });
 
@@ -564,116 +602,276 @@ const totalPages =
   overflow-x-hidden
 ">
 
-        {/* HEADER */}
+        {/* PAGE TITLE */}
 
-        <div className="
-          flex
-          flex-col
-          md:flex-row
-          md:items-center
-          md:justify-between
-          gap-2
-        ">
-
-          <div className="w-full text-center">
-
-            <h1
-              className="
-                text-2xl
-                font-bold
-                mb-1
-              "
-            >
-              Bed Management
-            </h1>
-
-          </div>
-
-          {/* SEARCH */}
-
-          <input
-            type="text"
-            placeholder="Search bed/EmpId/Name..."
-            value={searchTerm}
-            onChange={(e) =>
-              setSearchTerm(e.target.value)
-            }
-            className="
-              border
-              p-1.5
-              rounded-md
-              w-full
-              md:w-56
-              outline-none
-              focus:ring-1
-              focus:ring-blue-400
-            "
-          />
-
-          <select
-         value={statusFilter}
-         onChange={(e) =>
-         setStatusFilter(e.target.value)
-         }
-         className="
-         border
-       p-1.5
-       rounded-md
-        "
-        >
-
-  <option value="">
-    All Status
-  </option>
-
-  <option value="available">
-    Available
-  </option>
-
-  <option value="occupied">Occupied</option>
-  <option value="under_maintenance">
-  Under Maintenance
-</option>
-
-</select>
-
-<select
-  value={locationFilter}
-  onChange={(e) =>
-    setLocationFilter(e.target.value)
-  }
+<h1
   className="
-    border
-    p-1.5
-    rounded-md
+    text-3xl
+    font-bold
+    mb-4
+  "
+>
+  Bed Management
+</h1>
+
+
+{/* FILTER SECTION */}
+
+<div
+  className="
+    flex
+    flex-wrap
+    gap-3
+    mb-4
   "
 >
 
-  <option value="">
-    All Location
-  </option>
+  {/* SEARCH */}
 
-  <option value="inside">
-    Inside
-  </option>
+  <input
+    type="text"
+    placeholder="Search bed/EmpId/Name..."
+    value={searchTerm}
+    onChange={(e) =>
+      setSearchTerm(e.target.value)
+    }
 
-  <option value="outside">
-    Outside
-  </option>
+    className="
+      h-10
+      w-64
+      bg-white
+      border
+      border-gray-200
+      rounded-xl
+      px-3
+      text-sm
+      shadow-sm
+      outline-none
+    "
+  />
 
-</select>
+  {/* STATUS */}
 
-        </div>
+  <select
+    value={statusFilter}
+
+    onChange={(e) =>
+      setStatusFilter(
+        e.target.value
+      )
+    }
+
+    className="
+      h-10
+      w-44
+      bg-white
+      border
+      border-gray-200
+      rounded-xl
+      px-3
+      text-sm
+      shadow-sm
+      outline-none
+    "
+  >
+
+    <option value="">
+      All Status
+    </option>
+
+    <option value="available">
+      Available
+    </option>
+
+    <option value="occupied">
+      Occupied
+    </option>
+
+    <option value="under_maintenance">
+      Under Maintenance
+    </option>
+
+  </select>
+
+  {/* LOCATION */}
+
+  <select
+    value={locationFilter}
+
+    onChange={(e) =>
+      setLocationFilter(
+        e.target.value
+      )
+    }
+
+    className="
+      h-10
+      w-44
+      bg-white
+      border
+      border-gray-200
+      rounded-xl
+      px-3
+      text-sm
+      shadow-sm
+      outline-none
+    "
+  >
+
+    <option value="">
+      All Location
+    </option>
+
+    <option value="inside">
+      Inside
+    </option>
+
+    <option value="outside">
+      Outside
+    </option>
+
+  </select>
+
+  {/* ROOM */}
+
+  <select
+    value={roomFilter}
+
+    onChange={(e) => {
+
+      setRoomFilter(
+        e.target.value
+      );
+
+      setFloorFilter("");
+    }}
+
+    className="
+      h-10
+      w-44
+      bg-white
+      border
+      border-gray-200
+      rounded-xl
+      px-3
+      text-sm
+      shadow-sm
+      outline-none
+    "
+  >
+
+    <option value="">
+      All Hall / Room
+    </option>
+
+    {hallRoomOptions.map((item) => (
+
+      <option
+        key={item}
+        value={item}
+      >
+        {item}
+      </option>
+
+    ))}
+
+  </select>
+
+  {/* FLOOR */}
+
+  <select
+    value={floorFilter}
+
+    onChange={(e) =>
+      setFloorFilter(
+        e.target.value
+      )
+    }
+
+    className="
+      h-10
+      w-44
+      bg-white
+      border
+      border-gray-200
+      rounded-xl
+      px-3
+      text-sm
+      shadow-sm
+      outline-none
+    "
+  >
+
+    <option value="">
+      All Floor / Row
+    </option>
+
+    {roomFilter.startsWith("HALL") && (
+
+      <>
+
+        <option value="ROW1">
+          Row1
+        </option>
+
+        <option value="ROW2">
+          Row2
+        </option>
+
+        <option value="ROW3">
+          Row3
+        </option>
+
+        <option value="ROW4">
+          Row4
+        </option>
+
+      </>
+
+    )}
+
+    {roomFilter.startsWith("ROOM") && (
+
+      <>
+
+        <option value="FLOOR1">
+          Floor1
+        </option>
+
+        <option value="FLOOR2">
+          Floor2
+        </option>
+
+        <option value="FLOOR3">
+          Floor3
+        </option>
+
+      </>
+
+    )}
+
+     {(roomFilter === "SUPERMARKET" ||
+    roomFilter === "OTHERS") && (
+
+    <option value="OTHERS">
+      Others
+    </option>
+
+  )}
+
+  </select>
+
+</div>
 
 
         {/* ADD BED FORM */}
   {isAdmin && (
         <div className="
-          bg-white
-          p-2
-          rounded-lg
-          shadow-sm
-          mt-2
+        bg-white
+        rounded-2xl
+        shadow-sm
+        border
+        p-4
         ">
 
           <h2 className="text-lg font-bold mb-2">
@@ -707,39 +905,125 @@ const totalPages =
 
             {/* ROOM */}
 
-            <input
-              type="text"
-              placeholder="Hall"
-              value={room}
-              onChange={(e) =>
-             setRoom(
-               e.target.value.toUpperCase()
-              )
-              }
-              className="
-                border
-                p-1.5
-                rounded-md
-              "
-            />
+            <select
+  value={room}
+
+  onChange={(e) => {
+
+    const value =
+      e.target.value;
+
+    setRoom(value);
+
+    // RESET FLOOR/ROW
+
+    setFloor("");
+  }}
+
+  className="
+    border
+    p-1.5
+    rounded-md
+  "
+>
+
+  <option value="">
+    Select Hall / Room
+  </option>
+
+  {hallRoomOptions.map((item) => (
+
+    <option
+      key={item}
+      value={item}
+    >
+      {item}
+    </option>
+
+  ))}
+
+</select>
 
             {/* FLOOR */}
 
-            <input
-              type="text"
-              placeholder="Floor"
-              value={floor}
-             onChange={(e) =>
-             setFloor(
-             e.target.value.toUpperCase()
-             )
-              }
-              className="
-                border
-                p-1.5
-                rounded-md
-              "
-            />
+            <select
+  value={floor}
+
+  onChange={(e) =>
+    setFloor(e.target.value)
+  }
+
+  className="
+    border
+    p-1.5
+    rounded-md
+  "
+>
+
+  <option value="">
+    Select Floor / Row
+  </option>
+
+  {/* HALLS */}
+
+  {room.startsWith("HALL") && (
+
+    <>
+
+      <option value="ROW1">
+        Row1
+      </option>
+
+      <option value="ROW2">
+        Row2
+      </option>
+
+      <option value="ROW3">
+        Row3
+      </option>
+
+      <option value="ROW4">
+        Row4
+      </option>
+
+    </>
+
+  )}
+
+  {/* ROOMS */}
+
+  {room.startsWith("ROOM") && (
+
+    <>
+
+      <option value="FLOOR1">
+        Floor1
+      </option>
+
+      <option value="FLOOR2">
+        Floor2
+      </option>
+
+      <option value="FLOOR3">
+        Floor3
+      </option>
+
+    </>
+
+  )}
+
+  {/* SUPERMARKET / OTHERS */}
+
+  {(room === "SUPERMARKET" ||
+    room === "OTHERS") && (
+
+    <option value="OTHERS">
+      Others
+    </option>
+
+  )}
+
+</select>
 
             
 
@@ -829,15 +1113,18 @@ const totalPages =
 
           <button
             onClick={addBed}
-            className="
-              mt-2
-              bg-blue-600
-              text-white
-              px-3
-              py-1.5
-              rounded-md
-              hover:bg-blue-700
-            "
+           className="
+  mt-3
+  h-10
+  bg-blue-600
+  text-white
+  px-5
+  rounded-xl
+  text-sm
+  shadow-sm
+  hover:bg-blue-700
+  transition-all
+"
           >
             Create New Bed
           </button>
@@ -1004,10 +1291,12 @@ const totalPages =
   </p>
 
   <div className="
-    flex
-    gap-4
-    flex-wrap
-  ">
+  flex
+  flex-wrap
+  items-center
+  gap-2
+  mb-4
+">
 
     {/* FAN */}
 
