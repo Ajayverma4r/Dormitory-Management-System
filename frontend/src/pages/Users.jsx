@@ -1,3 +1,4 @@
+import usersBG from "../assets/usersBG.webp"
 import toast from "react-hot-toast";
 
 import {
@@ -185,34 +186,94 @@ function Users() {
 
       {/* MAIN */}
 
-      <div className="
-  p-5
-  w-full
-  md:ml-64
-  mt-14
-  md:mt-0
-  overflow-x-hidden
-">
+      <div
+  className="
+
+    relative
+
+    w-full
+
+    p-6
+
+    md:ml-64
+
+    min-h-screen
+
+    overflow-hidden
+
+    bg-cover
+    bg-center
+    bg-no-repeat
+  "
+
+  style={{
+    backgroundImage: `
+      linear-gradient(
+        rgba(240,244,255,0.92),
+        rgba(232,240,255,0.92)
+      ),
+      url(${usersBG})
+    `,
+  }}
+>
+  {/* BACKGROUND EFFECTS */}
+
+<div className="
+  absolute
+  top-10
+  right-10
+
+  w-72
+  h-72
+
+  bg-blue-300/20
+
+  rounded-full
+
+  blur-3xl
+
+  pointer-events-none
+"/>
+
+<div className="
+  absolute
+  bottom-10
+  left-10
+
+  w-72
+  h-72
+
+  bg-purple-300/20
+
+  rounded-full
+
+  blur-3xl
+
+  pointer-events-none
+"/>
 
         {/* TITLE */}
 
-        <h1 className="
-          text-3xl
-          font-bold
-          mb-5
-        ">
-          User Management
-        </h1>
+       <h1
+  className="
+    text-3xl
+    font-bold
+    mb-4
+  "
+>
+  User Management
+</h1>
 
         {/* CREATE USER */}
 
         <div className="
-          bg-white
-          p-4
-          rounded-xl
-          shadow-sm
-          mb-5
-        ">
+  bg-white
+  p-4
+  rounded-2xl
+  border
+  shadow-sm
+  mb-5
+">
 
           <h2 className="
             text-xl
@@ -241,10 +302,18 @@ function Users() {
                 )
               }
               className="
-                border
-                p-3
-                rounded-md
-              "
+  h-10
+  bg-white
+  border
+  border-gray-200
+  rounded-xl
+  px-3
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-400
+"
             />
 
             {/* PASSWORD */}
@@ -258,11 +327,19 @@ function Users() {
                   e.target.value
                 )
               }
-              className="
-                border
-                p-3
-                rounded-md
-              "
+             className="
+  h-10
+  bg-white
+  border
+  border-gray-200
+  rounded-xl
+  px-3
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-400
+"
             />
 
             {/* ROLE */}
@@ -275,10 +352,18 @@ function Users() {
                 )
               }
               className="
-                border
-                p-3
-                rounded-md
-              "
+  h-10
+  bg-white
+  border
+  border-gray-200
+  rounded-xl
+  px-3
+  text-sm
+  shadow-sm
+  outline-none
+  focus:ring-2
+  focus:ring-blue-400
+"
             >
 
               <option value="staff">
@@ -295,12 +380,17 @@ function Users() {
 
             <button
               onClick={createUser}
-              className="
-                bg-blue-600
-                text-white
-                rounded-md
-                hover:bg-blue-700
-              "
+             className="
+  h-10
+  bg-blue-600
+  text-white
+  px-5
+  rounded-xl
+  text-sm
+  shadow-sm
+  hover:bg-blue-700
+  transition-all
+"
             >
               Create User
             </button>
@@ -312,11 +402,12 @@ function Users() {
         {/* USER TABLE */}
 
         <div className="
-          bg-white
-          rounded-xl
-          shadow-sm
-          overflow-x-auto
-        ">
+  bg-white
+  rounded-2xl
+  border
+  shadow-sm
+  overflow-x-auto
+">
 
           <table className="
             w-full
@@ -326,8 +417,8 @@ function Users() {
             {/* HEADER */}
 
             <thead className="
-              bg-gray-100
-            ">
+  bg-gray-50
+">
 
               <tr>
 
@@ -370,11 +461,13 @@ function Users() {
               {users.map((user) => (
 
                 <tr
-                  key={user.id}
-                  className="
-                    border-b
-                  "
-                >
+  key={user.id}
+  className="
+    border-b
+    hover:bg-gray-50
+    transition
+  "
+>
 
                   {/* ID */}
 
@@ -477,13 +570,16 @@ function Users() {
                       }}
 
                       className="
-                        bg-yellow-500
-                        text-white
-                        px-3
-                        py-1
-                        rounded-md
-                        hover:bg-yellow-600
-                      "
+  bg-yellow-500
+  text-white
+  px-3
+  py-1.5
+  rounded-xl
+  text-sm
+  shadow-sm
+  hover:bg-yellow-600
+  transition-all
+"
                     >
                       Password
                     </button>
@@ -542,13 +638,16 @@ function Users() {
                       }}
 
                       className="
-                        bg-indigo-600
-                        text-white
-                        px-3
-                        py-1
-                        rounded-md
-                        hover:bg-indigo-700
-                      "
+  bg-indigo-600
+  text-white
+  px-3
+  py-1.5
+  rounded-xl
+  text-sm
+  shadow-sm
+  hover:bg-indigo-700
+  transition-all
+"
                     >
                       Role
                     </button>
@@ -562,13 +661,16 @@ function Users() {
                         )
                       }
                       className="
-                        bg-red-600
-                        text-white
-                        px-3
-                        py-1
-                        rounded-md
-                        hover:bg-red-700
-                      "
+  bg-red-600
+  text-white
+  px-3
+  py-1.5
+  rounded-xl
+  text-sm
+  shadow-sm
+  hover:bg-red-700
+  transition-all
+"
                     >
                       Delete
                     </button>

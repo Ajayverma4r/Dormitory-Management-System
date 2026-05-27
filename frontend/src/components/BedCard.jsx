@@ -1,91 +1,195 @@
 function BedCard({ bed, onClick }) {
 
+  const statusColors = {
+
+    available:
+      "border-green-200 bg-green-50/80",
+
+    occupied:
+      "border-red-200 bg-red-50/80",
+
+    under_maintenance:
+      "border-yellow-200 bg-yellow-50/80",
+  };
+
+  const statusTextColors = {
+
+    available:
+      "text-green-700",
+
+    occupied:
+      "text-red-700",
+
+    under_maintenance:
+      "text-yellow-700",
+  };
+
   return (
 
     <div
+
       onClick={() => onClick(bed)}
+
       className={`
+
         cursor-pointer
-        rounded-md
+
+        rounded-2xl
+
         border
-        p-1
-        text-center
+
+        p-3
+
         shadow-sm
+
+        backdrop-blur-lg
+
         transition-all
-        duration-200
 
-       ${
-  bed.status === "available"
+        duration-300
 
-    ? "bg-green-50 border-green-300"
+        hover:shadow-lg
 
-    : bed.status === "under_maintenance"
+        hover:-translate-y-1
 
-    ? "bg-yellow-50 border-yellow-400"
+        min-h-[120px]
 
-    : "bg-red-50 border-red-300"
-}
+        flex
 
-        ${
-          bed.location === "outside"
-            ? "bg-orange-50 border-orange-300"
-            : ""
-        }
+        flex-col
+
+        justify-between
+
+        ${statusColors[bed.status]}
       `}
     >
 
-      {/* BED NUMBER */}
+      {/* TOP */}
 
-      <h2 className="
-        text-sm
-        font-semibold
-        text-black
-        leading-tight
+      <div className="
+        flex
+        justify-between
+        items-start
       ">
-        {bed.bed_number}
-      </h2>
 
-      {/* STATUS */}
+        {/* BED NUMBER */}
 
-      <p
-        className={`
-          mt-0.5
-          text-[10px]
-          font-normal
+        <h2 className="
+          text-lg
+          font-bold
+          text-gray-800
+        ">
+          {bed.bed_number}
+        </h2>
 
-         ${
-  bed.status === "available"
+        {/* STATUS DOT */}
 
-    ? "text-green-700"
+        <div className={`
+          w-3
+          h-3
+          rounded-full
 
-    : bed.status === "under_maintenance"
+          ${
+            bed.status === "available"
 
-    ? "text-yellow-600"
+              ? "bg-green-500"
 
-    : "text-red-600"
-}
-        `}
-      >
-        {bed.status}
-      </p>
+              : bed.status ===
+                "under_maintenance"
+
+              ? "bg-yellow-400"
+
+              : "bg-red-500"
+          }
+        `} />
+
+      </div>
+
+      {/* ROOM/FLOOR */}
+
+      <div className="
+        mt-2
+        space-y-1
+      ">
+
+        <p className="
+          text-sm
+          text-gray-700
+          font-medium
+        ">
+
+          {bed.room}
+
+          {" • "}
+
+          {bed.floor}
+
+        </p>
+
+        <p className={`
+          text-xs
+          font-semibold
+          uppercase
+
+          ${statusTextColors[bed.status]}
+        `}>
+
+          {bed.status.replace(
+            "_",
+            " "
+          )}
+
+        </p>
+
+      </div>
 
       {/* LOCATION */}
 
-      <p
-        className={`
-          mt-0.5
-          text-[10px]
-          font-normal
+      <div className="
+        mt-3
+        flex
+        justify-between
+        items-center
+      ">
+
+        <span className={`
+          text-xs
+          px-2
+          py-1
+          rounded-full
+          font-medium
 
           ${
             bed.location === "inside"
-              ? "text-blue-600"
-              : "text-orange-500"
+
+              ? "bg-blue-100 text-blue-700"
+
+              : "bg-orange-100 text-orange-700"
           }
-        `}
-      >
-        {bed.location}
-      </p>
+        `}>
+
+          {bed.location}
+
+        </span>
+
+        {/* GUEST */}
+
+        {bed.guest?.name && (
+
+          <span className="
+            text-xs
+            text-gray-500
+            truncate
+            max-w-[90px]
+          ">
+
+            {bed.guest.name}
+
+          </span>
+
+        )}
+
+      </div>
 
     </div>
   );

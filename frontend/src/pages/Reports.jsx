@@ -1,3 +1,4 @@
+import ReportsBG from "../assets/reportsBG.webp" 
 import { useEffect, useState } from "react";
 import API from "../services/api";
 
@@ -320,16 +321,70 @@ const currentBeds =
 
       {/* MAIN */}
 
-      <div className="
-  p-2
-  w-full
-  overflow-y-auto
-  text-sm
-  md:ml-64
-  mt-14
-  md:mt-0
-  overflow-x-hidden
-">
+      <div
+  className="
+
+    relative
+
+    p-6
+
+    md:ml-64
+
+    min-h-screen
+
+    overflow-hidden
+
+    bg-cover
+    bg-center
+    bg-no-repeat
+  "
+
+  style={{
+    backgroundImage: `
+      linear-gradient(
+        rgba(240,244,255,0.92),
+        rgba(232,240,255,0.92)
+      ),
+      url(${ReportsBG})
+    `,
+  }}
+>
+
+  {/* BACKGROUND EFFECTS */}
+
+<div className="
+  absolute
+  top-10
+  right-10
+
+  w-72
+  h-72
+
+  bg-blue-300/20
+
+  rounded-full
+
+  blur-3xl
+
+  pointer-events-none
+"/>
+
+<div className="
+  absolute
+  bottom-10
+  left-10
+
+  w-72
+  h-72
+
+  bg-purple-300/20
+
+  rounded-full
+
+  blur-3xl
+
+  pointer-events-none
+"/>
 
         {/* TITLE */}
 
@@ -663,7 +718,6 @@ className="
   bg-blue-500/90
   backdrop-blur-md
   text-white
-  text-right
   px-4
   py-1.5
   rounded-xl

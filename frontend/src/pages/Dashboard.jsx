@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
-
+import dashboardBg from "../assets/dashboardBg.jpg";
 import Sidebar from "../components/Sidebar";
 
 function Dashboard() {
@@ -167,16 +167,70 @@ const girlsOccupied =
 
       {/* MAIN */}
 
-      <div className="
-  p-2
-  w-full
-  h-screen
-  overflow-y-auto
-  text-sm
-  md:ml-64
-  mt-14
-  md:mt-0
-">
+      <div
+  className="
+
+    relative
+
+    p-6
+
+    md:ml-64
+
+    min-h-screen
+
+    overflow-hidden
+
+    bg-cover
+    bg-center
+    bg-no-repeat
+  "
+
+  style={{
+    backgroundImage: `
+      linear-gradient(
+        rgba(240,244,255,0.92),
+        rgba(232,240,255,0.92)
+      ),
+      url(${dashboardBg})
+    `,
+  }}
+>
+
+  {/* BACKGROUND EFFECTS */}
+
+<div className="
+  absolute
+  top-10
+  right-10
+
+  w-72
+  h-72
+
+  bg-blue-300/20
+
+  rounded-full
+
+  blur-3xl
+
+  pointer-events-none
+"/>
+
+<div className="
+  absolute
+  bottom-10
+  left-10
+
+  w-72
+  h-72
+
+  bg-purple-300/20
+
+  rounded-full
+
+  blur-3xl
+
+  pointer-events-none
+"/>
 
         {/* TITLE */}
 
