@@ -230,90 +230,112 @@ maintenance_comment:
 
         {/* BED DETAILS */}
 
-        <p>
+      {/* BED DETAILS */}
 
-  <strong>
-
-    {bed.room?.startsWith("HALL")
-
-      ? "Hall"
-
-      : bed.room?.startsWith("ROOM")
-
-      ? "Room"
-
-      : "Area"}
-
-    :
-
-  </strong>
-
-  {" "}
-
-  {bed.room}
-
+<p>
+  <strong>Type:</strong>{" "}
+  {bed.location_type || "-"}
 </p>
+
+{/* HALL */}
+
+{bed.location_type === "Hall" && (
+
+  <>
+
+    <p>
+      <strong>Hall:</strong>{" "}
+      {bed.room}
+    </p>
+
+    <p>
+      <strong>Row:</strong>{" "}
+      {bed.floor}
+    </p>
+
+  </>
+
+)}
+
+{/* DORMITORY */}
+
+{(bed.location_type === "Dormitory1" ||
+  bed.location_type === "Dormitory2") && (
+
+  <>
+
+    <p>
+      <strong>Floor:</strong>{" "}
+      {bed.floor}
+    </p>
+
+    <p>
+      <strong>Room:</strong>{" "}
+      {bed.room}
+    </p>
+
+  </>
+
+)}
+
+{/* SUPERMARKET */}
+
+{bed.location_type === "Supermarket" && (
+
+  <p>
+    <strong>Section:</strong>{" "}
+    {bed.room}
+  </p>
+
+)}
+
+
+
+
+       
+
+        {/* STATUS */}
+  <p>
+  <strong>Location:</strong>{" "}
+  {bed.location}
+</p>
+        {/* STATUS */}
 
 <p>
 
-  <strong>
+  <strong>Status:</strong>{" "}
 
-    {bed.room?.startsWith("HALL")
+  {isEditing ? (
 
-      ? "Row"
+    <select
+      value={status}
+      onChange={(e) =>
+        setStatus(e.target.value)
+      }
+      style={inputStyle}
+    >
 
-      : bed.room?.startsWith("ROOM")
+      <option value="available">
+        Available
+      </option>
 
-      ? "Floor"
+      <option value="occupied">
+        Occupied
+      </option>
 
-      : "Type"}
+      <option value="under_maintenance">
+        Under Maintenance
+      </option>
 
-    :
+    </select>
 
-  </strong>
+  ) : (
 
-  {" "}
+    status.replace("_", " ")
 
-  {bed.floor}
+  )}
 
 </p>
-
-        <p>
-          <strong>Location:</strong> {bed.location}
-        </p>
-
-        {/* STATUS */}
-
-        <p>
-
-          <strong>Status:</strong>
-
-          {isEditing ? (
-
-            <select
-              value={status}
-              onChange={(e) =>
-                setStatus(e.target.value)
-              }
-              style={inputStyle}
-            >
-
-              <option value="available">
-                Available
-              </option>
-
-              <option value="occupied">Occupied</option>
-              <option value="under_maintenance">
-  Under Maintenance
-</option>
-
-            </select>
-
-          ) : (
-            ` ${status}`
-          )}
-
-        </p>
 
         {/* PERSON DETAILS */}
 

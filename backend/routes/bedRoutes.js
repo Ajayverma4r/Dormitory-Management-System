@@ -35,22 +35,22 @@ router.post("/", async (req, res) => {
   try {
 
     let {
-      bed_number,
-      room,
-      floor,
-      location,
-      status,
-      gender_type,
-      guest_name,
-      emp_id,
-      guest_phone,
-      check_in,
-      department,
-      fan,
-      mattress,
-      plywood,
-
-    } = req.body;
+  bed_number,
+  room,
+  floor,
+  location,
+  location_type,
+  status,
+  gender_type,
+  guest_name,
+  emp_id,
+  guest_phone,
+  check_in,
+  department,
+  fan,
+  mattress,
+  plywood,
+} = req.body;
 
     // UPPERCASE
 
@@ -134,73 +134,77 @@ router.post("/", async (req, res) => {
 
         `
         INSERT INTO beds
-        (
-          bed_number,
-          room,
-          floor,
-          location,
-          status,
-          gender_type,
-          guest_name,
-          emp_id,
-          guest_phone,
-          check_in,
-          department,
-          fan,
-          mattress,
-          plywood
-        )
+(
+  bed_number,
+  room,
+  floor,
+  location,
+  location_type,
+  status,
+  gender_type,
+  guest_name,
+  emp_id,
+  guest_phone,
+  check_in,
+  department,
+  fan,
+  mattress,
+  plywood
+)
 
-        VALUES
-        (
-          $1,
-          $2,
-          $3,
-          $4,
-          $5,
-          $6,
-          $7,
-          $8,
-          $9,
-          $10,
-          $11,
-          $12,
-          $13,
-          $14
-        )
+VALUES
+(
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9,
+  $10,
+  $11,
+  $12,
+  $13,
+  $14,
+  $15
+)
 
-        RETURNING *
+RETURNING *
         `,
 
        [
-        bed_number,
+  bed_number,
 
-        room,
+  room,
 
-        floor,
+  floor,
 
-        location,
+  location,
 
-        status,
+  location_type,
 
-        gender_type,
+  status,
 
-        guest_name,
+  gender_type,
 
-        emp_id,
+  guest_name,
 
-        guest_phone,
+  emp_id,
 
-        check_in,
+  guest_phone,
 
-        department,
+  check_in,
 
-        fan,
+  department,
 
-        mattress,
+  fan,
 
-        plywood,
-      ]
+  mattress,
+
+  plywood,
+]
 
       );
 

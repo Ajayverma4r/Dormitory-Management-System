@@ -154,9 +154,154 @@ const [plywood,
 
   const [floorFilter, setFloorFilter] = useState("");
 
+const [typeFilter, setTypeFilter] = useState("");
+const [dynamicRooms, setDynamicRooms] =
+  useState([]);
+
+const [dynamicFloors, setDynamicFloors] =
+  useState([]);
+
   const [currentPage, setCurrentPage] = useState(1);
 
 const bedsPerPage = 40;
+
+useEffect(() => {
+
+  // RESET
+
+  setRoomFilter("");
+  setFloorFilter("");
+
+  // DORMITORY1
+
+  if (typeFilter === "Dormitory1") {
+
+    setDynamicFloors([
+      "GROUND FLOOR",
+      "1ST FLOOR",
+      "2ND FLOOR",
+    ]);
+
+    if (floorFilter === "GROUND FLOOR") {
+
+      setDynamicRooms([
+        "R101",
+        "R102",
+        "R103",
+        "R104",
+        "R105",
+        "R106",
+      ]);
+    }
+
+    else if (floorFilter === "1ST FLOOR") {
+
+      setDynamicRooms([
+        "R107",
+        "R108",
+      ]);
+    }
+
+    else if (floorFilter === "2ND FLOOR") {
+
+      setDynamicRooms([
+        "R109",
+        "R110",
+      ]);
+    }
+  }
+
+  // DORMITORY2
+
+  else if (typeFilter === "Dormitory2") {
+
+    setDynamicFloors([
+      "GROUND FLOOR",
+      "1ST FLOOR",
+      "2ND FLOOR",
+    ]);
+
+    if (floorFilter === "GROUND FLOOR") {
+
+      setDynamicRooms([
+        "R201",
+        "R202",
+      ]);
+    }
+
+    else if (floorFilter === "1ST FLOOR") {
+
+      setDynamicRooms([
+        "R203",
+        "R204",
+      ]);
+    }
+
+    else if (floorFilter === "2ND FLOOR") {
+
+      setDynamicRooms([
+        "R205",
+        "R206",
+      ]);
+    }
+  }
+
+ // HALL
+
+else if (typeFilter === "Hall") {
+
+  // HALL DROPDOWN
+
+  setDynamicFloors([
+    "HALL1",
+    "HALL2",
+    "HALL3",
+    "HALL4",
+  ]);
+
+  // ROW DROPDOWN
+
+  setDynamicRooms([
+    "ROW1",
+    "ROW2",
+    "ROW3",
+    "ROW4",
+  ]);
+}
+
+  // SUPERMARKET
+
+  else if (typeFilter === "Supermarket") {
+
+    setDynamicFloors([
+      "LOWER",
+      "UPPER",
+    ]);
+
+    setDynamicRooms([]);
+  }
+
+  // OTHERS
+
+  else if (typeFilter === "Others") {
+
+    setDynamicFloors([
+      "OTHERS",
+    ]);
+
+    setDynamicRooms([
+      "OTHERS",
+    ]);
+  }
+
+  else {
+
+    setDynamicFloors([]);
+
+    setDynamicRooms([]);
+  }
+
+}, [typeFilter, floorFilter]);
 
   // FETCH BEDS
 
@@ -204,8 +349,7 @@ const bedsPerPage = 40;
   searchTerm,
   statusFilter,
   locationFilter,
-  roomFilter,
-  floorFilter,
+  typeFilter,
   summaryFilter,
 ]);
 
@@ -215,12 +359,11 @@ const bedsPerPage = 40;
 
   try {
 
-    if (
-      !bedNumber ||
-      !room ||
-      !floor ||
-      !location
-    ) {
+   if (
+  !bedNumber ||
+  !locationType ||
+  !location
+) {
       toast.error("Please fill all fields");
       return;
     }
@@ -256,6 +399,7 @@ const bedsPerPage = 40;
         room,
         floor,
         location,
+        location_type: locationType,
         status,
         gender_type: type,
         department,
@@ -266,6 +410,8 @@ const bedsPerPage = 40;
     );
 
     setBeds([...beds, response.data]);
+
+    toast.success("Bed created successfully");
 
     resetForm();
 
@@ -280,19 +426,36 @@ const bedsPerPage = 40;
 const resetForm = () => {
 
   setBedNumber("");
+
+  setLocationType("");
+
   setRoom("");
+
   setFloor("");
+
   setLocation("");
+
   setStatus("available");
 
   setGuestName("");
+
   setGuestPhone("");
+
   setEmpId("");
+
   setCheckIn("");
+
   setDepartment("");
+
   setFan(false);
+
   setMattress(false);
+
   setPlywood(false);
+
+  setShowCreateModal(false);
+
+  setShowGuestModal(false);
 };
 
 const saveOccupiedBed = async () => {
@@ -311,7 +474,9 @@ const saveOccupiedBed = async () => {
 
       toast.error(
         "Please fill all details"
+        
       );
+      
 
       return;
     }
@@ -336,6 +501,7 @@ const saveOccupiedBed = async () => {
         room,
         floor,
         location,
+        location_type: locationType,
         status,
         gender_type: type,
         guest_name: guestName,
@@ -385,6 +551,7 @@ const saveOccupiedBed = async () => {
     setShowGuestModal(false);
 
     resetForm();
+
 
   } catch (error) {
 
@@ -608,6 +775,13 @@ const matchesFloor =
 
   bed.floor === floorFilter;
 
+  const matchesType =
+
+  typeFilter === "" ||
+
+  bed.location_type ===
+    typeFilter;
+
   const matchesSummary =
 
   summaryFilter === "all"
@@ -630,6 +804,8 @@ const matchesFloor =
 matchesRoom &&
 
 matchesFloor &&
+
+matchesType &&
 
 matchesSummary
 );
@@ -825,63 +1001,27 @@ const totalPages =
 
   </select>
 
-  {/* LOCATION */}
+  {/* TYPE FILTER */}
 
   <select
-    value={locationFilter}
-
-    onChange={(e) =>
-      setLocationFilter(
-        e.target.value
-      )
-    }
-
-    className="
-      h-10
-      w-44
-      bg-white
-      border
-      border-gray-200
-      rounded-xl
-      px-3
-      text-sm
-      shadow-sm
-      outline-none
-    "
-  >
-
-    <option value="">
-      All Location
-    </option>
-
-    <option value="inside">
-      Inside
-    </option>
-
-    <option value="outside">
-      Outside
-    </option>
-
-  </select>
-
-  {/* ROOM */}
-
-  <select
-    value={roomFilter}
+    value={typeFilter}
 
     onChange={(e) => {
 
-      setRoomFilter(
+      setTypeFilter(
         e.target.value
       );
 
       setFloorFilter("");
+
+      setRoomFilter("");
     }}
 
     className="
       h-10
       w-44
-      bg-white
+      bg-white/70
+      backdrop-blur-xl
       border
       border-gray-200
       rounded-xl
@@ -893,134 +1033,117 @@ const totalPages =
   >
 
     <option value="">
-      All Hall / Room
+      All Types
     </option>
 
-   {/* BUILDING ROOMS */}
-
-{Object.values(
-  locationConfig.Building.buildings
-)
-  .flat()
-  .map((item) => (
-
-    <option
-      key={item}
-      value={item}
-    >
-      {item}
+    <option value="Dormitory1">
+      Dormitory1
     </option>
 
-))}
-
-{/* HALLS */}
-
-{locationConfig.Hall.halls.map(
-  (item) => (
-
-    <option
-      key={item}
-      value={item}
-    >
-      {item}
+    <option value="Dormitory2">
+      Dormitory2
     </option>
 
-))}
-
-{/* SUPERMARKET */}
-
-{locationConfig.Supermarket.sections.map(
-  (item) => (
-
-    <option
-      key={item}
-      value={item}
-    >
-      {item}
+    <option value="Hall">
+      Hall
     </option>
 
-))}
+    <option value="Supermarket">
+      Supermarket
+    </option>
+
+    <option value="Others">
+      Others
+    </option>
 
   </select>
+{/* FLOOR / ROW FILTER */}
 
-  {/* FLOOR */}
+<select
+  value={floorFilter}
 
-  <select
-    value={floorFilter}
+  onChange={(e) =>
+    setFloorFilter(
+      e.target.value
+    )
+  }
 
-    onChange={(e) =>
-      setFloorFilter(
-        e.target.value
-      )
-    }
+  className="
+    h-10
+    w-44
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+    shadow-sm
+    outline-none
+  "
+>
 
-    className="
-      h-10
-      w-44
-      bg-white
-      border
-      border-gray-200
-      rounded-xl
-      px-3
-      text-sm
-      shadow-sm
-      outline-none
-    "
-  >
+  <option value="">
+    All Floor / Row
+  </option>
 
-    <option value="">
-      All Floor / Row
+  {dynamicFloors.map((floor) => (
+
+    <option
+      key={floor}
+      value={floor}
+    >
+      {floor}
     </option>
 
-    {roomFilter.startsWith("HALL") && (
+  ))}
 
-      <>
+</select>
 
-        <option value="ROW1">
-          Row1
-        </option>
+{/* ROOM / HALL FILTER */}
 
-        <option value="ROW2">
-          Row2
-        </option>
+<select
+  value={roomFilter}
 
-        <option value="ROW3">
-          Row3
-        </option>
+  onChange={(e) =>
+    setRoomFilter(
+      e.target.value
+    )
+  }
 
-        <option value="ROW4">
-          Row4
-        </option>
+  className="
+    h-10
+    w-44
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+    shadow-sm
+    outline-none
+  "
+>
 
-      </>
+  <option value="">
+    All Room / Hall
+  </option>
 
-    )}
+  {dynamicRooms.map((room) => (
 
-    {roomFilter.startsWith("ROOM") && (
+    <option
+      key={room}
+      value={room}
+    >
+      {room}
+    </option>
 
-      <>
+  ))}
 
-       <option value="GROUND FLOOR">
-  GROUND FLOOR
-</option>
-
-<option value="FLOOR1">
-  FLOOR1
-</option>
-
-<option value="FLOOR2">
-  FLOOR2
-</option>
-
-      </>
-
-    )}
-
-    
-
-  </select>
+</select>
 
 </div>
+
+
 
 {/* SUMMARY CARDS */}
 
@@ -1385,7 +1508,7 @@ const totalPages =
     flex
     justify-center
     items-center
-    z-50
+    z-[999]
   ">
 
     <div className="
@@ -1928,25 +2051,7 @@ const totalPages =
 
 </div>
 
-<button
-  onClick={addBed}
 
-  className="
-    h-11
-    rounded-xl
-    bg-blue-600
-    hover:bg-blue-700
-    text-white
-    text-sm
-    font-semibold
-    transition
-    shadow-md
-  "
->
-
-  Create Bed
-
-</button>
 
 {/* CREATE BED MODAL */}
 
@@ -1964,8 +2069,8 @@ const totalPages =
   grid
   grid-cols-1
   md:grid-cols-2
-  lg:grid-cols-3
   gap-4
+  items-start
 ">
 
 {/* BED NUMBER */}
@@ -2019,35 +2124,42 @@ const totalPages =
     text-sm
   "
 >
-
   <option value="">
-    Select Type
-  </option>
+  Select Type
+</option>
+ <option value="Dormitory1">
+  Dormitory1
+</option>
 
-  <option value="Building">
-    Building
-  </option>
+<option value="Dormitory2">
+  Dormitory2
+</option>
 
-  <option value="Hall">
-    Hall
-  </option>
+<option value="Hall">
+  Hall
+</option>
 
-  <option value="Supermarket">
-    Supermarket
-  </option>
+<option value="Supermarket">
+  Supermarket
+</option>
+
+<option value="Others">
+  Others
+</option>
 
 </select>
 
-{/* BUILDING */}
+{/* FLOOR */}
 
-{locationType === "Building" && (
+{(locationType === "Dormitory1" ||
+  locationType === "Dormitory2") && (
 
 <select
-  value={building}
+  value={floor}
 
   onChange={(e) => {
 
-    setBuilding(
+    setFloor(
       e.target.value
     );
 
@@ -2066,20 +2178,345 @@ const totalPages =
 >
 
   <option value="">
-    Select Building
+    Select Floor
   </option>
 
-  <option value="Building 1">
-    Building 1
+  <option value="GROUND FLOOR">
+    Ground Floor
   </option>
 
-  <option value="Building 2">
-    Building 2
+  <option value="1ST FLOOR">
+    1st Floor
+  </option>
+
+  <option value="2ND FLOOR">
+    2nd Floor
   </option>
 
 </select>
 
 )}
+
+
+
+{/* HALL SELECT */}
+
+{locationType === "Hall" && (
+
+<select
+  value={room}
+
+  onChange={(e) =>
+    setRoom(
+      e.target.value
+    )
+  }
+
+  className="
+    h-10
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+  "
+>
+
+  <option value="">
+    Select Hall
+  </option>
+
+  <option value="HALL1">
+    HALL1
+  </option>
+
+  <option value="HALL2">
+    HALL2
+  </option>
+
+  <option value="HALL3">
+    HALL3
+  </option>
+
+  <option value="HALL4">
+    HALL4
+  </option>
+
+</select>
+
+)}
+
+{/* ROW SELECT */}
+
+{locationType === "Hall" && (
+
+<select
+  value={floor}
+
+  onChange={(e) =>
+    setFloor(
+      e.target.value
+    )
+  }
+
+  className="
+    h-10
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+  "
+>
+
+  <option value="">
+    Select Row
+  </option>
+
+  <option value="ROW1">
+    ROW1
+  </option>
+
+  <option value="ROW2">
+    ROW2
+  </option>
+
+  <option value="ROW3">
+    ROW3
+  </option>
+
+  <option value="ROW4">
+    ROW4
+  </option>
+
+</select>
+
+)}
+
+{/* ROOM */}
+
+{locationType !== "Hall" && (
+
+<select
+  value={room}
+
+  onChange={(e) =>
+    setRoom(
+      e.target.value
+    )
+  }
+
+  className="
+    h-10
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+  "
+>
+
+<option value="">
+  Select Room
+</option>
+
+{/* DORMITORY1 */}
+
+{locationType === "Dormitory1" &&
+ floor === "GROUND FLOOR" && (
+
+<>
+  <option value="R101">R101</option>
+  <option value="R102">R102</option>
+  <option value="R103">R103</option>
+  <option value="R104">R104</option>
+  <option value="R105">R105</option>
+  <option value="R106">R106</option>
+</>
+
+)}
+
+{locationType === "Dormitory1" &&
+ floor === "1ST FLOOR" && (
+
+<>
+  <option value="R107">R107</option>
+  <option value="R108">R108</option>
+</>
+
+)}
+
+{locationType === "Dormitory1" &&
+ floor === "2ND FLOOR" && (
+
+<>
+  <option value="R109">R109</option>
+  <option value="R110">R110</option>
+</>
+
+)}
+
+{/* DORMITORY2 */}
+
+{locationType === "Dormitory2" &&
+ floor === "GROUND FLOOR" && (
+
+<>
+  <option value="R201">R201</option>
+  <option value="R202">R202</option>
+</>
+
+)}
+
+{locationType === "Dormitory2" &&
+ floor === "1ST FLOOR" && (
+
+<>
+  <option value="R203">R203</option>
+  <option value="R204">R204</option>
+</>
+
+)}
+
+{locationType === "Dormitory2" &&
+ floor === "2ND FLOOR" && (
+
+<>
+  <option value="R205">R205</option>
+  <option value="R206">R206</option>
+</>
+
+)}
+
+
+
+{/* SUPERMARKET */}
+
+{locationType === "Supermarket" && (
+
+<>
+  <option value="LOWER">LOWER</option>
+  <option value="UPPER">UPPER</option>
+</>
+
+)}
+
+{/* OTHERS */}
+
+{locationType === "Others" && (
+
+<>
+  <option value="OTHERS">
+    OTHERS
+  </option>
+</>
+
+)} 
+
+</select>
+)}
+
+{/* LOCATION */}
+
+<select
+  value={location}
+
+  onChange={(e) =>
+    setLocation(
+      e.target.value
+    )
+  }
+
+  className="
+    h-10
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+  "
+>
+
+  <option value="">
+    Select Location
+  </option>
+
+  <option value="inside">
+    Inside
+  </option>
+
+  <option value="outside">
+    Outside
+  </option>
+
+</select>
+
+{/* STATUS */}
+
+<select
+  value={status}
+
+  onChange={(e) =>
+    setStatus(
+      e.target.value
+    )
+  }
+
+  className="
+    h-10
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+  "
+>
+
+  <option value="">
+    Select Status
+  </option>
+
+  <option value="available">
+    Available
+  </option>
+
+  <option value="occupied">
+    Occupied
+  </option>
+
+</select>
+
+
+{/* CREATE BUTTON */}
+
+<button
+  onClick={addBed}
+
+  className="
+    h-10
+    bg-blue-600
+    hover:bg-blue-700
+    text-white
+    rounded-xl
+    px-5
+    text-sm
+    font-semibold
+    transition
+  "
+>
+
+  Create Bed
+
+</button>
+
+
+
+
 
 </div>
 
