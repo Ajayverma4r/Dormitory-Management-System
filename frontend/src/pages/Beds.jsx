@@ -167,10 +167,16 @@ const bedsPerPage = 40;
 
 useEffect(() => {
 
+  setRoomFilter("");
+
+  setFloorFilter("");
+
+}, [typeFilter]);
+
+useEffect(() => {
+
   // RESET
 
-  setRoomFilter("");
-  setFloorFilter("");
 
   // DORMITORY1
 
@@ -250,8 +256,6 @@ useEffect(() => {
 
 else if (typeFilter === "Hall") {
 
-  // HALL DROPDOWN
-
   setDynamicFloors([
     "HALL1",
     "HALL2",
@@ -259,14 +263,13 @@ else if (typeFilter === "Hall") {
     "HALL4",
   ]);
 
-  // ROW DROPDOWN
-
   setDynamicRooms([
     "ROW1",
     "ROW2",
     "ROW3",
     "ROW4",
   ]);
+
 }
 
   // SUPERMARKET
@@ -727,6 +730,11 @@ maintenance_comment:
   }
 };
 
+console.log(
+  beds.filter(
+    b => b.location_type === "Hall"
+  )
+);
     // FILTERED BEDS
 
 const filteredBeds = beds.filter((bed) => {
@@ -765,15 +773,31 @@ const filteredBeds = beds.filter((bed) => {
 
     const matchesRoom =
 
-  roomFilter === "" ||
+  typeFilter === "Hall"
 
-  bed.room === roomFilter;
+    ? (
+        roomFilter === "" ||
+        bed.floor === roomFilter
+      )
+
+    : (
+        roomFilter === "" ||
+        bed.room === roomFilter
+      );
 
 const matchesFloor =
 
-  floorFilter === "" ||
+  typeFilter === "Hall"
 
-  bed.floor === floorFilter;
+    ? (
+        floorFilter === "" ||
+        bed.room === floorFilter
+      )
+
+    : (
+        floorFilter === "" ||
+        bed.floor === floorFilter
+      );
 
   const matchesType =
 
@@ -1062,11 +1086,17 @@ const totalPages =
 <select
   value={floorFilter}
 
-  onChange={(e) =>
-    setFloorFilter(
-      e.target.value
-    )
+  onChange={(e) => {
+
+  setFloorFilter(e.target.value);
+
+  if (typeFilter === "Hall") {
+
+    setRoomFilter("");
+
   }
+
+}}
 
   className="
     h-10

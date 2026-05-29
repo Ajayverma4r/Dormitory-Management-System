@@ -7,6 +7,114 @@ const router = express.Router();
 
 // GET ALL BEDS
 
+// GET BED HISTORY
+
+router.get("/history", async (req, res) => {
+
+  try {
+
+   const {
+  fromDate,
+  toDate,
+  empId,
+  guestName,
+  department,
+  bedNumber,
+  stayStatus,
+} = req.query;
+
+    let query = `
+      SELECT *
+      FROM bed_history
+      WHERE 1=1
+    `;
+
+    const values = [];
+
+    if (fromDate) {
+
+      values.push(fromDate);
+
+      query += `
+        AND check_in >= $${values.length}
+      `;
+    }
+
+    if (toDate) {
+
+      values.push(toDate);
+
+      query += `
+        AND check_in <= $${values.length}
+      `;
+    }
+    if (empId) {
+
+  values.push(`%${empId}%`);
+
+  query += `
+    AND emp_id ILIKE $${values.length}
+  `;
+}
+
+if (guestName) {
+
+  values.push(`%${guestName}%`);
+
+  query += `
+    AND guest_name ILIKE $${values.length}
+  `;
+}
+
+if (department) {
+
+  values.push(`%${department}%`);
+
+  query += `
+    AND department ILIKE $${values.length}
+  `;
+}
+
+if (bedNumber) {
+
+  values.push(`%${bedNumber}%`);
+
+  query += `
+    AND bed_number ILIKE $${values.length}
+  `;
+}
+
+if (stayStatus) {
+
+  values.push(stayStatus);
+
+  query += `
+    AND stay_status = $${values.length}
+  `;
+}
+
+    query += `
+      ORDER BY id DESC
+    `;
+
+    const result =
+      await pool.query(
+        query,
+        values
+      );
+
+    res.json(result.rows);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
 router.get("/", async (req, res) => {
 
   try {
@@ -216,55 +324,52 @@ if (status === "occupied") {
 
     `
     INSERT INTO bed_history
-    (
-      bed_id,
-      bed_number,
-      guest_name,
-      emp_id,
-      guest_phone,
-      department,
-      fan,
-      mattress,
-      plywood,
-      check_in
-    )
+(
+  bed_id,
+  bed_number,
+  guest_name,
+  emp_id,
+  guest_phone,
+  department,
+  fan,
+  mattress,
+  plywood,
+  check_in,
+  stay_status,
+  location_type
+)
 
     VALUES
-    (
-      $1,
-      $2,
-      $3,
-      $4,
-      $5,
-      $6,
-      $7,
-      $8,
-      $9,
-      $10
-    )
+(
+  $1,
+  $2,
+  $3,
+  $4,
+  $5,
+  $6,
+  $7,
+  $8,
+  $9,
+  $10,
+  $11,
+  $12
+)
     `,
 
     [
-      newBed.rows[0].id,
-
-      bed_number,
-
-      guest_name,
-
-      emp_id,
-
-      guest_phone,
-
-      department,
-
-      fan,
-
-      mattress,
-
-      plywood,
-
-      check_in,
-    ]
+  newBed.rows[0].id,
+  bed_number,
+  guest_name,
+  emp_id,
+  guest_phone,
+  department,
+  fan,
+  mattress,
+  plywood,
+  check_in,
+  "active",
+  location_type
+]
   );
 }
 
@@ -291,6 +396,22 @@ router.put("/:id", async (req, res) => {
 
     const { id } =
       req.params;
+const existingBed = await pool.query(
+  `
+  SELECT *
+  FROM beds
+  WHERE id = $1
+  `,
+  [id]
+);
+
+if (existingBed.rows.length === 0) {
+  return res.status(404).json({
+    message: "Bed not found",
+  });
+}
+
+const oldBed = existingBed.rows[0];
 
     const {
       room,
@@ -315,6 +436,175 @@ maintenance_cleaning,
 maintenance_others,
 maintenance_comment,
     } = req.body;
+
+    // AVAILABLE -> OCCUPIED
+if (
+  oldBed.status === "available" &&
+  status === "occupied"
+) {
+
+  await pool.query(
+    `
+    INSERT INTO bed_history
+    (
+      bed_id,
+      bed_number,
+      guest_name,
+      emp_id,
+      guest_phone,
+      department,
+      fan,
+      mattress,
+      plywood,
+      check_in,
+      stay_status,
+      location_type
+    )
+   VALUES
+(
+  $1,$2,$3,$4,$5,
+  $6,$7,$8,$9,$10,$11,$12
+)
+    `,
+    [
+  oldBed.id,
+  oldBed.bed_number,
+  guest_name,
+  emp_id,
+  guest_phone,
+  department,
+  fan,
+  mattress,
+  plywood,
+  check_in,
+  "active",
+  oldBed.location_type
+]
+  );
+}
+// OCCUPIED -> AVAILABLE
+if (
+  oldBed.status === "occupied" &&
+  status === "available"
+) {
+
+  await pool.query(
+    `
+    UPDATE bed_history
+    SET
+      check_out = CURRENT_DATE,
+      stay_status = 'completed'
+    WHERE
+      bed_id = $1
+      AND stay_status = 'active'
+    `,
+    [id]
+  );
+}
+
+// OCCUPIED -> OCCUPIED
+
+if (
+  oldBed.status === "occupied" &&
+  status === "occupied"
+) {
+
+  // SAME EMPLOYEE
+
+  if (oldBed.emp_id === emp_id) {
+
+    await pool.query(
+      `
+      UPDATE bed_history
+      SET
+        guest_name = $1,
+        guest_phone = $2,
+        department = $3,
+        fan = $4,
+        mattress = $5,
+        plywood = $6,
+        check_in = $7
+      WHERE
+        bed_id = $8
+        AND stay_status = 'active'
+      `,
+      [
+        guest_name,
+        guest_phone,
+        department,
+        fan,
+        mattress,
+        plywood,
+        check_in,
+        id,
+      ]
+    );
+
+  }
+
+  // NEW EMPLOYEE
+
+  else {
+
+    // CLOSE OLD RECORD
+
+    await pool.query(
+      `
+      UPDATE bed_history
+      SET
+        check_out = CURRENT_DATE,
+        stay_status = 'completed'
+      WHERE
+        bed_id = $1
+        AND stay_status = 'active'
+      `,
+      [id]
+    );
+
+    // CREATE NEW RECORD
+
+await pool.query(
+  `
+  INSERT INTO bed_history
+  (
+    bed_id,
+    bed_number,
+    guest_name,
+    emp_id,
+    guest_phone,
+    department,
+    fan,
+    mattress,
+    plywood,
+    check_in,
+    stay_status,
+    location_type
+  )
+  VALUES
+  (
+    $1,$2,$3,$4,$5,
+    $6,$7,$8,$9,$10,$11,$12
+  )
+  `,
+  [
+    id,
+    oldBed.bed_number,
+    guest_name,
+    emp_id,
+    guest_phone,
+    department,
+    fan,
+    mattress,
+    plywood,
+    check_in,
+    "active",
+    oldBed.location_type
+  ]
+);
+
+  }
+}
+
 
     const updatedBed =
       await pool.query(

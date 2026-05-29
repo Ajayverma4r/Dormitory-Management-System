@@ -1,3 +1,4 @@
+import * as XLSX from "xlsx";
 import ReportsBG from "../assets/reportsBG.webp" 
 import { useEffect, useState } from "react";
 import API from "../services/api";
@@ -7,12 +8,16 @@ import Sidebar from "../components/Sidebar";
 function Reports() {
 
   const [beds, setBeds] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
+  
 
   const [searchTerm, setSearchTerm] = useState("");
 
   const [statusFilter, setStatusFilter] = useState("");
 
   const [genderFilter, setGenderFilter] = useState("");
+
+  const [typeFilter, setTypeFilter] = useState("");
 
   const [
   roomFilter,
@@ -24,6 +29,9 @@ const [
   setFloorFilter
 ] = useState("");
 
+const [dynamicRooms, setDynamicRooms] = useState([]);
+const [dynamicFloors, setDynamicFloors] = useState([]);
+
   const [currentPage,
   setCurrentPage] =
   useState(1);
@@ -31,6 +39,9 @@ const [
   const [isPrinting,
   setIsPrinting] =
   useState(false);
+
+  const [reportType, setReportType] =
+  useState("beds");
 
   const rowsPerPage = 40;
   // FETCH DATA
@@ -50,11 +61,136 @@ const [
     }
   };
 
-  useEffect(() => {
+  const fetchHistory = async () => {
+
+  try {
+
+    const response =
+      await API.get("/beds/history");
+
+    setHistoryData(
+      response.data
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+};
+
+ useEffect(() => {
+
+  if (reportType === "beds") {
 
     fetchBeds();
 
-  }, []);
+  }
+
+  else {
+
+    fetchHistory();
+
+  }
+
+}, [reportType]);
+
+  useEffect(() => {
+
+  if (typeFilter === "Dormitory1") {
+
+    setDynamicFloors([
+      "GROUND FLOOR",
+      "1ST FLOOR",
+      "2ND FLOOR",
+    ]);
+
+    if (floorFilter === "GROUND FLOOR") {
+      setDynamicRooms([
+        "R101","R102","R103",
+        "R104","R105","R106",
+      ]);
+    }
+
+    else if (floorFilter === "1ST FLOOR") {
+      setDynamicRooms([
+        "R107","R108",
+      ]);
+    }
+
+    else if (floorFilter === "2ND FLOOR") {
+  setDynamicRooms([
+    "R109","R110",
+  ]);
+}
+
+  }
+
+  else if (typeFilter === "Dormitory2") {
+
+    setDynamicFloors([
+      "GROUND FLOOR",
+      "1ST FLOOR",
+      "2ND FLOOR",
+    ]);
+
+    if (floorFilter === "GROUND FLOOR") {
+      setDynamicRooms([
+        "R201","R202",
+      ]);
+    }
+
+    else if (floorFilter === "1ST FLOOR") {
+      setDynamicRooms([
+        "R203","R204",
+      ]);
+    }
+
+    else if (floorFilter === "2ND FLOOR") {
+      setDynamicRooms([
+        "R205","R206",
+      ]);
+    }
+
+  }
+
+else if (typeFilter === "Hall") {
+
+  setDynamicFloors([
+    "HALL1",
+    "HALL2",
+    "HALL3",
+    "HALL4",
+  ]);
+
+  setDynamicRooms([
+    "ROW1",
+    "ROW2",
+    "ROW3",
+    "ROW4",
+  ]);
+
+}
+
+  else if (typeFilter === "Supermarket") {
+
+    setDynamicRooms([
+      "LOWER",
+      "UPPER",
+    ]);
+
+    setDynamicFloors([]);
+
+  }
+
+  else {
+
+    setDynamicRooms([]);
+    setDynamicFloors([]);
+
+  }
+
+}, [typeFilter, floorFilter]);
 
   // EXPORT CSV
 
@@ -70,145 +206,220 @@ const [
 
       : "All Dormitory Report";
 
-  const exportCSV = () => {
+ const exportExcel = () => {
 
-    // FILTERED DATA
+  const filteredBeds = beds.filter((bed) => {
 
-    const filteredBeds = beds.filter((bed) => {
+    const matchesSearch =
 
-      const matchesSearch =
+      bed.bed_number
+        ?.toLowerCase()
+        .includes(
+          searchTerm.toLowerCase()
+        )
 
-        bed.bed_number
-          ?.toLowerCase()
-          .includes(
-            searchTerm.toLowerCase()
+      ||
+
+      bed.guest_name
+        ?.toLowerCase()
+        .includes(
+          searchTerm.toLowerCase()
+        )
+
+      ||
+
+      bed.emp_id
+        ?.toLowerCase()
+        .includes(
+          searchTerm.toLowerCase()
+        );
+
+    const matchesGender =
+
+      genderFilter === "" ||
+
+      bed.gender_type === genderFilter;
+
+    const matchesStatus =
+
+      statusFilter === "" ||
+
+      bed.status === statusFilter;
+
+    const matchesType =
+
+      typeFilter === "" ||
+
+      bed.location_type === typeFilter;
+
+    const matchesRoom =
+
+      typeFilter === "Hall"
+
+        ? (
+            roomFilter === "" ||
+            bed.floor === roomFilter
           )
 
-        ||
-        
-
-        bed.guest_name
-          ?.toLowerCase()
-          .includes(
-            searchTerm.toLowerCase()
-          )
-
-        ||
-
-        bed.emp_id
-          ?.toLowerCase()
-          .includes(
-            searchTerm.toLowerCase()
+        : (
+            roomFilter === "" ||
+            bed.room === roomFilter
           );
 
-          const matchesGender =
+    const matchesFloor =
 
-  genderFilter === "" ||
+      typeFilter === "Hall"
 
-  bed.gender_type === genderFilter;
+        ? (
+            floorFilter === "" ||
+            bed.room === floorFilter
+          )
 
-
-      const matchesStatus =
-
-        statusFilter === "" ||
-
-        bed.status === statusFilter;
-
-        const matchesRoom =
-
-  roomFilter === "" ||
-
-  bed.room === roomFilter;
-
-const matchesFloor =
-
-  floorFilter === "" ||
-
-  bed.floor === floorFilter;
+        : (
+            floorFilter === "" ||
+            bed.floor === floorFilter
+          );
 
     return (
 
-  matchesSearch &&
+      matchesSearch &&
 
-  matchesStatus &&
+      matchesStatus &&
 
-  matchesGender &&
+      matchesGender &&
 
-  matchesRoom &&
+      matchesType &&
 
-  matchesFloor
-);
-    });
+      matchesRoom &&
 
-
-    // HEADERS
-
-    const headers = [
-      "Bed",
-      "Room",
-      "Floor",
-      "Status",
-      "Name",
-      "Emp ID",
-      "Contact",
-    ];
-
-    // ROWS
-
-    const rows = filteredBeds.map((bed) => [
-
-      bed.bed_number,
-
-      bed.room,
-
-      bed.floor,
-
-      bed.status,
-
-      bed.guest_name || "",
-
-      bed.emp_id || "",
-
-      bed.guest_phone
-        ? `+91 ${bed.guest_phone}`
-        : "",
-    ]);
-
-    // CSV CONTENT
-
-    const csvContent = [
-
-  [reportTitle],
-
-  [],
-
-  headers.join(","),
-
-  ...rows.map((row) =>
-    row.join(",")
-  ),
-
-].join("\n");
-
-    // DOWNLOAD
-
-    const blob = new Blob(
-      [csvContent],
-      { type: "text/csv" }
+      matchesFloor
     );
 
-    const url =
-      window.URL.createObjectURL(blob);
+  });
 
-    const link =
-      document.createElement("a");
+  const excelData = filteredBeds.map(
+    (bed, index) => ({
 
-    link.href = url;
+      "S.No": index + 1,
 
-    link.download = "reports.csv";
+      "Bed": bed.bed_number,
 
-    link.click();
-  };
+      "Room / Hall": bed.room,
+
+      "Floor / Row": bed.floor,
+
+      "Location": bed.location,
+
+      "Status": bed.status,
+
+      "Name":
+        bed.guest_name || "-",
+
+      "Emp ID":
+        bed.emp_id || "-",
+
+      "Contact":
+        bed.guest_phone
+          ? `+91 ${bed.guest_phone}`
+          : "-",
+
+    })
+  );
+
+  const worksheet =
+  XLSX.utils.aoa_to_sheet([
+    ["DORMITORY MANAGEMENT SYSTEM"],
+    [reportTitle],
+    [""],
+    [
+      `Type: ${typeFilter || "All"}`
+    ],
+    [
+      `Floor/Row: ${floorFilter || "All"}`
+    ],
+    [
+      `Room/Hall: ${roomFilter || "All"}`
+    ],
+    [
+      `Status: ${statusFilter || "All"}`
+    ],
+   [
+  `Generated On: ${new Date().toLocaleString()}`
+],
+
+[
+  `Total Records: ${excelData.length}`
+],
+
+
+    
+    [""]
+  ]);
+
+  worksheet["!freeze"] = {
+  xSplit: 0,
+  ySplit: 10,
+};
+
+   worksheet["!merges"] = [
+
+  {
+    s: { r: 0, c: 0 },
+    e: { r: 0, c: 8 },
+  },
+
+  {
+    s: { r: 1, c: 0 },
+    e: { r: 1, c: 8 },
+  },
+
+];
+
+XLSX.utils.sheet_add_json(
+  worksheet,
+  excelData,
+  {
+    origin: "A10",
+    skipHeader: false,
+  }
+);
+
+worksheet["!cols"] = [
+
+  { wch: 8 },   // S.No
+
+  { wch: 15 },  // Bed
+
+  { wch: 18 },  // Room
+
+  { wch: 18 },  // Floor
+
+  { wch: 15 },  // Location
+
+  { wch: 20 },  // Status
+
+  { wch: 30 },  // Name
+
+  { wch: 18 },  // Emp ID
+
+  { wch: 20 },  // Contact
+
+];
+  const workbook =
+    XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Dormitory Report"
+  );
+
+  XLSX.writeFile(
+    workbook,
+    `${reportTitle}.xlsx`
+  );
+
+};
 
   // PRINT REPORT
 
@@ -218,20 +429,12 @@ const matchesFloor =
 
   setTimeout(() => {
 
-    const originalTitle =
-      document.title;
-
-    document.title =
-      reportTitle;
-
     window.print();
-
-    document.title =
-      originalTitle;
 
     setIsPrinting(false);
 
-  }, 300);
+  }, 1000);
+
 };
 
   // FILTERED DATA
@@ -275,14 +478,54 @@ const filteredBeds = beds.filter((bed) => {
 
     bed.status === statusFilter;
 
-  return (
+   const matchesType =
 
-    matchesSearch &&
+  typeFilter === "" ||
 
-    matchesStatus &&
+  bed.location_type === typeFilter;
 
-    matchesGender
-  );
+const matchesRoom =
+
+  typeFilter === "Hall"
+
+    ? (
+        roomFilter === "" ||
+        bed.floor === roomFilter
+      )
+
+    : (
+        roomFilter === "" ||
+        bed.room === roomFilter
+      );
+
+const matchesFloor =
+
+  typeFilter === "Hall"
+
+    ? (
+        floorFilter === "" ||
+        bed.room === floorFilter
+      )
+
+    : (
+        floorFilter === "" ||
+        bed.floor === floorFilter
+      );
+
+return (
+
+  matchesSearch &&
+
+  matchesStatus &&
+
+  matchesGender &&
+
+  matchesType &&
+
+  matchesRoom &&
+
+  matchesFloor
+);
 });
 
 
@@ -306,6 +549,24 @@ const currentBeds =
 
     startIndex + rowsPerPage
   );
+
+  const totalBeds =
+  filteredBeds.length;
+
+const availableBeds =
+  filteredBeds.filter(
+    bed => bed.status === "available"
+  ).length;
+
+const occupiedBeds =
+  filteredBeds.filter(
+    bed => bed.status === "occupied"
+  ).length;
+
+const maintenanceBeds =
+  filteredBeds.filter(
+    bed => bed.status === "under_maintenance"
+  ).length;
 
   return (
 
@@ -400,14 +661,14 @@ const currentBeds =
         {/* SEARCH & FILTER */}
 
         <div className="
-          flex
-          flex-wrap
-          items-center
-          md:flex-row
-          gap-2
-          mb-3
-        ">
-
+  flex
+  items-center
+  gap-2
+  mb-3
+  overflow-x-auto
+  pb-2
+">
+  
           {/* SEARCH */}
 
           <input
@@ -419,7 +680,7 @@ const currentBeds =
             }
            className="
   h-10
-  min-w-[170px]
+ w-36
   bg-white
   border
   border-gray-200
@@ -444,7 +705,7 @@ const currentBeds =
             }
             className="
   h-10
-  min-w-[170px]
+w-36
   bg-white
   border
   border-gray-200
@@ -488,7 +749,7 @@ const currentBeds =
   }
 className="
   h-10
-  min-w-[170px]
+  w-36
   bg-white
   border
   border-gray-200
@@ -518,230 +779,342 @@ className="
 
 </select>
 
-  {/* ROOM FILTER */}
-
 <select
-  value={roomFilter}
-
+  value={typeFilter}
   onChange={(e) => {
 
-    setRoomFilter(
-      e.target.value
-    );
+  setTypeFilter(
+    e.target.value
+  );
 
-    setFloorFilter("");
-  }}
+  setFloorFilter("");
 
-className="
-  h-10
-  min-w-[170px]
-  bg-white
-  border
-  border-gray-200
-  px-3
-  rounded-xl
-  text-sm
-  shadow-sm
-  outline-none
-  focus:ring-2
-  focus:ring-blue-300
-  appearance-none
-  cursor-pointer
-"
+  setRoomFilter("");
+
+}}
+
+  className="
+    h-10
+   w-36
+    bg-white
+    border
+    border-gray-200
+    px-3
+    rounded-xl
+    text-sm
+    shadow-sm
+    outline-none
+    focus:ring-2
+    focus:ring-blue-300
+  "
 >
 
   <option value="">
-    All Hall / Room
+    All Types
   </option>
 
-  <option value="HALL1">
-    Hall1
+  <option value="Dormitory1">
+    Dormitory1
   </option>
 
-  <option value="HALL2">
-    Hall2
+  <option value="Dormitory2">
+    Dormitory2
   </option>
 
-  <option value="HALL3">
-    Hall3
+  <option value="Hall">
+    Hall
   </option>
 
-  <option value="HALL4">
-    Hall4
-  </option>
-
-  <option value="ROOM1">
-    Room1
-  </option>
-
-  <option value="ROOM2">
-    Room2
-  </option>
-
-  <option value="ROOM3">
-    Room3
-  </option>
-
-  <option value="ROOM4">
-    Room4
-  </option>
-
-  <option value="SUPERMARKET">
+  <option value="Supermarket">
     Supermarket
   </option>
 
-  <option value="OTHERS">
+  <option value="Others">
     Others
   </option>
 
 </select>
 
-{/* FLOOR FILTER */}
+{/* FLOOR / ROW FILTER */}
 
 <select
   value={floorFilter}
+  onChange={(e) => {
 
-  onChange={(e) =>
-    setFloorFilter(
-      e.target.value
-    )
-  }
+  setFloorFilter(e.target.value);
 
- className="
-  h-10
-  min-w-[170px]
-  bg-white
-  border
-  border-gray-200
-  px-3
-  rounded-xl
-  text-sm
-  shadow-sm
-  outline-none
-  focus:ring-2
-  focus:ring-blue-300
-  appearance-none
-  cursor-pointer
-"
+  setRoomFilter("");
+
+}}
+
+  className="
+    h-10
+  w-36
+    bg-white
+    border
+    border-gray-200
+    px-3
+    rounded-xl
+    text-sm
+    shadow-sm
+  "
 >
 
   <option value="">
     All Floor / Row
   </option>
 
-  {/* HALL */}
+  {dynamicFloors.map((floor) => (
 
-  {roomFilter.startsWith("HALL") && (
-
-    <>
-
-      <option value="ROW1">
-        Row1
-      </option>
-
-      <option value="ROW2">
-        Row2
-      </option>
-
-      <option value="ROW3">
-        Row3
-      </option>
-
-      <option value="ROW4">
-        Row4
-      </option>
-
-    </>
-
-  )}
-
-  {/* ROOM */}
-
-  {roomFilter.startsWith("ROOM") && (
-
-    <>
-
-      <option value="FLOOR1">
-        Floor1
-      </option>
-
-      <option value="FLOOR2">
-        Floor2
-      </option>
-
-      <option value="FLOOR3">
-        Floor3
-      </option>
-
-    </>
-
-  )}
-
-  {/* OTHERS */}
-
-  {(roomFilter === "SUPERMARKET" ||
-    roomFilter === "OTHERS") && (
-
-    <option value="OTHERS">
-      Others
+    <option
+      key={floor}
+      value={floor}
+    >
+      {floor}
     </option>
 
-  )}
+  ))}
 
 </select>
 
-          {/* EXPORT */}
+{/* ROOM / HALL FILTER */}
 
-          <button
-            onClick={exportCSV}
-          className="
-  bg-green-500/90
-  backdrop-blur-md
-  text-white
-  px-4
-  py-1.5
-  rounded-xl
-  text-sm
-  shadow-md
-  hover:bg-green-600
-  transition-all
-"
-          >
-            Export CSV
-          </button>
+<select
+  value={roomFilter}
+  onChange={(e) =>
+    setRoomFilter(e.target.value)
+  }
 
-          {/* PRINT */}
+  className="
+    h-10
+   w-36
+    bg-white
+    border
+    border-gray-200
+    px-3
+    rounded-xl
+    text-sm
+    shadow-sm
+  "
+>
 
-          <button
-            onClick={printReport}
-           className="
-  bg-blue-500/90
-  backdrop-blur-md
-  text-white
-  px-4
-  py-1.5
-  rounded-xl
-  text-sm
-  shadow-md
-  hover:bg-blue-600
-  transition-all
-"
-          >
-            Print Report
-          </button>
+  <option value="">
+    All Room / Hall
+  </option>
 
-        </div>
+  {dynamicRooms.map((room) => (
 
-        <h2 className="
-  text-xl
-  font-bold
-  mb-3
-  text-center
+    <option
+      key={room}
+      value={room}
+    >
+      {room}
+    </option>
+
+  ))}
+
+</select>
+ </div>
+ <div className="
+  grid
+  grid-cols-2
+  md:grid-cols-4
+  gap-4
+  mb-4
 ">
+
+  <div className="
+    bg-white
+    rounded-xl
+    p-4
+    shadow-sm
+    text-center
+  ">
+    <p>Total Beds</p>
+
+    <h2 className="
+      text-3xl
+      font-bold
+    ">
+      {totalBeds}
+    </h2>
+  </div>
+
+  <div className="
+    bg-green-50
+    rounded-xl
+    p-4
+    shadow-sm
+    text-center
+  ">
+    <p>Available</p>
+
+    <h2 className="
+      text-3xl
+      font-bold
+      text-green-700
+    ">
+      {availableBeds}
+    </h2>
+  </div>
+
+  <div className="
+    bg-red-50
+    rounded-xl
+    p-4
+    shadow-sm
+    text-center
+  ">
+    <p>Occupied</p>
+
+    <h2 className="
+      text-3xl
+      font-bold
+      text-red-700
+    ">
+      {occupiedBeds}
+    </h2>
+  </div>
+
+  <div className="
+    bg-yellow-50
+    rounded-xl
+    p-4
+    shadow-sm
+    text-center
+  ">
+    <p>Maintenance</p>
+
+    <h2 className="
+      text-3xl
+      font-bold
+      text-yellow-700
+    ">
+      {maintenanceBeds}
+    </h2>
+  </div>
+
+</div>
+
+<div className="
+  flex
+  justify-between
+  items-center
+  mb-4
+">
+
+  <h2 className="
+    text-xl
+    font-bold
+  ">
+    {reportTitle}
+  </h2>
+
+ <div className="
+  flex
+  gap-3
+  items-center
+">
+
+  <select
+    value={reportType}
+    onChange={(e) =>
+      setReportType(e.target.value)
+    }
+    className="
+      bg-white
+      border
+      border-gray-200
+      px-4
+      py-2
+      rounded-xl
+      text-sm
+      shadow-md
+    "
+  >
+    <option value="beds">
+  Bed Report
+</option>
+
+<option value="backup">
+  Occupancy Backup
+</option>
+  </select>
+
+  <button
+    onClick={exportExcel}
+    className="
+      bg-green-500/90
+      text-white
+      px-4
+      py-2
+      rounded-xl
+      text-sm
+      shadow-md
+      hover:bg-green-600
+    "
+  >
+    Export Excel
+  </button>
+
+  <button
+    onClick={printReport}
+    className="
+      bg-blue-500/90
+      text-white
+      px-4
+      py-2
+      rounded-xl
+      text-sm
+      shadow-md
+      hover:bg-blue-600
+    "
+  >
+    Print Report
+  </button>
+
+</div>
+
+</div>
+
+
+{isPrinting && (
+
+  <div className="mb-6 text-center">
+
+    <h1 className="text-3xl font-bold">
 
   {reportTitle}
 
-</h2>
+  {typeFilter &&
+    ` - ${typeFilter}`}
+
+  {floorFilter &&
+    ` - ${floorFilter}`}
+
+  {roomFilter &&
+    ` - ${roomFilter}`}
+
+</h1>
+
+    <p className="text-gray-600 mt-2">
+
+      {typeFilter && `Type: ${typeFilter}`}
+
+      {floorFilter &&
+        ` | Floor/Row: ${floorFilter}`}
+
+      {roomFilter &&
+        ` | Room/Hall: ${roomFilter}`}
+
+      {statusFilter &&
+        ` | Status: ${statusFilter}`}
+
+    </p>
+
+  </div>
+
+)}
 
         {/* TABLE */}
 
@@ -752,6 +1125,40 @@ className="
           overflow-x-auto
           print-section
         ">
+
+          {isPrinting && (
+
+  <div
+    style={{
+      textAlign: "center",
+      padding: "20px",
+      borderBottom: "2px solid #000",
+      marginBottom: "20px",
+    }}
+  >
+
+    <h1
+      style={{
+        fontSize: "28px",
+        fontWeight: "bold",
+      }}
+    >
+      {reportTitle}
+    </h1>
+
+    <h3>
+      {typeFilter || "All Types"}
+
+      {floorFilter &&
+        ` | ${floorFilter}`}
+
+      {roomFilter &&
+        ` | ${roomFilter}`}
+    </h3>
+
+  </div>
+
+)}
 
           <table className="
             w-full
@@ -877,7 +1284,9 @@ className="
 
       <td className="p-3">
 
-        {startIndex + index + 1}
+       {isPrinting
+  ? index + 1
+  : startIndex + index + 1}
 
       </td>
 
