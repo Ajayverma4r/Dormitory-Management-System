@@ -1,7 +1,11 @@
+import Swal from "sweetalert2";
+import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
 import ReportsBG from "../assets/reportsBG.webp" 
 import { useEffect, useState } from "react";
 import API from "../services/api";
+
+import OccupancyBackupModal from "../components/OccupancyBackupModal";
 
 import Sidebar from "../components/Sidebar";
 
@@ -42,6 +46,10 @@ const [dynamicFloors, setDynamicFloors] = useState([]);
 
   const [reportType, setReportType] =
   useState("beds");
+
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [showBackupModal, setShowBackupModal] = useState(false);
 
   const rowsPerPage = 40;
   // FETCH DATA
@@ -206,8 +214,20 @@ else if (typeFilter === "Hall") {
 
       : "All Dormitory Report";
 
- const exportExcel = () => {
+ const exportExcel = async () => {
+  const result = await Swal.fire({
+  title: "Export Report?",
+  text: "Do you want to export the current filtered report?",
+  icon: "question",
+  width: "400px",
+  showCancelButton: true,
+  confirmButtonText: "Export",
+  cancelButtonText: "Cancel",
+});
 
+if (!result.isConfirmed) {
+  return;
+}
   const filteredBeds = beds.filter((bed) => {
 
     const matchesSearch =
@@ -375,6 +395,26 @@ else if (typeFilter === "Hall") {
 
 ];
 
+worksheet["A1"].s = {
+  font: {
+    bold: true,
+    sz: 18
+  },
+  alignment: {
+    horizontal: "center"
+  }
+};
+
+worksheet["A2"].s = {
+  font: {
+    bold: true,
+    sz: 14
+  },
+  alignment: {
+    horizontal: "center"
+  }
+};
+
 XLSX.utils.sheet_add_json(
   worksheet,
   excelData,
@@ -414,10 +454,14 @@ worksheet["!cols"] = [
     "Dormitory Report"
   );
 
-  XLSX.writeFile(
-    workbook,
-    `${reportTitle}.xlsx`
-  );
+ XLSX.writeFile(
+  workbook,
+  `${reportTitle}.xlsx`
+);
+
+toast.success(
+  "Report exported successfully"
+);
 
 };
 
@@ -434,6 +478,193 @@ worksheet["!cols"] = [
     setIsPrinting(false);
 
   }, 1000);
+
+};
+
+const downloadOccupancyBackup = async () => {
+
+  try {
+
+    if (!fromDate || !toDate) {
+
+      toast.error(
+        "Please select From Date and To Date"
+      );
+
+      return;
+    }
+
+    const from = new Date(fromDate).getTime();
+    const to = new Date(toDate).getTime();
+
+    if (isNaN(from) || isNaN(to)) {
+
+      toast.error(
+        "Please select valid dates"
+      );
+
+      return;
+    }
+
+    if (from > to) {
+
+      toast.error(
+        "Please choose the correct date"
+      );
+
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "Download Occupancy Backup?",
+      html: `
+        <b>From:</b> ${fromDate}<br/>
+        <b>To:</b> ${toDate}
+      `,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Download",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    const response = await API.get(
+      `/beds/history?fromDate=${fromDate}&toDate=${toDate}`
+    );
+
+    const history = response.data;
+
+    const excelData = history.map(
+      (row, index) => ({
+
+        "S.No": index + 1,
+
+        "Bed Number": row.bed_number,
+
+        "Guest Name": row.guest_name,
+
+        "EMP ID": row.emp_id,
+
+        "Contact": row.guest_phone,
+
+        "Department": row.department,
+
+        "Location Type": row.location_type,
+
+        "Check In": row.check_in
+          ? new Date(row.check_in).toLocaleDateString("en-GB")
+          : "-",
+
+        "Check Out": row.check_out
+          ? new Date(row.check_out).toLocaleDateString("en-GB")
+          : "Still Occupied",
+
+        "Stay Status": row.stay_status,
+
+      })
+    );
+
+    const worksheet = XLSX.utils.aoa_to_sheet([
+
+      ["DORMITORY MANAGEMENT SYSTEM"],
+
+      ["Occupancy Backup Report"],
+
+      [""],
+
+      [`From Date: ${fromDate}`],
+
+      [`To Date: ${toDate}`],
+
+      [`Generated On: ${new Date().toLocaleString()}`],
+
+      [`Total Records: ${excelData.length}`],
+
+      [""]
+
+    ]);
+
+    worksheet["!merges"] = [
+
+      {
+        s: { r: 0, c: 0 },
+        e: { r: 0, c: 8 },
+      },
+
+      {
+        s: { r: 1, c: 0 },
+        e: { r: 1, c: 8 },
+      },
+
+    ];
+
+    XLSX.utils.sheet_add_json(
+      worksheet,
+      excelData,
+      {
+        origin: "A9",
+        skipHeader: false,
+      }
+    );
+
+    worksheet["!cols"] = [
+
+      { wch: 8 },   // S.No
+      { wch: 18 },  // Bed Number
+      { wch: 28 },  // Guest Name
+      { wch: 18 },  // EMP ID
+      { wch: 18 },  // Contact
+      { wch: 22 },  // Department
+      { wch: 18 },  // Location Type
+      { wch: 18 },  // Check In
+      { wch: 18 },  // Check Out
+      { wch: 18 },  // Stay Status
+
+    ];
+
+    worksheet["!freeze"] = {
+      xSplit: 0,
+      ySplit: 8,
+    };
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Occupancy Backup"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `Occupancy_Backup_${fromDate}_to_${toDate}.xlsx`
+    );
+
+    toast.success(
+      "Occupancy backup downloaded successfully"
+    );
+
+    setFromDate("");
+    setToDate("");
+
+    setShowBackupModal(false);
+
+  } catch (error) {
+
+    console.error(
+      "BACKUP ERROR =",
+      error
+    );
+
+    toast.error(
+      error?.message ||
+      "Failed to download occupancy backup"
+    );
+
+  }
 
 };
 
@@ -475,7 +706,7 @@ const filteredBeds = beds.filter((bed) => {
   const matchesStatus =
 
     statusFilter === "" ||
-
+    
     bed.status === statusFilter;
 
    const matchesType =
@@ -584,17 +815,11 @@ const maintenanceBeds =
 
       <div
   className="
-
     relative
-
     p-6
-
     md:ml-64
-
     min-h-screen
-
     overflow-hidden
-
     bg-cover
     bg-center
     bg-no-repeat
@@ -1018,9 +1243,23 @@ className="
 
   <select
     value={reportType}
-    onChange={(e) =>
-      setReportType(e.target.value)
-    }
+   onChange={(e) => {
+
+  const value = e.target.value;
+
+  if (value === "backup") {
+
+    setShowBackupModal(true);
+
+    setReportType("beds");
+
+    return;
+
+  }
+
+  setReportType(value);
+
+}}
     className="
       bg-white
       border
@@ -1525,7 +1764,18 @@ className="
         </div>
 
       </div>
-
+      
+<OccupancyBackupModal
+  isOpen={showBackupModal}
+  onClose={() =>
+    setShowBackupModal(false)
+  }
+  fromDate={fromDate}
+  setFromDate={setFromDate}
+  toDate={toDate}
+  setToDate={setToDate}
+  onDownload={downloadOccupancyBackup}
+/>
     </div>
   );
 }
