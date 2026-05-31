@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import usersBG from "../assets/usersBG.webp"
 import toast from "react-hot-toast";
 
@@ -145,14 +146,23 @@ function Users() {
 
     // CONFIRM
 
-    const confirmDelete =
-      window.confirm(
-        "Delete this user?"
-      );
+    const result =
+  await Swal.fire({
+    title: "Delete User?",
+    text:
+      "This action cannot be undone",
+    icon: "warning",
+    width: "350px",
+    showCancelButton: true,
+    confirmButtonText:
+      "Delete",
+    cancelButtonText:
+      "Cancel",
+  });
 
-    if (!confirmDelete) {
-      return;
-    }
+if (!result.isConfirmed) {
+  return;
+}
 
     try {
 
@@ -521,52 +531,56 @@ function Users() {
                     <button
                       onClick={async () => {
 
-                        const newPassword =
-                          prompt(
-                            "Enter new password"
-                          );
+                        const { value: newPassword } =
+  await Swal.fire({
+    title: "Change Password",
+    input: "password",
+    inputLabel: "Enter New Password",
+    inputPlaceholder: "New Password",
+    width: "350px",
+    showCancelButton: true,
+    confirmButtonText: "Update",
+    cancelButtonText: "Cancel",
+  });
 
-                        if (!newPassword) {
-                          return;
-                        }
+if (!newPassword) return;
 
-                        // VALIDATION
+if (newPassword.length < 6) {
 
-                        if (
-                          newPassword.length < 6
-                        ) {
+  toast.error(
+    "Password must be at least 6 characters"
+  );
 
-                          toast.error(
-                            "Password must be at least 6 characters"
-                          );
+  return;
+}
 
-                          return;
-                        }
+try {
 
-                        try {
+  await API.put(
 
-                          await API.put(
+    `/auth/users/${user.id}/password`,
 
-                            `/auth/users/${user.id}/password`,
+    {
+      password: newPassword,
+    }
+  );
 
-                            {
-                              password:
-                                newPassword,
-                            }
-                          );
+  await Swal.fire({
+    icon: "success",
+    title: "Password Updated",
+    text:
+      "Password updated successfully",
+      width: "350px",
+  });
 
-                          toast.success(
-                            "Password updated successfully"
-                          );
+} catch (error) {
 
-                        } catch (error) {
+  console.log(error);
 
-                          console.log(error);
-
-                          toast.error(
-                            "Failed to update password"
-                          );
-                        }
+  toast.error(
+    "Failed to update password"
+  );
+}
                       }}
 
                       className="
@@ -589,52 +603,60 @@ function Users() {
                     <button
                       onClick={async () => {
 
-                        const newRole =
-                          prompt(
-                            "Enter role: admin or staff"
-                          );
+                        const { value: newRole } =
+  await Swal.fire({
+    title: "Change Role",
 
-                        if (
-                          !newRole ||
-                          (
-                            newRole !== "admin" &&
-                            newRole !== "staff"
-                          )
-                        ) {
+    input: "select",
 
-                          toast.error(
-                            "Invalid role"
-                          );
+    inputOptions: {
+      admin: "Admin",
+      staff: "Staff",
+    },
+    width: "350px",
 
-                          return;
-                        }
+    inputPlaceholder:
+      "Select Role",
 
-                        try {
+    showCancelButton: true,
 
-                          await API.put(
+    confirmButtonText:
+      "Update",
 
-                            `/auth/users/${user.id}/role`,
+    cancelButtonText:
+      "Cancel",
+  });
 
-                            {
-                              role:
-                                newRole,
-                            }
-                          );
+if (!newRole) return;
 
-                          toast.success(
-                            "Role updated successfully"
-                          );
+try {
 
-                          fetchUsers();
+  await API.put(
 
-                        } catch (error) {
+    `/auth/users/${user.id}/role`,
 
-                          console.log(error);
+    {
+      role: newRole,
+    }
+  );
 
-                          toast.error(
-                            "Failed to update role"
-                          );
-                        }
+  await Swal.fire({
+    icon: "success",
+    title: "Role Updated",
+    text:
+      "Role updated successfully",
+  });
+
+  fetchUsers();
+
+} catch (error) {
+
+  console.log(error);
+
+  toast.error(
+    "Failed to update role"
+  );
+}
                       }}
 
                       className="

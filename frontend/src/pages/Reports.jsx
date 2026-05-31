@@ -219,7 +219,7 @@ else if (typeFilter === "Hall") {
   title: "Export Report?",
   text: "Do you want to export the current filtered report?",
   icon: "question",
-  width: "400px",
+  width: "350px",
   showCancelButton: true,
   confirmButtonText: "Export",
   cancelButtonText: "Cancel",

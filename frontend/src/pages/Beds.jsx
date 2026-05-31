@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import bedsBG from "../assets/bedsBG.jpg"
 import {
   FaBed,
@@ -566,35 +567,49 @@ const saveOccupiedBed = async () => {
   // DELETE BED
 
   const deleteBed = async (id) => {
+  const result = await Swal.fire({
+    title: "Delete Bed?",
+    text: "Are you sure you want to delete this bed?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, Delete",
+    cancelButtonText: "Cancel",
+  });
 
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this bed?"
+  if (!result.isConfirmed) {
+    return;
+  }
+
+  try {
+    await API.delete(`/beds/${id}`);
+
+    const updatedBeds = beds.filter(
+      (bed) => bed.id !== id
     );
 
-    if (!confirmDelete) {
-      return;
-    }
+    setBeds(updatedBeds);
+    setSelectedBed(null);
 
-    try {
+    Swal.fire({
+      title: "Deleted!",
+      text: "Bed has been deleted successfully.",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false,
+    });
 
-      await API.delete(`/beds/${id}`);
+  } catch (error) {
+    console.log(error);
 
-      const updatedBeds = beds.filter(
-        (bed) => bed.id !== id
-      );
-
-      setBeds(updatedBeds);
-
-     setSelectedBed(null);
-
-
-    } catch (error) {
-
-      console.log(error);
-
-      toast.error("Failed to delete bed");
-    }
-  };
+    Swal.fire({
+      title: "Error!",
+      text: "Failed to delete bed.",
+      icon: "error",
+    });
+  }
+};
 
   // UPDATE BED
 
