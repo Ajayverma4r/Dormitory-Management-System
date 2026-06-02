@@ -345,7 +345,7 @@ shadow-[0_8px_32px_rgba(15,23,42,0.4)]
 
                 <FaBed />
 
-                Boys Dormitory
+                Men Dormitory
 
               </NavLink>
 
@@ -391,7 +391,7 @@ shadow-[0_8px_32px_rgba(15,23,42,0.4)]
 
                 <FaBed />
 
-                Girls Dormitory
+                Women Dormitory
 
               </NavLink>
 

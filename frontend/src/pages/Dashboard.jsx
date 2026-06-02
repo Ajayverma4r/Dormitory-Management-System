@@ -1,3 +1,8 @@
+import { useNavigate } from "react-router-dom";
+import {
+  FaSearch,
+  FaBed
+} from "react-icons/fa";
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import dashboardBg from "../assets/dashboardBg.jpg";
@@ -8,6 +13,11 @@ function Dashboard() {
   const [beds, setBeds] = useState([]);
 
   const [recentFilter, setRecentFilter ] = useState("");
+  
+  const navigate = useNavigate();
+
+const [searchText, setSearchText] =
+  useState("");
 
   // FETCH DATA
 
@@ -30,6 +40,36 @@ function Dashboard() {
     fetchBeds();
 
   }, []);
+
+  useEffect(() => {
+
+  const handleShortcut = (e) => {
+
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      e.key.toLowerCase() === "k"
+    ) {
+
+      e.preventDefault();
+
+      document.querySelector("input")?.focus();
+    }
+  };
+
+  window.addEventListener(
+    "keydown",
+    handleShortcut
+  );
+
+  return () => {
+
+    window.removeEventListener(
+      "keydown",
+      handleShortcut
+    );
+  };
+
+}, []);
 
   // COUNTS
 
@@ -142,6 +182,7 @@ const girlsOccupied =
       matchesDormitory
     );
   })
+  
 
   // NEWEST FIRST
 
@@ -152,7 +193,42 @@ const girlsOccupied =
   // ONLY 50
 
   .slice(0, 50);
-  
+
+ const searchResults = beds
+
+  .filter((bed) => {
+
+    if (!searchText.trim()) {
+      return false;
+    }
+
+    const query =
+      searchText.toLowerCase();
+
+    return (
+
+      bed.bed_number
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.guest_name
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.emp_id
+        ?.toLowerCase()
+        .includes(query)
+
+    );
+
+  })
+
+  .slice(0, 10);
+ 
   return (
 
    <div className="
@@ -169,21 +245,17 @@ const girlsOccupied =
 
       <div
   className="
-
     relative
-
+    flex-1
     p-6
-
     md:ml-64
-
     min-h-screen
-
     overflow-hidden
-
     bg-cover
     bg-center
     bg-no-repeat
   "
+
 
   style={{
     backgroundImage: `
@@ -234,23 +306,217 @@ const girlsOccupied =
 
         {/* TITLE */}
 
-        <h1 className="
-          text-2xl
-          font-bold
-          mb-4
-          text-center
-        ">
-          Dashboard
-        </h1>
-
-       <div className="
+        <div className="
   flex
-  justify-center
-  gap-8
-  mt-10
-  flex-wrap
+  flex-col
+  md:flex-row
+  md:items-center
+  md:justify-between
+  gap-4
+  mb-6
 ">
 
+  <div>
+
+    <p className="
+      text-xs
+      uppercase
+      tracking-wider
+      text-gray-500
+    ">
+      Leonia Dormitory Management System
+    </p>
+
+    <h1 className="
+      text-3xl
+      font-bold
+    ">
+      Dashboard
+    </h1>
+
+  </div>
+
+ <div className="
+  relative
+  w-full
+  md:w-[420px]
+">
+
+  <FaSearch
+    className="
+      absolute
+      left-4
+      top-1/2
+      -translate-y-1/2
+      text-gray-400
+      z-10
+    "
+  />
+
+  <input
+    value={searchText}
+    onChange={(e) =>
+      setSearchText(e.target.value)
+    }
+    placeholder="Search beds, employees..."
+
+    className="
+      w-full
+      h-11
+
+      bg-white/90
+
+      border
+
+      rounded-full
+
+      pl-11
+      pr-20
+
+      text-sm
+
+      shadow-sm
+
+      outline-none
+
+      focus:ring-2
+      focus:ring-blue-500
+    "
+  />
+
+  <span
+    className="
+      absolute
+      right-3
+      top-1/2
+      -translate-y-1/2
+
+      text-xs
+
+      bg-gray-100
+
+      px-2
+      py-1
+
+      rounded-md
+    "
+  >
+    Ctrl + K
+  </span>
+
+  {searchText && (
+
+    <div className="
+      absolute
+
+      top-14
+      left-0
+      right-0
+
+      bg-white
+
+      border
+
+      rounded-xl
+
+      shadow-xl
+
+      overflow-hidden
+
+      z-50
+    ">
+
+      {searchResults.length === 0 ? (
+
+        <div className="
+          px-4
+          py-3
+          text-sm
+          text-gray-500
+        ">
+          No results found
+        </div>
+
+      ) : (
+
+        searchResults.map((bed) => (
+
+          <div
+
+            key={bed.id}
+
+            onClick={() => {
+
+              navigate(
+
+                bed.gender_type === "boys"
+                  ? "/boys"
+                  : "/girls",
+
+                {
+                  state: {
+                    openBedId: bed.id
+                  }
+                }
+
+              );
+
+            }}
+
+            className="
+              px-4
+              py-3
+
+              border-b
+
+              hover:bg-blue-50
+
+              cursor-pointer
+
+              transition
+            "
+          >
+
+            <div className="
+              font-medium
+            ">
+              {bed.bed_number}
+            </div>
+
+            <div className="
+              text-xs
+              text-gray-500
+            ">
+              {bed.guest_name} • {bed.emp_id}
+            </div>
+
+          </div>
+
+        ))
+
+      )}
+
+    </div>
+
+  )}
+
+</div>
+
+
+</div>
+
+   
+
+      <div
+  className="
+    grid
+    grid-cols-1
+    md:grid-cols-2
+    xl:grid-cols-3
+    gap-8
+    mt-10
+    w-full
+">
   {/* TOTAL */}
 
   <div className="
@@ -258,7 +524,8 @@ const girlsOccupied =
     p-5
     rounded-2xl
     shadow-md
-    w-72
+    w-full
+max-w-[360px]
     text-center
   ">
 
@@ -353,6 +620,13 @@ const girlsOccupied =
           {totalOccupied}/{totalBeds}
 
         </p>
+        <p className="
+  text-xs
+  text-green-600
+  mt-1
+">
+  Available: {totalBeds - totalOccupied}
+</p>
 
       </div>
 
@@ -363,14 +637,34 @@ const girlsOccupied =
 
   {/* BOYS */}
 
-  <div className="
+<div
+
+  onClick={() =>
+    navigate("/boys")
+  }
+
+  className="
     bg-white
     p-5
     rounded-2xl
     shadow-md
-    w-72
+
+    w-full
+    max-w-[360px]
+
     text-center
-  ">
+
+    cursor-pointer
+
+    hover:scale-105
+
+    hover:shadow-xl
+
+    transition-all
+
+    duration-300
+  "
+>
 
     <h2 className="
       text-lg
@@ -378,8 +672,14 @@ const girlsOccupied =
       text-blue-700
       mb-4
     ">
-      Boys Occupancy
+      Men Occupancy
     </h2>
+    <p className="
+  text-xs
+  text-gray-500
+">
+  Click to open dormitory
+</p>
 
     <div className="
       relative
@@ -465,6 +765,14 @@ const girlsOccupied =
 
         </p>
 
+        <p className="
+  text-xs
+  text-green-600
+  mt-1
+">
+  Available: {boysBeds - boysOccupied}
+</p>
+
       </div>
 
     </div>
@@ -472,16 +780,36 @@ const girlsOccupied =
   </div>
 
 
-  {/* GIRLS */}
+ {/* GIRLS */}
 
-  <div className="
+<div
+
+  onClick={() =>
+    navigate("/girls")
+  }
+
+  className="
     bg-white
     p-5
     rounded-2xl
     shadow-md
-    w-72
+
+    w-full
+    max-w-[360px]
+
     text-center
-  ">
+
+    cursor-pointer
+
+    hover:scale-105
+
+    hover:shadow-xl
+
+    transition-all
+
+    duration-300
+  "
+>
 
     <h2 className="
       text-lg
@@ -489,8 +817,14 @@ const girlsOccupied =
       text-pink-600
       mb-4
     ">
-      Girls Occupancy
+      Women Occupancy
     </h2>
+    <p className="
+  text-xs
+  text-gray-500
+">
+  Click to open dormitory
+</p>
 
     <div className="
       relative
@@ -575,7 +909,13 @@ const girlsOccupied =
           {girlsOccupied}/{girlsBeds}
 
         </p>
-
+            <p className="
+  text-xs
+  text-green-600
+  mt-1
+">
+  Available: {girlsBeds - girlsOccupied}
+</p>
       </div>
 
     </div>
@@ -587,13 +927,16 @@ const girlsOccupied =
 
         {/* RECENT OCCUPIED */}
 
-        <div className="
-          mt-6
-          bg-white
-          p-2
-          rounded-xl
-          shadow-sm
-        ">
+        <div
+  className="
+    mt-6
+    bg-white
+    p-4
+    rounded-xl
+    shadow-sm
+    w-full
+  "
+>
 
          <div className="
   flex
@@ -661,6 +1004,7 @@ const girlsOccupied =
     text-gray-600
   ">
 
+
     <span>Bed</span>
 
     <span className="text-center">
@@ -672,6 +1016,7 @@ const girlsOccupied =
     </span>
 
   </div>
+  
 
             {occupiedList.length > 0 ? (
 
@@ -731,6 +1076,8 @@ const girlsOccupied =
 
         </div>
 
+      
+     
       </div>
 
     </div>

@@ -206,11 +206,11 @@ else if (typeFilter === "Hall") {
 
   genderFilter === "boys"
 
-    ? "Boys Dormitory Report"
+    ? "Men Dormitory Report"
 
     : genderFilter === "girls"
 
-      ? "Girls Dormitory Report"
+      ? "Women Dormitory Report"
 
       : "All Dormitory Report";
 
@@ -813,17 +813,27 @@ const maintenanceBeds =
 
       {/* MAIN */}
 
-      <div
+      {/* MAIN */}
+
+<div
   className="
-    relative
-    p-6
-    md:ml-64
-    min-h-screen
-    overflow-hidden
-    bg-cover
-    bg-center
-    bg-no-repeat
-  "
+  flex-1
+
+  relative
+
+  p-6
+
+  md:ml-64
+
+  min-h-screen
+
+  overflow-x-auto
+
+  bg-cover
+  bg-center
+  bg-no-repeat
+"
+
 
   style={{
     backgroundImage: `
@@ -885,13 +895,15 @@ const maintenanceBeds =
 
         {/* SEARCH & FILTER */}
 
-        <div className="
+       <div className="
   flex
+  flex-wrap
+
   items-center
+
   gap-2
-  mb-3
-  overflow-x-auto
-  pb-2
+
+  mb-4
 ">
   
           {/* SEARCH */}
@@ -995,11 +1007,11 @@ className="
   </option>
 
   <option value="boys">
-    Boys Dormitory
+    Men Dormitory
   </option>
 
   <option value="girls">
-    Girls Dormitory
+    Women Dormitory
   </option>
 
 </select>
@@ -1223,11 +1235,16 @@ className="
 
 <div className="
   flex
+  flex-wrap
+
   justify-between
+
   items-center
+
+  gap-3
+
   mb-4
 ">
-
   <h2 className="
     text-xl
     font-bold
@@ -1358,13 +1375,18 @@ className="
         {/* TABLE */}
 
         <div className="
-          bg-white
-          rounded-xl
-          shadow-sm
-          overflow-x-auto
-          print-section
-        ">
+  w-full
 
+  bg-white
+
+  rounded-xl
+
+  shadow-sm
+
+  overflow-x-auto
+
+  print-section
+">
           {isPrinting && (
 
   <div

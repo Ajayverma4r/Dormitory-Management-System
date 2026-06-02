@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import API from "../services/api";
 
 import Sidebar from "../components/Sidebar";
@@ -78,6 +79,7 @@ const locationConfig = {
 };
 
 function Beds({ type }) {
+ const routerLocation = useLocation();
 
   const user = JSON.parse(
     localStorage.getItem("user")
@@ -344,6 +346,26 @@ else if (typeFilter === "Hall") {
     fetchBeds();
 
   }, []);
+  useEffect(() => {
+
+  if (
+    !routerLocation.state?.openBedId ||
+    beds.length === 0
+  ) {
+    return;
+  }
+
+  const targetBed = beds.find(
+    (bed) =>
+      bed.id ===
+      routerLocation.state.openBedId
+  );
+
+  if (targetBed) {
+    setSelectedBed(targetBed);
+  }
+
+}, [beds, routerLocation.state]);
 
   useEffect(() => {
 
