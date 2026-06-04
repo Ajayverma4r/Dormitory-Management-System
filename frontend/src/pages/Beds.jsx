@@ -1670,28 +1670,60 @@ const totalPages =
 >
 
   <option value="">
-    Select Department
-  </option>
+                    Select
+                  </option>
 
-  <option value="IT">
-    IT
-  </option>
+                  <option value="IT">
+                    IT
+                  </option>
 
-  <option value="HR">
-    HR
-  </option>
+                  <option value="HR">
+                    HR
+                  </option>
 
-  <option value="Finance">
-    Finance
-  </option>
+                  <option value="Maintenance">
+                    Maintenance
+                  </option>
 
-  <option value="Operations">
-    Operations
-  </option>
+                  <option value="Housekeeping">
+                    Housekeeping
+                  </option>
 
-  <option value="Management">
-    Management
-  </option>
+                  <option value="F&B Production">
+                    F&B Production
+                  </option>
+
+                  <option value="F&B service">
+                    F&B Service
+                  </option>
+
+                  <option value="Horticulture">
+                    Horticulture
+                  </option>
+
+                  <option value="KST">
+                    KST
+                  </option>
+
+                  <option value="Security">
+                    Security
+                  </option>
+
+                  <option value="Accounts & Finance">
+                    Accounts & Finance
+                  </option>
+
+                  <option value="FrontOffice">
+                    Front Office
+                  </option>
+
+                  <option value="Transport">
+                    Transport
+                  </option>
+
+                  <option value="Juventa">
+                    Juventa
+                  </option>
 
 </select>
 
