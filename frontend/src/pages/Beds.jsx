@@ -1670,7 +1670,7 @@ const totalPages =
 >
 
   <option value="">
-                    Select
+                    Select Department
                   </option>
 
                   <option value="IT">
