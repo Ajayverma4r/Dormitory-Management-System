@@ -57,6 +57,14 @@ function BedModal({
     useState(
       bed.status || "available"
     );
+
+    const [
+  occupantGender,
+  setOccupantGender
+] = useState(
+  bed.occupant_gender || ""
+);
+
       const [
   maintenanceFan,
   setMaintenanceFan
@@ -119,6 +127,45 @@ const [
 
   const handleSave = async () => {
 
+
+    // GENDER VALIDATION
+
+if (
+  bed.gender_type === "boys" &&
+  occupantGender === "female"
+) {
+
+  toast.error(
+    "Female occupants cannot be assigned to Men Dormitory"
+  );
+
+  return;
+}
+
+if (
+  bed.gender_type === "girls" &&
+  occupantGender === "male"
+) {
+
+  toast.error(
+    "Male occupants cannot be assigned to Women Dormitory"
+  );
+
+  return;
+}
+
+if (
+  status === "occupied" &&
+  !occupantGender
+) {
+
+  toast.error(
+    "Please select gender"
+  );
+
+  return;
+}
+
     // PHONE VALIDATION
 
     if (
@@ -159,6 +206,9 @@ const [
       ...bed,
 
       status,
+
+        occupant_gender:
+    occupantGender,
 
       department,
 
@@ -468,6 +518,44 @@ maintenance_comment:
               )}
 
             </div>
+
+            <p>
+
+  <strong>Gender:</strong>
+
+  {isEditing ? (
+
+    <select
+      value={occupantGender}
+      onChange={(e) =>
+        setOccupantGender(
+          e.target.value
+        )
+      }
+      style={inputStyle}
+    >
+
+      <option value="">
+        Select
+      </option>
+
+      <option value="male">
+        Male
+      </option>
+
+      <option value="female">
+        Female
+      </option>
+
+    </select>
+
+  ) : (
+
+    ` ${occupantGender || "-"}`
+
+  )}
+
+</p>
 
             {/* DEPARTMENT */}
 

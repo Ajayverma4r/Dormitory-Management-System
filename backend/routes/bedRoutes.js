@@ -154,6 +154,7 @@ router.post("/", async (req, res) => {
   emp_id,
   guest_phone,
   check_in,
+  occupant_gender,
   department,
   fan,
   mattress,
@@ -168,17 +169,44 @@ router.post("/", async (req, res) => {
 
     floor = floor.toUpperCase();
 
+
     // VALIDATION
 
-    if (
-      !gender_type
-    ) {
+if (!gender_type) {
 
-      return res.status(400).json({
-        message:
-          "Please select dormitory type",
-      });
-    }
+  return res.status(400).json({
+    message:
+      "Please select dormitory type",
+  });
+}
+
+// MEN DORMITORY VALIDATION
+
+if (
+  status === "occupied" &&
+  gender_type === "boys" &&
+  occupant_gender === "female"
+) {
+
+  return res.status(400).json({
+    message:
+      "Female occupants cannot be assigned to Men Dormitory",
+  });
+}
+
+// WOMEN DORMITORY VALIDATION
+
+if (
+  status === "occupied" &&
+  gender_type === "girls" &&
+  occupant_gender === "male"
+) {
+
+  return res.status(400).json({
+    message:
+      "Male occupants cannot be assigned to Women Dormitory",
+  });
+}
 
     // OCCUPIED VALIDATION
 
@@ -188,7 +216,8 @@ router.post("/", async (req, res) => {
         !guest_name ||
         !emp_id ||
         !guest_phone ||
-        !check_in
+        !check_in ||
+        !occupant_gender
       ) {
 
         return res.status(400).json({
@@ -254,6 +283,7 @@ router.post("/", async (req, res) => {
   emp_id,
   guest_phone,
   check_in,
+  occupant_gender,
   department,
   fan,
   mattress,
@@ -276,7 +306,8 @@ VALUES
   $12,
   $13,
   $14,
-  $15
+  $15,
+  $16
 )
 
 RETURNING *
@@ -284,26 +315,18 @@ RETURNING *
 
        [
   bed_number,
-
   room,
-
   floor,
-
   location,
-
   location_type,
-
   status,
-
   gender_type,
-
   guest_name,
-
   emp_id,
-
   guest_phone,
-
   check_in,
+
+  occupant_gender,
 
   department,
 
@@ -413,12 +436,15 @@ if (existingBed.rows.length === 0) {
 
 const oldBed = existingBed.rows[0];
 
+
+
     const {
       room,
       floor,
       location,
       status,
       gender_type,
+      occupant_gender,
       guest_name,
       emp_id,
       guest_phone,
@@ -436,6 +462,43 @@ maintenance_cleaning,
 maintenance_others,
 maintenance_comment,
     } = req.body;
+
+    // MEN DORMITORY VALIDATION
+
+if (
+  status === "occupied" &&
+  gender_type === "boys" &&
+  occupant_gender === "female"
+) {
+
+  return res.status(400).json({
+    message:
+      "Female occupants cannot be assigned to Men Dormitory",
+  });
+}
+
+// WOMEN DORMITORY VALIDATION
+
+if (
+  status === "occupied" &&
+  gender_type === "girls" &&
+  occupant_gender === "male"
+) {
+
+  return res.status(400).json({
+    message:
+      "Male occupants cannot be assigned to Women Dormitory",
+  });
+}
+  if (
+  status === "occupied" &&
+  !occupant_gender
+) {
+
+  return res.status(400).json({
+    message: "Please select gender",
+  });
+}
 
     // AVAILABLE -> OCCUPIED
 if (
@@ -629,33 +692,26 @@ await pool.query(
 
   guest_phone = $8,
 
-  check_in = $9,
+ check_in = $9,
 
-  department = $10,
+occupant_gender = $10,
 
-  fan = $11,
+department = $11,
 
-  mattress = $12,
+  fan = $12,
+mattress = $13,
+plywood = $14,
 
-  plywood = $13,
+maintenance_fan = $15,
+maintenance_mattress = $16,
+maintenance_plywood = $17,
+maintenance_bed = $18,
+maintenance_electrical = $19,
+maintenance_cleaning = $20,
+maintenance_others = $21,
+maintenance_comment = $22
 
-  maintenance_fan = $14,
-
-  maintenance_mattress = $15,
-
-  maintenance_plywood = $16,
-
-  maintenance_bed = $17,
-
-  maintenance_electrical = $18,
-
-  maintenance_cleaning = $19,
-
-  maintenance_others = $20,
-
-  maintenance_comment = $21
-
-WHERE id = $22
+WHERE id = $23
 
 
         RETURNING *
@@ -679,6 +735,8 @@ WHERE id = $22
   guest_phone,
 
   check_in,
+
+  occupant_gender,
 
   department,
 

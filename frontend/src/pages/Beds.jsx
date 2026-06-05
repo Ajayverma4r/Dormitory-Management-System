@@ -127,6 +127,10 @@ const [guestPhone, setGuestPhone] =
 const [checkIn, setCheckIn] =
   useState("");
 
+  const [occupantGender,
+  setOccupantGender] =
+  useState("");
+
   const [department,
   setDepartment] =
   useState("");
@@ -471,6 +475,8 @@ const resetForm = () => {
 
   setCheckIn("");
 
+  setOccupantGender("");
+
   setDepartment("");
 
   setFan(false);
@@ -490,22 +496,61 @@ const saveOccupiedBed = async () => {
 
     // VALIDATION
 
-    if (
-      !guestName ||
-      !empId ||
-      !guestPhone ||
-      
-      !checkIn
-    ) {
+   // REQUIRED FIELDS
 
-      toast.error(
-        "Please fill all details"
-        
-      );
-      
+if (
+  !guestName ||
+  !empId ||
+  !guestPhone ||
+  !checkIn ||
+  !department
+) {
 
-      return;
-    }
+  toast.error(
+    "Please fill all details"
+  );
+
+  return;
+}
+
+// GENDER REQUIRED
+
+if (!occupantGender) {
+
+  toast.error(
+    "Please select gender"
+  );
+
+  return;
+}
+
+// MEN DORMITORY VALIDATION
+
+if (
+  type === "boys" &&
+  occupantGender === "female"
+) {
+
+  toast.error(
+    "Female occupants cannot be assigned to Men Dormitory"
+  );
+
+  return;
+}
+
+// WOMEN DORMITORY VALIDATION
+
+if (
+  type === "girls" &&
+  occupantGender === "male"
+) {
+
+  toast.error(
+    "Male occupants cannot be assigned to Women Dormitory"
+  );
+
+  return;
+}
 
     // PHONE VALIDATION
 
@@ -537,6 +582,8 @@ const saveOccupiedBed = async () => {
         guest_phone: guestPhone,
 
         check_in: checkIn,
+
+        occupant_gender: occupantGender,
 
         department,
 
@@ -673,6 +720,11 @@ const updateBed = async (updatedBed) => {
     updatedBed.status === "available"
       ? null
       : updatedBed.guest?.checkIn || null,
+
+      occupant_gender:
+  updatedBed.status === "available"
+    ? null
+    : updatedBed.occupant_gender || null,
 
       department:
   updatedBed.department,
@@ -1649,6 +1701,39 @@ const totalPages =
             rounded-lg
           "
         />
+
+        {/* GENDER */}
+
+<select
+
+  value={occupantGender}
+
+  onChange={(e) =>
+    setOccupantGender(
+      e.target.value
+    )
+  }
+
+  className="
+    border
+    p-3
+    rounded-lg
+  "
+>
+
+  <option value="">
+    Select Gender
+  </option>
+
+  <option value="male">
+    Male
+  </option>
+
+  <option value="female">
+    Female
+  </option>
+
+</select>
 
         {/* DEPARTMENT */}
 
