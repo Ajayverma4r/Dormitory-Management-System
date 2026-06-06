@@ -15,6 +15,10 @@ import {
 
 } from "react-icons/fa";
 
+import SidebarClock from "./SidebarClock";
+
+
+
 function Sidebar() {
 
   const [open, setOpen] =
@@ -233,9 +237,8 @@ shadow-[0_8px_32px_rgba(15,23,42,0.4)]
   flex
   flex-col
   gap-3
-  h-[85vh]
+  h-[calc(100vh-140px)]
 ">
-
           {/* DASHBOARD */}
 
           <NavLink
@@ -495,57 +498,53 @@ shadow-[0_8px_32px_rgba(15,23,42,0.4)]
 
           )}
 
-          {/* LOGOUT */}
+          <div className="mt-auto">
 
-          <button
+  <SidebarClock />
 
-            onClick={() => {
+  <button
 
-              localStorage.removeItem(
-                "token"
-              );
+    onClick={() => {
 
-              localStorage.removeItem(
-                "user"
-              );
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
 
-              window.location.href = "/";
-            }}
+      window.location.href = "/";
 
-            className="
+    }}
 
-              mt-6
+    className="
+      mt-4
+      w-full
 
-              flex
-              items-center
-              justify-center
-              gap-2
+      flex
+      items-center
+      justify-center
+      gap-2
 
-              bg-red-500/90
-              hover:bg-red-600
+      bg-red-500/90
+      hover:bg-red-600
 
-              text-white
+      text-white
 
-              px-4
-              py-3
+      px-4
+      py-3
 
-              rounded-2xl
+      rounded-2xl
 
-              font-medium
+      font-medium
 
-              transition-all
-              duration-300
+      transition-all
+      duration-300
 
-              shadow-lg
-            "
-          >
+      shadow-lg
+    "
+  >
+    <FaSignOutAlt />
+    Logout
+  </button>
 
-            <FaSignOutAlt />
-
-            Logout
-
-          </button>
-
+</div>
         </div>
 
       </div>

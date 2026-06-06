@@ -571,6 +571,7 @@ try {
     text:
       "Password updated successfully",
       width: "350px",
+      
   });
 
 } catch (error) {

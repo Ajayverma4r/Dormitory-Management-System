@@ -1,5 +1,7 @@
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { FaPhoneAlt } from "react-icons/fa";
+import { MdContentCopy } from "react-icons/md";
 
 function BedModal({
   isAdmin,
@@ -511,11 +513,67 @@ maintenance_comment:
 
               ) : (
 
-                guestPhone
-                  ? ` +91 ${guestPhone}`
-                  : "-"
+  guestPhone ? (
 
-              )}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        marginLeft: "8px",
+      }}
+    >
+
+      <span>
+        +91 {guestPhone}
+      </span>
+
+     <a
+  href={`tel:${guestPhone}`}
+  title="Call"
+  style={{
+    color: "#16a34a",
+    display: "flex",
+    alignItems: "center",
+  }}
+>
+  <FaPhoneAlt size={14} />
+</a>
+
+      <button
+  onClick={() => {
+
+    navigator.clipboard.writeText(
+      guestPhone
+    );
+
+    toast.success(
+      "Phone number copied"
+    );
+
+  }}
+  style={{
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    color: "#2563eb",
+    display: "flex",
+    alignItems: "center",
+  }}
+  title="Copy Number"
+>
+  <MdContentCopy size={16} />
+</button>
+
+    </div>
+
+  ) : (
+
+    "-"
+
+  )
+
+)}
 
             </div>
 
@@ -590,8 +648,8 @@ maintenance_comment:
                     HR
                   </option>
 
-                  <option value="Maintenance">
-                    Maintenance
+                  <option value="Engineering">
+                    Engineering
                   </option>
 
                   <option value="Housekeeping">
@@ -633,6 +691,37 @@ maintenance_comment:
                   <option value="Juventa">
                     Juventa
                   </option>
+
+                  <option value="Stores">
+                    Stores
+                  </option>
+
+                  <option value="Sales">
+                    Sales
+                  </option>
+
+                  <option value="Cafeteria">
+                    Cafeteria
+                  </option>
+
+                  <option value="Events & Conference">
+                    Events & Conference
+                  </option>
+                    
+                    <option value="Audio Visual">
+                      Audio Visual
+                    </option>
+
+                    <option value="IET">
+                      IET
+                    </option>
+                    <option value="Activities">
+                      Activities
+                    </option>
+                    <option value="HR Facilities">
+                      HR Facilities
+                    </option>
+                    
 
                 </select>
 

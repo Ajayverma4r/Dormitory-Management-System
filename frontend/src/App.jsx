@@ -34,8 +34,8 @@ function App() {
     timeout = setTimeout(
 
       logout,
-
-      60 * 60 * 1000
+        60 * 60 * 1000
+      //no logout
       // 60 MINUTES
     );
   };

@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
-  FaBed
+  FaBed,
+  FaUser,
+  FaChartBar
 } from "react-icons/fa";
+
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import dashboardBg from "../assets/dashboardBg.jpg";
@@ -513,414 +516,802 @@ const girlsOccupied =
     grid-cols-1
     md:grid-cols-2
     xl:grid-cols-3
+2xl:grid-cols-3
     gap-8
     mt-10
     w-full
 ">
-  {/* TOTAL */}
+
+
+ {/* TOTAL */}
+
+<div
+  className="
+    bg-white/80
+    backdrop-blur-xl
+    rounded-3xl
+    p-5
+    shadow-xl
+    border
+    border-white/40
+    relative
+  "
+>
+
+<h2 className="
+  text-2xl
+  font-bold
+ 
+  mb-5
+">
+  Total Occupancy
+</h2>
+
+
+<div className="
+  absolute
+  top-3.5
+right-3.5
+
+  w-12
+  h-12
+
+  rounded-xl
+
+  bg-purple-100
+
+  flex
+  items-center
+  justify-center
+">
+  <FaChartBar className="
+  text-purple-600 text-xl
+"/>
+</div>
+
+<div className="
+flex
+items-center
+justify-center
+gap-5
+mt-5
+">
+
+  {/* LEFT - CIRCLE */}
+
+ <div className="
+  relative
+  w-32
+  h-32
+  shrink-0
+">
+
+  <svg
+  className="
+    w-32
+    h-32
+    -rotate-90
+  "
+>
+      <circle
+  cx="64"
+  cy="64"
+  r="50"
+
+        stroke="#EDE9FE"
+        strokeWidth="12"
+        fill="none"
+      />
+
+      <circle
+        cx="64"
+  cy="64"
+  r="50"
+        stroke="#7C3AED"
+        strokeWidth="12"
+        fill="none"
+        strokeDasharray={
+          2 * Math.PI * 50
+        }
+        strokeDashoffset={
+          2 * Math.PI * 50 *
+          (
+            1 -
+            totalOccupied /
+            (totalBeds || 1)
+          )
+        }
+        strokeLinecap="round"
+      />
+    </svg>
+
+    <div className="
+      absolute
+      inset-0
+      flex
+      items-center
+      justify-center
+    ">
+      <p className="
+        text-2xl
+        font-bold
+        text-purple-600
+      ">
+        {Math.round(
+          (
+            totalOccupied /
+            (totalBeds || 1)
+          ) * 100
+        )}%
+      </p>
+    </div>
+
+  </div>
+
+  {/* DIVIDER */}
 
   <div className="
-    bg-white
-    p-5
-    rounded-2xl
-    shadow-md
-    w-full
-max-w-[360px]
-    text-center
+  h-24
+  self-center
+  w-px
+  bg-gray-200
+" />
+
+  {/* RIGHT STATS */}
+
+ <div className="
+  flex
+  flex-col
+  gap-4
+  min-w-[150px]
+">
+
+    <div className="flex items-center gap-3">
+
+  <div className="
+    w-11 h-11
+    rounded-xl
+    bg-blue-50
+    flex items-center justify-center
   ">
+    <FaBed className="
+      text-blue-600 text-xl
+    " />
+  </div>
 
-    <h2 className="
-      text-lg
+  <div>
+    <p className="text-gray-500 text-sm">
+      Total Beds
+    </p>
+
+    <p className="
+      text-3xl
       font-bold
-      mb-4
     ">
-      Total Occupancy
-    </h2>
+     {totalBeds}
+    </p>
+  </div>
 
-    <div className="
-      relative
-      w-40
-      h-40
-      mx-auto
+</div>
+
+   <div className="flex items-center gap-3">
+
+  <div className="
+    w-11 h-11
+    rounded-xl
+    bg-pink-50
+    flex items-center justify-center
+  ">
+    <FaUser className="
+      text-pink-600 text-xl
+    " />
+  </div>
+
+  <div>
+    <p className="text-gray-500 text-sm">
+      Occupied
+    </p>
+
+    <p className="
+      text-3xl
+      font-bold
+      text-blue-600
     ">
+     {totalOccupied}
+    </p>
+  </div>
 
-      <svg
-        className="
-          w-40
-          h-40
-          -rotate-90
-        "
-      >
+</div>
 
-        <circle
-          cx="80"
-          cy="80"
-          r="65"
-          stroke="#EDE9FE"
-          strokeWidth="12"
-          fill="none"
-        />
+  <div className="flex items-center gap-3">
 
-        <circle
-          cx="80"
-          cy="80"
-          r="65"
-          stroke="#7C3AED"
-          strokeWidth="12"
-          fill="none"
+  <div className="
+    w-11 h-11
+    rounded-xl
+    bg-green-50
+    flex items-center justify-center
+  ">
+    <FaBed className="
+      text-green-600 text-xl
+    " />
+  </div>
 
-          strokeDasharray={
-            2 * Math.PI * 65
-          }
+  <div>
+    <p className="text-gray-500 text-sm">
+      Available
+    </p>
 
-          strokeDashoffset={
-            2 * Math.PI * 65 *
+    <p className="
+      text-3xl
+      font-bold
+      text-green-600
+    ">
+     {totalBeds - totalOccupied}
+    </p>
+  </div>
 
-            (
-              1 -
-              totalOccupied /
-              (totalBeds || 1)
-            )
-          }
+</div>
 
-          strokeLinecap="round"
-        />
-
-      </svg>
-
-      <div className="
-        absolute
-        inset-0
-        flex
-        flex-col
-        items-center
-        justify-center
-      ">
-
-        <p className="
-          text-4xl
-          font-bold
-          text-purple-600
-        ">
-
-          {Math.round(
-            (
-              totalOccupied /
-              (totalBeds || 1)
-            ) * 100
-          )}%
-
-        </p>
-
-        <p className="
-          text-sm
-          text-gray-500
-        ">
-
-          {totalOccupied}/{totalBeds}
-
-        </p>
-        <p className="
-  text-xs
-  text-green-600
-  mt-1
-">
-  Available: {totalBeds - totalOccupied}
-</p>
-
-      </div>
-
-    </div>
-
+  </div>
   </div>
 
 
-  {/* BOYS */}
+
+</div>
+
+ 
+
+{/* BOYS */}
 
 <div
-
-  onClick={() =>
-    navigate("/boys")
-  }
-
+  onClick={() => navigate("/boys")}
   className="
-    bg-white
+    bg-white/80
+    backdrop-blur-xl
+    rounded-3xl
     p-5
-    rounded-2xl
-    shadow-md
-
-    w-full
-    max-w-[360px]
-
-    text-center
-
+    shadow-xl
+    border
+    border-white/40
+    relative
     cursor-pointer
-
-    hover:scale-105
-
-    hover:shadow-xl
-
+    hover:scale-[1.02]
     transition-all
-
-    duration-300
   "
 >
 
-    <h2 className="
-      text-lg
-      font-bold
-      text-blue-700
-      mb-4
-    ">
-      Men Occupancy
-    </h2>
-    <p className="
-  text-xs
-  text-gray-500
+<h2 className="
+  text-2xl
+  font-bold
+  text-blue-600
+ 
 ">
-  Click to open dormitory
-</p>
+  Men Dormitory
+</h2>
 
-    <div className="
-      relative
-      w-40
-      h-40
-      mx-auto
-    ">
 
-      <svg
-        className="
-          w-40
-          h-40
-          -rotate-90
-        "
-      >
+<div className="
+  absolute
+  top-3.5
+  right-3.5
 
-        <circle
-          cx="80"
-          cy="80"
-          r="65"
-          stroke="#DBEAFE"
-          strokeWidth="12"
-          fill="none"
-        />
+  w-12
+  h-12
 
-        <circle
-          cx="80"
-          cy="80"
-          r="65"
-          stroke="#2563EB"
-          strokeWidth="12"
-          fill="none"
+  rounded-xl
 
-          strokeDasharray={
-            2 * Math.PI * 65
-          }
+  bg-blue-100
 
-          strokeDashoffset={
-            2 * Math.PI * 65 *
-
-            (
-              1 -
-              boysOccupied /
-              (boysBeds || 1)
-            )
-          }
-
-          strokeLinecap="round"
-        />
-
-      </svg>
-
-      <div className="
-        absolute
-        inset-0
-        flex
-        flex-col
-        items-center
-        justify-center
-      ">
-
-        <p className="
-          text-4xl
-          font-bold
-          text-blue-600
-        ">
-
-          {Math.round(
-            (
-              boysOccupied /
-              (boysBeds || 1)
-            ) * 100
-          )}%
-
-        </p>
-
-        <p className="
-          text-sm
-          text-gray-500
-        ">
-
-          {boysOccupied}/{boysBeds}
-
-        </p>
-
-        <p className="
-  text-xs
-  text-green-600
-  mt-1
+  flex
+  items-center
+  justify-center
 ">
-  Available: {boysBeds - boysOccupied}
-</p>
+  <FaBed className="
+  text-blue-600 text-xl
+"/>
+</div>
 
-      </div>
+<div className="
+flex
+items-center
+justify-center
+gap-5
+mt-5
+">
 
-    </div>
+  {/* LEFT - CIRCLE */}
 
-  </div>
+  <div className="
+  relative
+  w-32
+  h-32
+  shrink-0
+">
 
-
- {/* GIRLS */}
-
-<div
-
-  onClick={() =>
-    navigate("/girls")
-  }
-
+   <svg
   className="
-    bg-white
-    p-5
-    rounded-2xl
-    shadow-md
-
-    w-full
-    max-w-[360px]
-
-    text-center
-
-    cursor-pointer
-
-    hover:scale-105
-
-    hover:shadow-xl
-
-    transition-all
-
-    duration-300
+    w-32
+    h-32
+    -rotate-90
   "
 >
 
-    <h2 className="
-      text-lg
-      font-bold
-      text-pink-600
-      mb-4
-    ">
-      Women Occupancy
-    </h2>
-    <p className="
-  text-xs
-  text-gray-500
-">
-  Click to open dormitory
-</p>
+      <circle
+        cx="64"
+        cy="64"
+        r="50"
+        stroke="#DBEAFE"
+        strokeWidth="12"
+        fill="none"
+      />
+
+      <circle
+        cx="64"
+        cy="64"
+        r="50"
+        stroke="#2563EB"
+        strokeWidth="12"
+        fill="none"
+        strokeDasharray={
+          2 * Math.PI * 50
+        }
+        strokeDashoffset={
+          2 * Math.PI * 50 *
+          (
+            1 -
+            boysOccupied /
+            (boysBeds || 1)
+          )
+        }
+        strokeLinecap="round"
+      />
+
+    </svg>
 
     <div className="
-      relative
-      w-40
-      h-40
-      mx-auto
+      absolute
+      inset-0
+      flex
+      items-center
+      justify-center
     ">
 
-      <svg
-        className="
-          w-40
-          h-40
-          -rotate-90
-        "
-      >
-
-        <circle
-          cx="80"
-          cy="80"
-          r="65"
-          stroke="#FBCFE8"
-          strokeWidth="12"
-          fill="none"
-        />
-
-        <circle
-          cx="80"
-          cy="80"
-          r="65"
-          stroke="#EC4899"
-          strokeWidth="12"
-          fill="none"
-
-          strokeDasharray={
-            2 * Math.PI * 65
-          }
-
-          strokeDashoffset={
-            2 * Math.PI * 65 *
-
-            (
-              1 -
-              girlsOccupied /
-              (girlsBeds || 1)
-            )
-          }
-
-          strokeLinecap="round"
-        />
-
-      </svg>
-
-      <div className="
-        absolute
-        inset-0
-        flex
-        flex-col
-        items-center
-        justify-center
+      <p className="
+        text-2xl
+        font-bold
+        text-blue-600
       ">
-
-        <p className="
-          text-4xl
-          font-bold
-          text-pink-600
-        ">
-
-          {Math.round(
-            (
-              girlsOccupied /
-              (girlsBeds || 1)
-            ) * 100
-          )}%
-
-        </p>
-
-        <p className="
-          text-sm
-          text-gray-500
-        ">
-
-          {girlsOccupied}/{girlsBeds}
-
-        </p>
-            <p className="
-  text-xs
-  text-green-600
-  mt-1
-">
-  Available: {girlsBeds - girlsOccupied}
-</p>
-      </div>
+        {Math.round(
+          (
+            boysOccupied /
+            (boysBeds || 1)
+          ) * 100
+        )}%
+      </p>
 
     </div>
 
   </div>
+
+  {/* DIVIDER */}
+
+ <div className="
+  h-32
+  self-center
+  w-px
+  bg-gray-200
+" />
+
+  {/* RIGHT STATS */}
+
+  <div className="
+  flex
+  flex-col
+  gap-4
+  min-w-[145px]
+">
+
+  <div className="flex items-center gap-3">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-blue-50
+
+      flex
+      items-center
+      justify-center
+    ">
+      <FaBed className="
+        text-blue-600
+        text-lg
+      "/>
+    </div>
+
+    <div>
+
+      <p className="
+        text-sm
+        text-gray-500
+      ">
+        Total Beds
+      </p>
+
+      <p className="
+        text-3xl
+        font-bold
+      ">
+        {boysBeds}
+      </p>
+
+    </div>
+
+  </div>
+
+  <div className="flex items-center gap-3">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-pink-50
+
+      flex
+      items-center
+      justify-center
+    ">
+      <FaUser className="
+        text-pink-600
+        text-lg
+      "/>
+    </div>
+
+    <div>
+
+      <p className="
+        text-sm
+        text-gray-500
+      ">
+        Occupied
+      </p>
+
+      <p className="
+        text-3xl
+        font-bold
+        text-blue-600
+      ">
+        {boysOccupied}
+      </p>
+
+    </div>
+
+  </div>
+
+  <div className="flex items-center gap-3">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-green-50
+
+      flex
+      items-center
+      justify-center
+    ">
+      <FaBed className="
+        text-green-600
+        text-lg
+      "/>
+    </div>
+
+    <div>
+
+      <p className="
+        text-sm
+        text-gray-500
+      ">
+        Available
+      </p>
+
+      <p className="
+        text-3xl
+        font-bold
+        text-green-600
+      ">
+        {boysBeds - boysOccupied}
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+  </div>
+
+
+
+</div>
+
+
+
+
+{/* GIRLS */}
+
+<div
+  onClick={() => navigate("/girls")}
+  className="
+    bg-white/80
+    backdrop-blur-xl
+    rounded-3xl
+    p-5
+    shadow-xl
+    border
+    border-white/40
+    relative
+    cursor-pointer
+    hover:scale-[1.02]
+    transition-all
+  "
+>
+
+<h2 className="
+  text-2xl
+  font-bold
+  text-pink-600
+ 
+">
+  Women Dormitory
+</h2>
+
+
+
+<div className="
+  absolute
+  top-5
+  right-5
+
+  w-12
+  h-12
+
+  rounded-xl
+
+  bg-pink-100
+
+  flex
+  items-center
+  justify-center
+">
+  <FaBed className="
+    text-pink-600
+    text-xl
+  " />
+</div>
+
+<div className="
+flex
+items-center
+justify-center
+gap-5
+mt-5
+">
+
+  {/* LEFT - CIRCLE */}
+
+ <div className="
+  relative
+  w-32
+  h-32
+  shrink-0
+  
+">
+
+   <svg
+  className="
+    w-32
+    h-32
+    -rotate-90
+  "
+>
+
+      <circle
+        cx="65"
+        cy="65"
+        r="50"
+        stroke="#FBCFE8"
+        strokeWidth="12"
+        fill="none"
+      />
+
+      <circle
+        cx="65"
+        cy="65"
+        r="50"
+        stroke="#EC4899"
+        strokeWidth="12"
+        fill="none"
+        strokeDasharray={
+          2 * Math.PI * 50
+        }
+        strokeDashoffset={
+          2 * Math.PI * 50 *
+          (
+            1 -
+            girlsOccupied /
+            (girlsBeds || 1)
+          )
+        }
+        strokeLinecap="round"
+      />
+
+    </svg>
+
+    <div className="
+      absolute
+      inset-0
+      flex
+      items-center
+      justify-center
+    ">
+
+      <p className="
+        text-2xl
+        font-bold
+        text-pink-600
+      ">
+        {Math.round(
+          (
+            girlsOccupied /
+            (girlsBeds || 1)
+          ) * 100
+        )}%
+      </p>
+
+    </div>
+
+  </div>
+
+  {/* DIVIDER */}
+
+  <div className="
+  h-32
+  self-center
+  w-px
+  bg-gray-200
+" />
+
+  {/* RIGHT STATS */}
+
+  <div className="
+  flex
+  flex-col
+  gap-4
+  min-w-[140px]
+">
+
+  <div className="flex items-center gap-3">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-blue-50
+
+      flex
+      items-center
+      justify-center
+    ">
+      <FaBed className="
+        text-blue-600
+        text-lg
+      "/>
+    </div>
+
+    <div>
+
+      <p className="
+        text-sm
+        text-gray-500
+      ">
+        Total Beds
+      </p>
+
+      <p className="
+        text-3xl
+        font-bold
+      ">
+        {girlsBeds}
+      </p>
+
+    </div>
+
+  </div>
+
+  <div className="flex items-center gap-3">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-pink-50
+
+      flex
+      items-center
+      justify-center
+    ">
+      <FaUser className="
+        text-pink-600
+        text-lg
+      "/>
+    </div>
+
+    <div>
+
+      <p className="
+        text-sm
+        text-gray-500
+      ">
+        Occupied
+      </p>
+
+      <p className="
+        text-3xl
+        font-bold
+        text-blue-600
+      ">
+       {girlsOccupied}
+      </p>
+
+    </div>
+
+  </div>
+
+  <div className="flex items-center gap-3">
+
+    <div className="
+      w-12
+      h-12
+      rounded-xl
+      bg-green-50
+
+      flex
+      items-center
+      justify-center
+    ">
+      <FaBed className="
+        text-green-600
+        text-lg
+      "/>
+    </div>
+
+    <div>
+
+      <p className="
+        text-sm
+        text-gray-500
+      ">
+        Available
+      </p>
+
+      <p className="
+        text-3xl
+        font-bold
+        text-green-600
+      ">
+        {girlsBeds - girlsOccupied}
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+  </div>
+
+</div>
 
 </div>
           

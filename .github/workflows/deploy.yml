@@ -26,8 +26,3 @@ jobs:
             docker compose down
 
             docker compose up -d --build
-with:
-  host: ${{ secrets.HOST }}
-  username: ${{ secrets.USERNAME }}
-  key: ${{ secrets.SSH_KEY }}
-  debug: true

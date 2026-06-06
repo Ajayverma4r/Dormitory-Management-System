@@ -23,7 +23,7 @@ justify-center
       <div className="
         bg-white/80
         backdrop-blur-xl
-        rounded-2xl
+        rounded-3xl
         shadow-2xl
         border
         border-white/40

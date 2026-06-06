@@ -439,11 +439,38 @@ else if (typeFilter === "Hall") {
       }
     );
 
-    setBeds([...beds, response.data]);
+   const newBed = {
+  ...response.data,
 
-    toast.success("Bed created successfully");
+  guest: {
+    name:
+      response.data.guest_name,
 
-    resetForm();
+    empId:
+      response.data.emp_id,
+
+    phone:
+      response.data.guest_phone,
+
+    checkIn:
+      response.data.check_in,
+  },
+};
+
+setBeds([
+  newBed,
+  ...beds,
+]);
+
+setSelectedBed(
+  newBed
+);
+
+toast.success(
+  "Bed created successfully"
+);
+
+resetForm();
 
   } catch (error) {
 
@@ -617,13 +644,21 @@ if (
     };
 
     setBeds([
-      ...beds,
-      formattedBed,
-    ]);
+  formattedBed,
+  ...beds,
+]);
 
-    setShowGuestModal(false);
+setSelectedBed(
+  formattedBed
+);
 
-    resetForm();
+setShowGuestModal(false);
+
+toast.success(
+  "Bed created successfully"
+);
+
+resetForm();
 
 
   } catch (error) {
@@ -1589,9 +1624,13 @@ const totalPages =
 
   <button
 
-    onClick={() =>
-      setShowCreateModal(true)
-    }
+    onClick={() => {
+
+  setSummaryFilter("all");
+
+  setShowCreateModal(true);
+
+}}
 
     className="
       bg-blue-600
@@ -1809,6 +1848,40 @@ const totalPages =
                   <option value="Juventa">
                     Juventa
                   </option>
+
+                   <option value="Stores">
+                    Stores
+                  </option>
+
+                  <option value="Sales">
+                    Sales
+                  </option>
+
+                  <option value="Cafeteria">
+                    Cafeteria
+                  </option>
+
+                  <option value="Events & Conference">
+                    Events & Conference
+                  </option>
+                    
+                    <option value="Audio Visual">
+                      Audio Visual
+                    </option>
+
+                    <option value="IET">
+                      IET
+                    </option>
+                    <option value="Activities">
+                      Activities
+                    </option>
+                    <option value="HR Facilities">
+                      HR Facilities
+                    </option>
+                    <option value="Reservation">
+                      Reservation
+                    </option>
+
 
 </select>
 
