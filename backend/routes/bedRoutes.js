@@ -243,16 +243,23 @@ if (
     // CHECK EXISTING BED
 
     const existingBed =
-      await pool.query(
-
-        `
-        SELECT *
-        FROM beds
-        WHERE bed_number=$1
-        `,
-
-        [bed_number]
-      );
+  await pool.query(
+    `
+    SELECT *
+    FROM beds
+    WHERE
+      bed_number = $1
+      AND room = $2
+      AND floor = $3
+      AND location_type = $4
+    `,
+    [
+      bed_number,
+      room,
+      floor,
+      location_type,
+    ]
+  );
 
     if (
       existingBed.rows.length > 0

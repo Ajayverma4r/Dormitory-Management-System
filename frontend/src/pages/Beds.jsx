@@ -401,10 +401,22 @@ else if (typeFilter === "Hall") {
     // DUPLICATE CHECK
 
     const existingBed = beds.find(
-      (bed) =>
-        bed.bed_number?.toLowerCase() ===
-        bedNumber.toLowerCase()
-    );
+  (bed) =>
+    bed.bed_number?.toLowerCase() ===
+      bedNumber.toLowerCase()
+
+    &&
+
+    bed.room === room
+
+    &&
+
+    bed.floor === floor
+
+    &&
+
+    bed.location_type === locationType
+);
 
     if (existingBed) {
       toast.error("Bed number already exists");
