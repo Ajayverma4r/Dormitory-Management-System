@@ -573,30 +573,30 @@ right-3.5
 flex
 items-center
 justify-center
-gap-5
 mt-5
+max-w-[430px]
+mx-auto
 ">
 
   {/* LEFT - CIRCLE */}
 
- <div className="
+<div className="
   relative
-  w-32
-  h-32
+  w-36
+  h-36
   shrink-0
 ">
 
-  <svg
-  className="
-    w-32
-    h-32
-    -rotate-90
-  "
+ <svg className="
+  w-36
+  h-36
+  -rotate-90
+"
 >
       <circle
-  cx="64"
-  cy="64"
-  r="50"
+  cx="72"
+cy="72"
+r="58"
 
         stroke="#EDE9FE"
         strokeWidth="12"
@@ -604,9 +604,9 @@ mt-5
       />
 
       <circle
-        cx="64"
-  cy="64"
-  r="50"
+        cx="72"
+cy="72"
+r="58"
         stroke="#7C3AED"
         strokeWidth="12"
         fill="none"
@@ -815,40 +815,40 @@ mt-5
 flex
 items-center
 justify-center
-gap-5
 mt-5
+max-w-[430px]
+mx-auto
 ">
 
   {/* LEFT - CIRCLE */}
 
   <div className="
   relative
-  w-32
-  h-32
+  w-36
+  h-36
   shrink-0
 ">
 
-   <svg
-  className="
-    w-32
-    h-32
-    -rotate-90
-  "
+ <svg className="
+  w-36
+  h-36
+  -rotate-90
+"
 >
 
       <circle
-        cx="64"
-        cy="64"
-        r="50"
+       cx="72"
+cy="72"
+r="58"
         stroke="#DBEAFE"
         strokeWidth="12"
         fill="none"
       />
 
       <circle
-        cx="64"
-        cy="64"
-        r="50"
+       cx="72"
+cy="72"
+r="58"
         stroke="#2563EB"
         strokeWidth="12"
         fill="none"
@@ -1093,41 +1093,39 @@ mt-5
 flex
 items-center
 justify-center
-gap-5
 mt-5
+max-w-[430px]
+mx-auto
 ">
-
   {/* LEFT - CIRCLE */}
 
  <div className="
   relative
-  w-32
-  h-32
+  w-36
+  h-36
   shrink-0
-  
 ">
 
-   <svg
-  className="
-    w-32
-    h-32
-    -rotate-90
-  "
+  <svg className="
+  w-36
+  h-36
+  -rotate-90
+"
 >
 
       <circle
-        cx="65"
-        cy="65"
-        r="50"
+       cx="72"
+cy="72"
+r="58"
         stroke="#FBCFE8"
         strokeWidth="12"
         fill="none"
       />
 
       <circle
-        cx="65"
-        cy="65"
-        r="50"
+       cx="72"
+cy="72"
+r="58"
         stroke="#EC4899"
         strokeWidth="12"
         fill="none"
