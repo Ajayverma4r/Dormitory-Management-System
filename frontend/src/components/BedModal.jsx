@@ -262,6 +262,61 @@ maintenance_comment:
 
     setIsEditing(false);
   };
+  
+  const copyPhone = async () => {
+  try {
+
+    if (
+      navigator.clipboard &&
+      window.isSecureContext
+    ) {
+
+      await navigator.clipboard.writeText(
+        guestPhone
+      );
+
+    } else {
+
+      const textArea =
+        document.createElement(
+          "textarea"
+        );
+
+      textArea.value = guestPhone;
+
+      textArea.style.position =
+        "fixed";
+
+      textArea.style.left =
+        "-999999px";
+
+      document.body.appendChild(
+        textArea
+      );
+
+      textArea.focus();
+
+      textArea.select();
+
+      document.execCommand("copy");
+
+      textArea.remove();
+    }
+
+    toast.success(
+      "Phone number copied"
+    );
+
+  } catch (err) {
+
+    console.error(err);
+
+    toast.error(
+      "Failed to copy number"
+    );
+
+  }
+};
 
   return (
 
@@ -540,18 +595,8 @@ maintenance_comment:
   <FaPhoneAlt size={14} />
 </a>
 
-      <button
-  onClick={() => {
-
-    navigator.clipboard.writeText(
-      guestPhone
-    );
-
-    toast.success(
-      "Phone number copied"
-    );
-
-  }}
+    <button
+  onClick={copyPhone}
   style={{
     border: "none",
     background: "transparent",
