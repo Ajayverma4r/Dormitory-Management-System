@@ -258,9 +258,12 @@ maintenance_comment:
           : null,
     };
 
-    await updateBed(updatedBed);
+   const success =
+  await updateBed(updatedBed);
 
-    setIsEditing(false);
+if (success) {
+  setIsEditing(false);
+}
   };
   
   const copyPhone = async () => {
@@ -502,10 +505,12 @@ maintenance_comment:
                   type="text"
                   value={empId}
                   onChange={(e) =>
-                    setEmpId(
-                      e.target.value.toUpperCase()
-                    )
-                  }
+  setEmpId(
+    e.target.value
+      .trim()
+      .toUpperCase()
+  )
+}
                   style={inputStyle}
                 />
 

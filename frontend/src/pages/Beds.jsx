@@ -549,8 +549,25 @@ if (
     "Please fill all details"
   );
 
+   return;
+}
+
+  const duplicateEmpId = beds.find(
+  (bed) =>
+    bed.guest?.empId?.trim().toLowerCase() ===
+    empId.trim().toLowerCase()
+);
+
+if (duplicateEmpId) {
+
+  toast.error(
+    "EMP ID already assigned"
+  );
+
   return;
 }
+
+ 
 
 // GENDER REQUIRED
 
@@ -677,9 +694,12 @@ resetForm();
 
     console.log(error);
 
-    toast.error("Server Error");
+   toast.error(
+  error.response?.data?.message ||
+  "Server Error"
+);
   }
-};
+}; 
   // DELETE BED
 
   const deleteBed = async (id) => {
@@ -837,7 +857,8 @@ maintenance_comment:
           }
         : bed
     );
-
+    return true;
+    
     setBeds(updatedBeds);
 
     setSelectedBed({
@@ -857,14 +878,22 @@ maintenance_comment:
       response.data.check_in,
   },
 });
+ 
+return true;
 
   } catch (error) {
 
-    console.log(error);
+  console.log(error);
 
-    toast.error("Failed to update bed");
-  }
-};
+  toast.error(
+    error.response?.data?.message ||
+    "Failed to update bed"
+  );
+
+  return false;
+}
+}; 
+
 
 console.log(
   beds.filter(
@@ -1743,9 +1772,13 @@ const totalPages =
           type="text"
           placeholder="EMP ID"
           value={empId}
-          onChange={(e) =>
-            setEmpId(e.target.value)
-          }
+         onChange={(e) =>
+  setEmpId(
+    e.target.value
+      .trim()
+      .toUpperCase()
+  )
+}
           className="
             border
             p-3

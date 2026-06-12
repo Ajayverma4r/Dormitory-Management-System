@@ -241,6 +241,30 @@ if (
     }
 
     // CHECK EXISTING BED
+    if (status === "occupied") {
+
+  const duplicateEmp =
+    await pool.query(
+      `
+      SELECT id
+      FROM beds
+      WHERE
+        emp_id = $1
+        AND status = 'occupied'
+      `,
+      [emp_id]
+    );
+
+  if (
+    duplicateEmp.rows.length > 0
+  ) {
+
+    return res.status(400).json({
+      message:
+        "EMP ID already assigned to another bed",
+    });
+  }
+}
 
     const existingBed =
   await pool.query(
@@ -469,7 +493,34 @@ maintenance_cleaning,
 maintenance_others,
 maintenance_comment,
     } = req.body;
+if (
+  status === "occupied" &&
+  emp_id
+) {
 
+  const duplicateEmp =
+    await pool.query(
+      `
+      SELECT id
+      FROM beds
+      WHERE
+        emp_id = $1
+        AND status = 'occupied'
+        AND id != $2
+      `,
+      [emp_id, id]
+    );
+
+  if (
+    duplicateEmp.rows.length > 0
+  ) {
+
+    return res.status(400).json({
+      message:
+        "EMP ID already assigned to another bed",
+    });
+  }
+}
     // MEN DORMITORY VALIDATION
 
 if (
