@@ -857,7 +857,7 @@ maintenance_comment:
           }
         : bed
     );
-    return true;
+   
     
     setBeds(updatedBeds);
 
@@ -878,6 +878,10 @@ maintenance_comment:
       response.data.check_in,
   },
 });
+
+toast.success(
+  "Bed updated successfully"
+);
  
 return true;
 
