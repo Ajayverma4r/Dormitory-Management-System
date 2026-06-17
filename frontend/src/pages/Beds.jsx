@@ -109,7 +109,7 @@ const [building, setBuilding] =
   const [room, setRoom] = useState("");
   const [floor, setFloor] = useState("");
   const [location, setLocation] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("available");
   const [genderType, setGenderType] = useState("");
 
   const [showGuestModal, setShowGuestModal] =
@@ -1947,17 +1947,25 @@ const totalPages =
         {/* CHECK IN */}
 
         <input
-          type="date"
-          value={checkIn}
-          onChange={(e) =>
-            setCheckIn(e.target.value)
-          }
-          className="
-            border
-            p-3
-            rounded-lg
-          "
-        />
+  type="date"
+  value={checkIn}
+
+  max={
+    new Date()
+      .toISOString()
+      .split("T")[0]
+  }
+
+  onChange={(e) =>
+    setCheckIn(e.target.value)
+  }
+
+  className="
+    border
+    p-3
+    rounded-lg
+  "
+/>
 
         {/* PROVIDED AMENITIES */}
 

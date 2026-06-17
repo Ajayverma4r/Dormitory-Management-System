@@ -226,6 +226,23 @@ if (
         });
       }
     }
+      if (status === "occupied") {
+
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  const checkInDate =
+    new Date(check_in);
+
+  if (checkInDate > today) {
+
+    return res.status(400).json({
+      message:
+        "Future check-in date is not allowed",
+    });
+  }
+}
 
     // AVAILABLE → CLEAR GUEST DATA
 
@@ -556,6 +573,27 @@ if (
   return res.status(400).json({
     message: "Please select gender",
   });
+}
+
+if (
+  status === "occupied" &&
+  check_in
+) {
+
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  const checkInDate =
+    new Date(check_in);
+
+  if (checkInDate > today) {
+
+    return res.status(400).json({
+      message:
+        "Future check-in date is not allowed",
+    });
+  }
 }
 
     // AVAILABLE -> OCCUPIED
