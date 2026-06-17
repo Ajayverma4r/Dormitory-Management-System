@@ -182,6 +182,16 @@ useEffect(() => {
 
 useEffect(() => {
 
+  setSelectedBed(null);
+
+  setShowCreateModal(false);
+
+  setShowGuestModal(false);
+
+}, [routerLocation.pathname]);
+
+useEffect(() => {
+
   // RESET
 
 

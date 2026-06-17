@@ -265,6 +265,187 @@ if (success) {
   setIsEditing(false);
 }
   };
+
+  const handlePrint = () => {
+
+  const printWindow = window.open(
+    "",
+    "_blank"
+  );
+
+  const amenities = [];
+
+  if (fan) amenities.push("Fan");
+  if (mattress) amenities.push("Mattress");
+  if (plywood) amenities.push("Plywood");
+
+  printWindow.document.write(`
+
+    <html>
+
+      <head>
+
+        <title>
+          Bed Details
+        </title>
+
+        <style>
+
+          body {
+            font-family: Arial;
+            padding: 20px;
+          }
+
+          h2 {
+            text-align: center;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          td {
+            padding: 8px;
+            border: 1px solid #ccc;
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <h2>
+  ${
+    bed.gender_type === "boys"
+      ? "Men Dormitory"
+      : "Women Dormitory"
+  }
+</h2>
+
+<h3 style="text-align:center;">
+  Accommodation Details
+</h3>
+
+        <table>
+
+          <tr>
+            <td><b>Bed Number</b></td>
+            <td>${bed.bed_number}</td>
+          </tr>
+
+          ${
+  bed.location_type === "Supermarket"
+  ? `
+      <tr>
+        <td><b>Section</b></td>
+        <td>${bed.room || "-"}</td>
+      </tr>
+    `
+  : bed.location_type === "Hall"
+  ? `
+      <tr>
+        <td><b>Hall</b></td>
+        <td>${bed.room || "-"}</td>
+      </tr>
+
+      <tr>
+        <td><b>Row</b></td>
+        <td>${bed.floor || "-"}</td>
+      </tr>
+    `
+  : `
+      <tr>
+        <td><b>Room</b></td>
+        <td>${bed.room || "-"}</td>
+      </tr>
+
+      <tr>
+        <td><b>Floor</b></td>
+        <td>${bed.floor || "-"}</td>
+      </tr>
+    `
+}
+
+          <tr>
+            <td><b>Location</b></td>
+            <td>${bed.location || "-"}</td>
+          </tr>
+
+          <tr>
+            <td><b>Status</b></td>
+            <td>${status}</td>
+          </tr>
+
+          <tr>
+            <td><b>Name</b></td>
+            <td>${guestName || "-"}</td>
+          </tr>
+
+          <tr>
+            <td><b>EMP ID</b></td>
+            <td>${empId || "-"}</td>
+          </tr>
+
+          <tr>
+            <td><b>Gender</b></td>
+            <td>${occupantGender || "-"}</td>
+          </tr>
+
+          <tr>
+            <td><b>Department</b></td>
+            <td>${department || "-"}</td>
+          </tr>
+
+          <tr>
+            <td><b>Amenities</b></td>
+            <td>${amenities.join(", ")}</td>
+          </tr>
+
+          <tr>
+            <td><b>Check In</b></td>
+            <td>
+              ${
+                checkIn
+                  ? new Date(checkIn)
+                      .toLocaleDateString(
+                        "en-IN"
+                      )
+                  : "-"
+              }
+            </td>
+          </tr>
+
+        </table>
+
+      </body>
+
+    </html>
+
+  `);
+
+ printWindow.document.close();
+
+setTimeout(() => {
+
+  printWindow.focus();
+
+  printWindow.print();
+
+  setTimeout(() => {
+
+    if (!printWindow.closed) {
+
+      printWindow.close();
+
+    }
+
+  }, 1000);
+
+}, 300);
+  
+};
   
   const copyPhone = async () => {
   try {
@@ -338,7 +519,7 @@ if (success) {
           {bed.bed_number}
         </h2>
 
-        {/* BED DETAILS */}
+       
 
       {/* BED DETAILS */}
 
@@ -1321,6 +1502,16 @@ if (success) {
             </button>
 
           )}
+
+          <button
+  onClick={handlePrint}
+  style={{
+    ...buttonStyle,
+    background: "#059669",
+  }}
+>
+  Print
+</button>
 
           {/* CLOSE */}
 
