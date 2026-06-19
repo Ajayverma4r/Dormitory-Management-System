@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 
 import API from "../services/api";
 
+import { FaUser, FaLock, FaEye, FaEyeSlash, FaShieldAlt, FaBed, FaChartLine } from "react-icons/fa";
+
 
 function Login() {
 
@@ -23,7 +25,8 @@ function Login() {
 
   const [error, setError] =
     useState("");
-
+const [showPassword, setShowPassword] = useState(false);
+const [rememberMe, setRememberMe] = useState(false);
 
   const handleLogin = async (e) => {
 
@@ -72,250 +75,151 @@ function Login() {
 
 
   return (
+  <div
+    className="min-h-screen relative bg-cover bg-center overflow-hidden"
+    style={{ backgroundImage: `url(${bgImage})` }}
+  >
+    <div className="absolute inset-0 bg-black/55"></div>
 
-    <div
-  className="
-    min-h-screen
-    flex
-    items-center
-    justify-center
-    p-4
-    bg-cover
-    bg-center
-    relative
-  "
+    <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
+      <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-10">
 
-  style={{
-    backgroundImage:
-      `url(${bgImage})`
-  }}
->
+        {/* LEFT SIDE */}
+        <div className="hidden lg:flex flex-col justify-center text-white max-w-xl relative">
+          <div className="absolute -left-40 top-[-120px] w-[500px] h-[700px] bg-gradient-to-b from-[#0a0f2c]/90 to-[#0a0f2c]/70 rounded-r-[250px]" />
 
-  <div className="
-  absolute
-  inset-0
-  bg-black/40
-  backdrop-blur-[2px]
-"></div>
+          <div className="relative z-10">
+            <img
+              src={leoniaLogo}
+              alt="Leonia"
+              className="w-64 mb-8"
+            />
 
-{/* LEONIA LOGO */}
+            <h1 className="text-5xl font-bold leading-tight mb-4">
+              Bed Management
+              <br />
+              System
+            </h1>
 
-<img
-  src={leoniaLogo}
+            <div className="w-16 h-1 bg-purple-500 rounded-full mb-6"></div>
 
-  alt="Leonia"
+            <p className="text-xl text-gray-300 mb-10">
+              One System.
+              <br />
+              Complete Control.
+            </p>
 
-  className="
-    absolute
-    top-5
-    left-6
-    w-44
-    object-contain
-    drop-shadow-lg
-    select-none
-  "
-/>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
+                <FaBed className="text-purple-400 text-3xl mx-auto mb-3" />
+                <p className="text-sm">Bed Management</p>
+              </div>
 
-      {/* LOGIN CARD */}
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
+                <FaChartLine className="text-blue-400 text-3xl mx-auto mb-3" />
+                <p className="text-sm">Occupancy Tracking</p>
+              </div>
 
-      <div className="
-        relative z-10
-        w-full
-        max-w-sm
-        bg-white/70
-        backdrop-blur-xl
-        border
-        border-white/30
-        shadow-2xl
-        rounded-3xl
-        p-2
-      ">
-
-        {/* TITLE */}
-
-        <div className="
-          text-center
-          mb-8
-        ">
-
-          <h1 className="
-  text-2xl
-  font-bold
-  text-gray-800
-  whitespace-nowrap
-">
-  Leonia Holistic Destination
-</h1>
-
-          <p className="
-            text-gray-500
-            mt-2
-          ">
-            Bed Management System
-          </p>
-
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
+                <FaShieldAlt className="text-cyan-400 text-3xl mx-auto mb-3" />
+                <p className="text-sm">Secure Access</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        
+        {/* RIGHT SIDE LOGIN */}
+        <div className="w-full max-w-md">
+          <div className="bg-[#0e1228]/70 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8">
 
-        {/* ERROR */}
+            <h2 className="text-white text-4xl font-bold text-center mb-2">
+              Welcome Back!
+            </h2>
 
-        {error && (
+            <p className="text-gray-300 text-center mb-8">
+              Sign in to continue
+            </p>
 
-          <div className="
-            bg-red-100
-            text-red-600
-            p-3
-            rounded-xl
-            text-sm
-            mb-4
-            text-center
-          ">
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/30 text-red-300 p-3 rounded-xl text-sm mb-5">
+                {error}
+              </div>
+            )}
 
-            {error}
+            <form onSubmit={handleLogin} className="space-y-5">
 
+              <div className="relative">
+                <FaUser className="absolute left-4 top-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="relative">
+                <FaLock className="absolute left-4 top-4 text-gray-400" />
+
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-12 pr-12 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none focus:border-blue-500"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-4 text-gray-400"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 text-gray-300">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={() =>
+                      setRememberMe(!rememberMe)
+                    }
+                  />
+                  Remember me
+                </label>
+
+                <span className="text-gray-400 hover:text-white cursor-pointer">
+                  Forgot Password?
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg hover:opacity-90 transition"
+              >
+                Login
+              </button>
+            </form>
+
+            <p className="text-center text-gray-500 text-sm mt-8">
+              © 2026 Leonia Holistic Destination
+            </p>
           </div>
-        )}
-
-        {/* FORM */}
-
-        <form
-          onSubmit={handleLogin}
-          className="
-  flex
-  flex-col
-  gap-6
-  mt-6
-"
-        >
-
-          {/* USERNAME */}
-
-          <input
-            type="text"
-
-            placeholder="Username"
-
-            value={username}
-
-            onChange={(e) =>
-              setUsername(
-                e.target.value
-              )
-            }
-
-            required
-
-            className="
-  w-full
-  px-4
-  py-2
-  rounded-2xl
-  bg-white/60
-  backdrop-blur-md
-  border
-  border-white/30
-  shadow-sm
-  outline-none
-  focus:ring-2
-  focus:ring-blue-300
-  transition-all
-  text-gray-700
-  placeholder:text-gray-400
-"
-          />
-
-          {/* PASSWORD */}
-
-          <input
-            type="password"
-
-            placeholder="Password"
-
-            value={password}
-
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
-
-            required
-
-           className="
-  w-full
-  px-4
-  py-2
-  rounded-2xl
-  bg-white/60
-  backdrop-blur-md
-  border
-  border-white/30
-  shadow-sm
-  outline-none
-  focus:ring-2
-  focus:ring-blue-300
-  transition-all
-  text-gray-700
-  placeholder:text-gray-400
-"
-          />
-
-          {/* BUTTON */}
-
-          <button
-            type="submit"
-
-            className="
-  w-full
-  py-2
-  rounded-2xl
-  bg-gradient-to-r
-  from-blue-500
-  via-indigo-500
-  to-purple-500
-  text-white
-  font-semibold
-  text-lg
-  shadow-lg
-  hover:scale-[1.02]
-  hover:shadow-2xl
-  transition-all
-  duration-300
-"
-          >
-
-            Login
-
-          </button>
-
-        </form>
+        </div>
 
       </div>
-
-      {/* WATERMARK LOGO */}
-
-<img
-  src={logo}
-
-  alt="Ajay Verma"
-
-  className="
-    absolute
-    bottom-4
-    right-6
-    w-39
-    opacity-10
-    hover:opacity-30
-    transition-all
-    duration-300
-    select-none
-    pointer-events-none
-  "
-/>
-
     </div>
-  );
+
+    <img
+      src={logo}
+      alt="Watermark"
+      className="absolute bottom-4 right-6 w-40 opacity-10 pointer-events-none"
+    />
+  </div>
+);
 }
 
 export default Login;
