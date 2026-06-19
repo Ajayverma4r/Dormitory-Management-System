@@ -7,7 +7,7 @@ import {
   FaTools,
 } from "react-icons/fa";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import API from "../services/api";
 
@@ -151,6 +151,8 @@ const [plywood,
 
   const [beds, setBeds] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef(null);
   const [statusFilter, setStatusFilter] = useState("");
 
   const [summaryFilter, setSummaryFilter] =
@@ -171,6 +173,38 @@ const [dynamicFloors, setDynamicFloors] =
   const [currentPage, setCurrentPage] = useState(1);
 
 const bedsPerPage = 40;
+useEffect(() => {
+
+  const handleClickOutside = (event) => {
+
+    if (
+      searchRef.current &&
+      !searchRef.current.contains(event.target)
+    ) {
+
+      setShowSearchResults(false);
+
+      setSearchTerm("");
+
+    }
+
+  };
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () => {
+
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+
+  };
+
+}, []);
 
 useEffect(() => {
 
@@ -187,6 +221,10 @@ useEffect(() => {
   setShowCreateModal(false);
 
   setShowGuestModal(false);
+
+  setShowSearchResults(false);
+
+  setSearchTerm("");
 
 }, [routerLocation.pathname]);
 
@@ -916,104 +954,83 @@ console.log(
 );
     // FILTERED BEDS
 
-const filteredBeds = beds.filter((bed) => {
+const searchResults = beds
+  .filter((bed) => {
 
- const matchesSearch =
+    if (!searchTerm.trim()) {
+      return false;
+    }
 
-  bed.bed_number
-    ?.toLowerCase()
-    .includes(
-      searchTerm.toLowerCase()
-    )
+    const query =
+      searchTerm.toLowerCase();
 
-  ||
+    return (
 
-  bed.guest?.name
-    ?.toLowerCase()
-    .includes(
-      searchTerm.toLowerCase()
-    )
+      bed.gender_type === type &&
 
-  ||
+      (
 
-  bed.guest?.empId
-    ?.toLowerCase()
-    .includes(
-      searchTerm.toLowerCase()
+        bed.bed_number
+          ?.toLowerCase()
+          .includes(query)
+
+        ||
+
+        bed.guest?.name
+          ?.toLowerCase()
+          .includes(query)
+
+        ||
+
+        bed.guest?.empId
+          ?.toLowerCase()
+          .includes(query)
+
+      )
+
     );
 
-  const matchesStatus =
-    statusFilter === "" ||
-    bed.status === statusFilter;
+  })
+  .slice(0, 10);
+  
 
-  const matchesLocation =
-    locationFilter === "" ||
-    bed.location === locationFilter;
+  const filteredBeds = beds.filter((bed) => {
 
-    const matchesRoom =
+  if (bed.gender_type !== type)
+    return false;
 
-  typeFilter === "Hall"
+  if (
+    statusFilter &&
+    bed.status !== statusFilter
+  )
+    return false;
 
-    ? (
-        roomFilter === "" ||
-        bed.floor === roomFilter
-      )
+  if (
+    summaryFilter !== "all" &&
+    bed.status !== summaryFilter
+  )
+    return false;
 
-    : (
-        roomFilter === "" ||
-        bed.room === roomFilter
-      );
+  if (
+    typeFilter &&
+    bed.location_type !== typeFilter
+  )
+    return false;
 
-const matchesFloor =
+  if (
+    floorFilter &&
+    bed.floor !== floorFilter
+  )
+    return false;
 
-  typeFilter === "Hall"
+  if (
+    roomFilter &&
+    bed.room !== roomFilter
+  )
+    return false;
 
-    ? (
-        floorFilter === "" ||
-        bed.room === floorFilter
-      )
-
-    : (
-        floorFilter === "" ||
-        bed.floor === floorFilter
-      );
-
-  const matchesType =
-
-  typeFilter === "" ||
-
-  bed.location_type ===
-    typeFilter;
-
-  const matchesSummary =
-
-  summaryFilter === "all"
-
-    ? true
-
-    : bed.status ===
-      summaryFilter;
-
- return (
-
-  bed.gender_type === type &&
-
-  matchesSearch &&
-
-  matchesStatus &&
-
-  matchesLocation &&
-
-matchesRoom &&
-
-matchesFloor &&
-
-matchesType &&
-
-matchesSummary
-);
+  return true;
 });
-
 
 // PAGINATION
 
@@ -1132,34 +1149,131 @@ const totalPages =
     items-center
     gap-3
     mb-5
-    overflow-x-auto
     pb-2
+    overflow-visible
   "
 >
 
   {/* SEARCH */}
 
-  <input
-    type="text"
-    placeholder="Search bed/EmpId/Name..."
-    value={searchTerm}
-    onChange={(e) =>
-      setSearchTerm(e.target.value)
-    }
+<div
+  ref={searchRef}
+  className="relative"
+  style={{
+    zIndex: 9999,
+  }}
+>
 
-    className="
-      h-10
-      w-56
-      bg-white
-      border
-      border-gray-200
-      rounded-xl
-      px-3
+  <input
+  key={routerLocation.pathname}
+  type="text"
+  placeholder="Search bed/EmpId/Name..."
+  value={searchTerm}
+
+  onChange={(e) => {
+    setSearchTerm(e.target.value);
+    setShowSearchResults(true);
+  }}
+
+  onFocus={() =>
+    setShowSearchResults(true)
+  }
+
+  className="
+    h-10
+    w-56
+    bg-white
+    border
+    border-gray-200
+    rounded-xl
+    px-3
+    text-sm
+    shadow-sm
+    outline-none
+  "
+/>
+
+{showSearchResults &&
+ searchTerm.trim() && (
+
+<div
+  className="
+    absolute
+    top-12
+    left-0
+    w-72
+    bg-white
+    rounded-xl
+    border
+    shadow-xl
+    overflow-hidden
+  "
+  style={{
+    zIndex: 99999,
+  }}
+>
+
+  {searchResults.length === 0 ? (
+
+    <div className="
+      px-4
+      py-3
       text-sm
-      shadow-sm
-      outline-none
-    "
-  />
+      text-gray-500
+    ">
+      No results found
+    </div>
+
+  ) : (
+
+    searchResults.map((bed) => (
+
+      <div
+        key={bed.id}
+
+       onClick={() => {
+
+  setSelectedBed(bed);
+
+  setShowSearchResults(false);
+
+  setSearchTerm(
+    bed.guest?.name ||
+    bed.bed_number
+  );
+}}
+
+        className="
+          px-4
+          py-3
+          border-b
+          hover:bg-blue-50
+          cursor-pointer
+        "
+      >
+
+        <div className="font-medium">
+          {bed.bed_number}
+        </div>
+
+        <div className="
+          text-xs
+          text-gray-500
+        ">
+          {bed.guest?.name || "No Name"} • {bed.guest?.empId || "-"}
+        </div>
+
+      </div>
+
+    ))
+
+  )}
+
+</div>
+
+)}
+
+</div>
 
   {/* STATUS */}
 

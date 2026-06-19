@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { FaPhoneAlt } from "react-icons/fa";
 import { MdContentCopy } from "react-icons/md";
+import leoniaLogo from "../assets/Leonia.webp";
 
 function BedModal({
   isAdmin,
@@ -285,9 +286,7 @@ if (success) {
 
       <head>
 
-        <title>
-          Bed Details
-        </title>
+        <title>Dormitory Slip</title>
 
         <style>
 
@@ -316,17 +315,38 @@ if (success) {
 
       <body>
 
-        <h2>
-  ${
-    bed.gender_type === "boys"
-      ? "Men Dormitory"
-      : "Women Dormitory"
-  }
-</h2>
+<div
+  style="
+    text-align:center;
+    margin-bottom:20px;
+  "
+>
 
-<h3 style="text-align:center;">
-  Accommodation Details
-</h3>
+ <img
+  src="${leoniaLogo}"
+  style="
+    width:120px;
+    margin-bottom:10px;
+  "
+/>
+
+  <h2>
+    Leonia Holistic Destination
+  </h2>
+
+  <h3>
+    ${
+      bed.gender_type === "boys"
+        ? "Men Dormitory"
+        : "Women Dormitory"
+    }
+  </h3>
+
+  <p>
+    Employee Accommodation Details
+  </p>
+
+</div>
 
         <table>
 

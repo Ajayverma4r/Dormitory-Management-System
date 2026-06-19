@@ -5,8 +5,14 @@ import {
   FaUser,
   FaChartBar
 } from "react-icons/fa";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer
+} from "recharts";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import API from "../services/api";
 import dashboardBg from "../assets/dashboardBg.jpg";
 import Sidebar from "../components/Sidebar";
@@ -21,6 +27,7 @@ function Dashboard() {
 
 const [searchText, setSearchText] =
   useState("");
+  const searchRef = useRef(null);
 
   // FETCH DATA
 
@@ -85,6 +92,37 @@ const [searchText, setSearchText] =
   const occupiedBeds = beds.filter(
     (bed) => bed.status === "occupied"
   ).length;
+ const maintenanceBeds = beds.filter(
+  (bed) =>
+    bed.status?.toLowerCase().includes("maint")
+).length;
+
+
+const boysAvailable = beds.filter(
+  (bed) =>
+    bed.gender_type === "boys" &&
+    bed.status === "available"
+).length;
+
+const girlsAvailable = beds.filter(
+  (bed) =>
+    bed.gender_type === "girls" &&
+    bed.status === "available"
+).length;
+
+const boysMaintenance = beds.filter(
+  (bed) =>
+    bed.gender_type === "boys" &&
+    bed.status?.toLowerCase().includes("maint")
+).length;
+
+const girlsMaintenance = beds.filter(
+  (bed) =>
+    bed.gender_type === "girls" &&
+    bed.status?.toLowerCase().includes("maint")
+).length;
+
+
 
   const insideBeds = beds.filter(
     (bed) => bed.location === "inside"
@@ -152,6 +190,25 @@ const girlsOccupied =
 
   ).length;
 
+  const totalChartData = [
+  { name: "Occupied", value: occupiedBeds, color: "#EF4444" },
+  { name: "Available", value: availableBeds, color: "#22C55E" },
+  { name: "Maintenance", value: maintenanceBeds, color: "#F59E0B" }
+];
+
+const boysChartData = [
+
+  { name: "Occupied", value: boysOccupied, color: "#2563EB" },
+  { name: "Available", value: boysAvailable, color: "#22C55E" },
+  { name: "Maintenance", value: boysMaintenance, color: "#F59E0B" }
+];
+
+const girlsChartData = [
+  { name: "Occupied", value: girlsOccupied, color: "#EC4899" },
+  { name: "Available", value: girlsAvailable, color: "#22C55E" },
+  { name: "Maintenance", value: girlsMaintenance, color: "#F59E0B" }
+];
+
   // OCCUPANCY %
 
   const occupancyRate =
@@ -196,6 +253,37 @@ const girlsOccupied =
   // ONLY 50
 
   .slice(0, 50);
+
+  useEffect(() => {
+
+  const handleClickOutside = (event) => {
+
+    if (
+      searchRef.current &&
+      !searchRef.current.contains(event.target)
+    ) {
+
+      setSearchText("");
+
+    }
+
+  };
+
+  document.addEventListener(
+    "mousedown",
+    handleClickOutside
+  );
+
+  return () => {
+
+    document.removeEventListener(
+      "mousedown",
+      handleClickOutside
+    );
+
+  };
+
+}, []);
 
  const searchResults = beds
 
@@ -339,11 +427,14 @@ const girlsOccupied =
 
   </div>
 
- <div className="
-  relative
-  w-full
-  md:w-[420px]
-">
+ <div
+  ref={searchRef}
+  className="
+    relative
+    w-full
+    md:w-[420px]
+  "
+>
 
   <FaSearch
     className="
@@ -580,73 +671,44 @@ mx-auto
 
   {/* LEFT - CIRCLE */}
 
-<div className="
-  relative
-  w-36
-  h-36
-  shrink-0
-">
+<div className="relative w-40 h-40 shrink-0">
 
- <svg className="
-  w-36
-  h-36
-  -rotate-90
-"
->
-      <circle
-  cx="72"
-cy="72"
-r="58"
+  <ResponsiveContainer width="100%" height="100%">
+    <PieChart>
+      <Pie
+        data={totalChartData}
+        dataKey="value"
+        innerRadius={45}
+        outerRadius={70}
+      >
+        {totalChartData.map((item, i) => (
+          <Cell
+            key={i}
+            fill={item.color}
+          />
+        ))}
+      </Pie>
+    </PieChart>
+  </ResponsiveContainer>
 
-        stroke="#EDE9FE"
-        strokeWidth="12"
-        fill="none"
-      />
+  <div className="
+    absolute
+    inset-0
+    flex
+    flex-col
+    items-center
+    justify-center
+  ">
+    <span className="text-xs text-gray-500">
+      Total
+    </span>
 
-      <circle
-        cx="72"
-cy="72"
-r="58"
-        stroke="#7C3AED"
-        strokeWidth="12"
-        fill="none"
-        strokeDasharray={
-          2 * Math.PI * 50
-        }
-        strokeDashoffset={
-          2 * Math.PI * 50 *
-          (
-            1 -
-            totalOccupied /
-            (totalBeds || 1)
-          )
-        }
-        strokeLinecap="round"
-      />
-    </svg>
-
-    <div className="
-      absolute
-      inset-0
-      flex
-      items-center
-      justify-center
-    ">
-      <p className="
-        text-2xl
-        font-bold
-        text-purple-600
-      ">
-        {Math.round(
-          (
-            totalOccupied /
-            (totalBeds || 1)
-          ) * 100
-        )}%
-      </p>
-    </div>
-
+    <span className="text-2xl font-bold">
+      {totalBeds}
+    </span>
   </div>
+
+</div>
 
   {/* DIVIDER */}
 
@@ -659,100 +721,59 @@ r="58"
 
   {/* RIGHT STATS */}
 
- <div className="
-  flex
-  flex-col
-  gap-4
-  min-w-[150px]
-">
+<div className="space-y-4 min-w-[180px]">
 
-    <div className="flex items-center gap-3">
+  {totalChartData.map((item) => (
+
+    <div
+      key={item.name}
+      className="
+        flex
+        items-center
+        justify-between
+      "
+    >
+
+      <div className="
+        flex
+        items-center
+        gap-3
+      ">
+
+        <div
+          className="
+            w-3
+            h-3
+            rounded-full
+          "
+          style={{
+            background: item.color
+          }}
+        />
+
+        <span>
+          {item.name}
+        </span>
+
+      </div>
+
+      <span className="font-bold">
+        {item.value}
+      </span>
+
+    </div>
+
+  ))}
 
   <div className="
-    w-11 h-11
-    rounded-xl
-    bg-blue-50
-    flex items-center justify-center
+    pt-3
+    border-t
+    font-bold
   ">
-    <FaBed className="
-      text-blue-600 text-xl
-    " />
-  </div>
-
-  <div>
-    <p className="text-gray-500 text-sm">
-      Total Beds
-    </p>
-
-    <p className="
-      text-3xl
-      font-bold
-    ">
-     {totalBeds}
-    </p>
+    Total Beds: {totalBeds}
   </div>
 
 </div>
-
-   <div className="flex items-center gap-3">
-
-  <div className="
-    w-11 h-11
-    rounded-xl
-    bg-pink-50
-    flex items-center justify-center
-  ">
-    <FaUser className="
-      text-pink-600 text-xl
-    " />
-  </div>
-
-  <div>
-    <p className="text-gray-500 text-sm">
-      Occupied
-    </p>
-
-    <p className="
-      text-3xl
-      font-bold
-      text-blue-600
-    ">
-     {totalOccupied}
-    </p>
-  </div>
-
-</div>
-
-  <div className="flex items-center gap-3">
-
-  <div className="
-    w-11 h-11
-    rounded-xl
-    bg-green-50
-    flex items-center justify-center
-  ">
-    <FaBed className="
-      text-green-600 text-xl
-    " />
-  </div>
-
-  <div>
-    <p className="text-gray-500 text-sm">
-      Available
-    </p>
-
-    <p className="
-      text-3xl
-      font-bold
-      text-green-600
-    ">
-     {totalBeds - totalOccupied}
-    </p>
-  </div>
-
-</div>
-
-  </div>
   </div>
 
 
@@ -822,76 +843,44 @@ mx-auto
 
   {/* LEFT - CIRCLE */}
 
+  <div className="relative w-40 h-40 shrink-0">
+
+  <ResponsiveContainer width="100%" height="100%">
+    <PieChart>
+      <Pie
+       data={boysChartData}
+        dataKey="value"
+        innerRadius={45}
+        outerRadius={70}
+      >
+        {boysChartData.map((item, i) => (
+          <Cell
+            key={i}
+            fill={item.color}
+          />
+        ))}
+      </Pie>
+    </PieChart>
+  </ResponsiveContainer>
+
   <div className="
-  relative
-  w-36
-  h-36
-  shrink-0
-">
+    absolute
+    inset-0
+    flex
+    flex-col
+    items-center
+    justify-center
+  ">
+    <span className="text-xs text-gray-500">
+      Total
+    </span>
 
- <svg className="
-  w-36
-  h-36
-  -rotate-90
-"
->
-
-      <circle
-       cx="72"
-cy="72"
-r="58"
-        stroke="#DBEAFE"
-        strokeWidth="12"
-        fill="none"
-      />
-
-      <circle
-       cx="72"
-cy="72"
-r="58"
-        stroke="#2563EB"
-        strokeWidth="12"
-        fill="none"
-        strokeDasharray={
-          2 * Math.PI * 50
-        }
-        strokeDashoffset={
-          2 * Math.PI * 50 *
-          (
-            1 -
-            boysOccupied /
-            (boysBeds || 1)
-          )
-        }
-        strokeLinecap="round"
-      />
-
-    </svg>
-
-    <div className="
-      absolute
-      inset-0
-      flex
-      items-center
-      justify-center
-    ">
-
-      <p className="
-        text-2xl
-        font-bold
-        text-blue-600
-      ">
-        {Math.round(
-          (
-            boysOccupied /
-            (boysBeds || 1)
-          ) * 100
-        )}%
-      </p>
-
-    </div>
-
+    <span className="text-2xl font-bold">
+      {boysBeds}
+    </span>
   </div>
+
+</div>
 
   {/* DIVIDER */}
 
@@ -904,127 +893,56 @@ r="58"
 
   {/* RIGHT STATS */}
 
+  <div className="space-y-4 min-w-[180px]">
+
+  {boysChartData.map((item) => (
+
+    <div
+      key={item.name}
+      className="
+        flex
+        items-center
+        justify-between
+      "
+    >
+
+      <div className="
+        flex
+        items-center
+        gap-3
+      ">
+
+        <div
+          className="
+            w-3
+            h-3
+            rounded-full
+          "
+          style={{
+            background: item.color
+          }}
+        />
+
+        <span>
+          {item.name}
+        </span>
+
+      </div>
+
+      <span className="font-bold">
+        {item.value}
+      </span>
+
+    </div>
+
+  ))}
+
   <div className="
-  flex
-  flex-col
-  gap-4
-  min-w-[145px]
-">
-
-  <div className="flex items-center gap-3">
-
-    <div className="
-      w-12
-      h-12
-      rounded-xl
-      bg-blue-50
-
-      flex
-      items-center
-      justify-center
-    ">
-      <FaBed className="
-        text-blue-600
-        text-lg
-      "/>
-    </div>
-
-    <div>
-
-      <p className="
-        text-sm
-        text-gray-500
-      ">
-        Total Beds
-      </p>
-
-      <p className="
-        text-3xl
-        font-bold
-      ">
-        {boysBeds}
-      </p>
-
-    </div>
-
-  </div>
-
-  <div className="flex items-center gap-3">
-
-    <div className="
-      w-12
-      h-12
-      rounded-xl
-      bg-pink-50
-
-      flex
-      items-center
-      justify-center
-    ">
-      <FaUser className="
-        text-pink-600
-        text-lg
-      "/>
-    </div>
-
-    <div>
-
-      <p className="
-        text-sm
-        text-gray-500
-      ">
-        Occupied
-      </p>
-
-      <p className="
-        text-3xl
-        font-bold
-        text-blue-600
-      ">
-        {boysOccupied}
-      </p>
-
-    </div>
-
-  </div>
-
-  <div className="flex items-center gap-3">
-
-    <div className="
-      w-12
-      h-12
-      rounded-xl
-      bg-green-50
-
-      flex
-      items-center
-      justify-center
-    ">
-      <FaBed className="
-        text-green-600
-        text-lg
-      "/>
-    </div>
-
-    <div>
-
-      <p className="
-        text-sm
-        text-gray-500
-      ">
-        Available
-      </p>
-
-      <p className="
-        text-3xl
-        font-bold
-        text-green-600
-      ">
-        {boysBeds - boysOccupied}
-      </p>
-
-    </div>
-
+    pt-3
+    border-t
+    font-bold
+  ">
+    Total Beds: {boysBeds}
   </div>
 
 </div>
@@ -1099,76 +1017,44 @@ mx-auto
 ">
   {/* LEFT - CIRCLE */}
 
- <div className="
-  relative
-  w-36
-  h-36
-  shrink-0
-">
+<div className="relative w-40 h-40 shrink-0">
 
-  <svg className="
-  w-36
-  h-36
-  -rotate-90
-"
->
+  <ResponsiveContainer width="100%" height="100%">
+    <PieChart>
+      <Pie
+        data={girlsChartData}
+        dataKey="value"
+        innerRadius={45}
+        outerRadius={70}
+      >
+        {girlsChartData.map((item, i) => (
+  <Cell
+    key={i}
+    fill={item.color}
+  />
+))}
+      </Pie>
+    </PieChart>
+  </ResponsiveContainer>
 
-      <circle
-       cx="72"
-cy="72"
-r="58"
-        stroke="#FBCFE8"
-        strokeWidth="12"
-        fill="none"
-      />
+  <div className="
+    absolute
+    inset-0
+    flex
+    flex-col
+    items-center
+    justify-center
+  ">
+    <span className="text-xs text-gray-500">
+      Total
+    </span>
 
-      <circle
-       cx="72"
-cy="72"
-r="58"
-        stroke="#EC4899"
-        strokeWidth="12"
-        fill="none"
-        strokeDasharray={
-          2 * Math.PI * 50
-        }
-        strokeDashoffset={
-          2 * Math.PI * 50 *
-          (
-            1 -
-            girlsOccupied /
-            (girlsBeds || 1)
-          )
-        }
-        strokeLinecap="round"
-      />
-
-    </svg>
-
-    <div className="
-      absolute
-      inset-0
-      flex
-      items-center
-      justify-center
-    ">
-
-      <p className="
-        text-2xl
-        font-bold
-        text-pink-600
-      ">
-        {Math.round(
-          (
-            girlsOccupied /
-            (girlsBeds || 1)
-          ) * 100
-        )}%
-      </p>
-
-    </div>
-
+    <span className="text-2xl font-bold">
+      {girlsBeds}
+    </span>
   </div>
+
+</div>
 
   {/* DIVIDER */}
 
@@ -1181,127 +1067,56 @@ r="58"
 
   {/* RIGHT STATS */}
 
+  <div className="space-y-4 min-w-[180px]">
+
+  {girlsChartData.map((item) => (
+
+    <div
+      key={item.name}
+      className="
+        flex
+        items-center
+        justify-between
+      "
+    >
+
+      <div className="
+        flex
+        items-center
+        gap-3
+      ">
+
+        <div
+          className="
+            w-3
+            h-3
+            rounded-full
+          "
+          style={{
+            background: item.color
+          }}
+        />
+
+        <span>
+          {item.name}
+        </span>
+
+      </div>
+
+      <span className="font-bold">
+        {item.value}
+      </span>
+
+    </div>
+
+  ))}
+
   <div className="
-  flex
-  flex-col
-  gap-4
-  min-w-[140px]
-">
-
-  <div className="flex items-center gap-3">
-
-    <div className="
-      w-12
-      h-12
-      rounded-xl
-      bg-blue-50
-
-      flex
-      items-center
-      justify-center
-    ">
-      <FaBed className="
-        text-blue-600
-        text-lg
-      "/>
-    </div>
-
-    <div>
-
-      <p className="
-        text-sm
-        text-gray-500
-      ">
-        Total Beds
-      </p>
-
-      <p className="
-        text-3xl
-        font-bold
-      ">
-        {girlsBeds}
-      </p>
-
-    </div>
-
-  </div>
-
-  <div className="flex items-center gap-3">
-
-    <div className="
-      w-12
-      h-12
-      rounded-xl
-      bg-pink-50
-
-      flex
-      items-center
-      justify-center
-    ">
-      <FaUser className="
-        text-pink-600
-        text-lg
-      "/>
-    </div>
-
-    <div>
-
-      <p className="
-        text-sm
-        text-gray-500
-      ">
-        Occupied
-      </p>
-
-      <p className="
-        text-3xl
-        font-bold
-        text-blue-600
-      ">
-       {girlsOccupied}
-      </p>
-
-    </div>
-
-  </div>
-
-  <div className="flex items-center gap-3">
-
-    <div className="
-      w-12
-      h-12
-      rounded-xl
-      bg-green-50
-
-      flex
-      items-center
-      justify-center
-    ">
-      <FaBed className="
-        text-green-600
-        text-lg
-      "/>
-    </div>
-
-    <div>
-
-      <p className="
-        text-sm
-        text-gray-500
-      ">
-        Available
-      </p>
-
-      <p className="
-        text-3xl
-        font-bold
-        text-green-600
-      ">
-        {girlsBeds - girlsOccupied}
-      </p>
-
-    </div>
-
+    pt-3
+    border-t
+    font-bold
+  ">
+    Total Beds: {girlsBeds}
   </div>
 
 </div>
