@@ -82,11 +82,21 @@ const [rememberMe, setRememberMe] = useState(false);
     <div className="absolute inset-0 bg-black/55"></div>
 
     <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-6">
+   <div className="w-full max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center justify-between px-10">
 
         {/* LEFT SIDE */}
-        <div className="hidden lg:flex flex-col justify-center text-white max-w-lg relative">
-          <div className="absolute -left-32 -top-24 -bottom-24 w-[430px] bg-gradient-to-b from-[#0a0f2c]/90 to-[#0a0f2c]/70 rounded-r-[250px]" />
+        <div className="hidden lg:flex flex-col justify-center text-white w-[520px] relative flex-shrink-0">
+         <div
+  className="absolute
+  -left-40
+  -top-40
+  -bottom-40
+  w-[520px]
+  bg-gradient-to-b
+  from-[#0a0f2c]/90
+  to-[#0a0f2c]/70
+  rounded-r-[300px]"
+/>
 
           <div className="relative z-10">
             <img
@@ -112,7 +122,7 @@ const [rememberMe, setRememberMe] = useState(false);
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-2 text-center">
                 <FaBed className="text-purple-400 text-3xl mx-auto mb-3" />
-                <p className="text-sm">Bed <br /> Management</p>
+                <p className="text-sm">Bed<br /> Management</p>
               </div>
 
               <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
@@ -129,7 +139,7 @@ const [rememberMe, setRememberMe] = useState(false);
         </div>
 
         {/* RIGHT SIDE LOGIN */}
-        <div className="w-full max-w-[380px]">
+        <div className="w-full max-w-[420px] flex-shrink-0">
           <div className="bg-[#0e1228]/70 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-6">
 
             <h2 className="text-white text-3xl font-bold text-center mb-2">
