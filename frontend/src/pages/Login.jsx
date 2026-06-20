@@ -82,20 +82,20 @@ const [rememberMe, setRememberMe] = useState(false);
     <div className="absolute inset-0 bg-black/55"></div>
 
     <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-10">
+      <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-6">
 
         {/* LEFT SIDE */}
-        <div className="hidden lg:flex flex-col justify-center text-white max-w-xl relative">
-          <div className="absolute -left-40 top-[-120px] w-[500px] h-[700px] bg-gradient-to-b from-[#0a0f2c]/90 to-[#0a0f2c]/70 rounded-r-[250px]" />
+        <div className="hidden lg:flex flex-col justify-center text-white max-w-lg relative">
+          <div className="absolute -left-32 -top-24 -bottom-24 w-[430px] bg-gradient-to-b from-[#0a0f2c]/90 to-[#0a0f2c]/70 rounded-r-[250px]" />
 
           <div className="relative z-10">
             <img
               src={leoniaLogo}
               alt="Leonia"
-              className="w-64 mb-8"
+              className="w-56 mb-6"
             />
 
-            <h1 className="text-5xl font-bold leading-tight mb-4">
+            <h1 className="text-4xl font-bold leading-tight mb-4">
               Bed Management
               <br />
               System
@@ -103,16 +103,16 @@ const [rememberMe, setRememberMe] = useState(false);
 
             <div className="w-16 h-1 bg-purple-500 rounded-full mb-6"></div>
 
-            <p className="text-xl text-gray-300 mb-10">
+            <p className="text-lg text-gray-300 mb-10">
               One System.
               <br />
               Complete Control.
             </p>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-2 text-center">
                 <FaBed className="text-purple-400 text-3xl mx-auto mb-3" />
-                <p className="text-sm">Bed Management</p>
+                <p className="text-sm">Bed <br /> Management</p>
               </div>
 
               <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
@@ -129,10 +129,10 @@ const [rememberMe, setRememberMe] = useState(false);
         </div>
 
         {/* RIGHT SIDE LOGIN */}
-        <div className="w-full max-w-md">
-          <div className="bg-[#0e1228]/70 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-8">
+        <div className="w-full max-w-[380px]">
+          <div className="bg-[#0e1228]/70 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-6">
 
-            <h2 className="text-white text-4xl font-bold text-center mb-2">
+            <h2 className="text-white text-3xl font-bold text-center mb-2">
               Welcome Back!
             </h2>
 
@@ -155,7 +155,7 @@ const [rememberMe, setRememberMe] = useState(false);
                   placeholder="Username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none focus:border-blue-500"
+                  className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none focus:border-blue-500"
                 />
               </div>
 
@@ -167,7 +167,7 @@ const [rememberMe, setRememberMe] = useState(false);
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-12 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none focus:border-blue-500"
+                  className="w-full pl-12 pr-12 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 outline-none focus:border-blue-500"
                 />
 
                 <button
@@ -198,13 +198,13 @@ const [rememberMe, setRememberMe] = useState(false);
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-lg hover:opacity-90 transition"
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold text-base hover:opacity-90 transition"
               >
                 Login
               </button>
             </form>
 
-            <p className="text-center text-gray-500 text-sm mt-8">
+            <p className="text-center text-gray-500 text-sm mt-6">
               © 2026 Leonia Holistic Destination
             </p>
           </div>

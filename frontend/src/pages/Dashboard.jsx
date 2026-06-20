@@ -338,7 +338,7 @@ const girlsChartData = [
   className="
     relative
     flex-1
-    p-6
+    p-4
     md:ml-64
     min-h-screen
     overflow-hidden
@@ -432,7 +432,7 @@ const girlsChartData = [
   className="
     relative
     w-full
-    md:w-[420px]
+    md:w-[360px]
   "
 >
 
@@ -456,7 +456,7 @@ const girlsChartData = [
 
     className="
       w-full
-      h-11
+      h-10
 
       bg-white/90
 
@@ -607,9 +607,9 @@ const girlsChartData = [
     grid-cols-1
     md:grid-cols-2
     xl:grid-cols-3
-2xl:grid-cols-3
-    gap-8
-    mt-10
+    2xl:grid-cols-3
+    gap-5
+    mt-6
     w-full
 ">
 
@@ -619,10 +619,10 @@ const girlsChartData = [
 <div
   className="
     bg-white/80
-    backdrop-blur-xl
-    rounded-3xl
-    p-5
-    shadow-xl
+backdrop-blur-xl
+rounded-2xl
+p-4
+shadow-xl
     border
     border-white/40
     relative
@@ -664,22 +664,22 @@ right-3.5
 flex
 items-center
 justify-center
+gap-4
 mt-5
-max-w-[430px]
-mx-auto
+w-full
 ">
 
   {/* LEFT - CIRCLE */}
 
-<div className="relative w-40 h-40 shrink-0">
+<div className="relative w-32 h-32 shrink-0">
 
   <ResponsiveContainer width="100%" height="100%">
     <PieChart>
       <Pie
         data={totalChartData}
         dataKey="value"
-        innerRadius={45}
-        outerRadius={70}
+        innerRadius={35}
+outerRadius={55}
       >
         {totalChartData.map((item, i) => (
           <Cell
@@ -703,7 +703,7 @@ mx-auto
       Total
     </span>
 
-    <span className="text-2xl font-bold">
+    <span className="text-xl font-bold">
       {totalBeds}
     </span>
   </div>
@@ -721,7 +721,7 @@ mx-auto
 
   {/* RIGHT STATS */}
 
-<div className="space-y-4 min-w-[180px]">
+<div className="space-y-4 min-w-[140px]">
 
   {totalChartData.map((item) => (
 
@@ -788,10 +788,10 @@ mx-auto
   onClick={() => navigate("/boys")}
   className="
     bg-white/80
-    backdrop-blur-xl
-    rounded-3xl
-    p-5
-    shadow-xl
+backdrop-blur-xl
+rounded-2xl
+p-4
+shadow-xl
     border
     border-white/40
     relative
@@ -836,22 +836,22 @@ mx-auto
 flex
 items-center
 justify-center
+gap-4
 mt-5
-max-w-[430px]
-mx-auto
+w-full
 ">
 
   {/* LEFT - CIRCLE */}
 
-  <div className="relative w-40 h-40 shrink-0">
+  <div className="relative w-32 h-32 shrink-0">
 
   <ResponsiveContainer width="100%" height="100%">
     <PieChart>
       <Pie
        data={boysChartData}
         dataKey="value"
-        innerRadius={45}
-        outerRadius={70}
+        innerRadius={35}
+outerRadius={55}
       >
         {boysChartData.map((item, i) => (
           <Cell
@@ -875,7 +875,7 @@ mx-auto
       Total
     </span>
 
-    <span className="text-2xl font-bold">
+    <span className="text-xl font-bold">
       {boysBeds}
     </span>
   </div>
@@ -893,7 +893,7 @@ mx-auto
 
   {/* RIGHT STATS */}
 
-  <div className="space-y-4 min-w-[180px]">
+ <div className="space-y-4 min-w-[140px]">
 
   {boysChartData.map((item) => (
 
@@ -961,10 +961,10 @@ mx-auto
   onClick={() => navigate("/girls")}
   className="
     bg-white/80
-    backdrop-blur-xl
-    rounded-3xl
-    p-5
-    shadow-xl
+backdrop-blur-xl
+rounded-2xl
+p-4
+shadow-xl
     border
     border-white/40
     relative
@@ -987,8 +987,8 @@ mx-auto
 
 <div className="
   absolute
-  top-5
-  right-5
+ top-3.5
+  right-3.5
 
   w-12
   h-12
@@ -1011,21 +1011,21 @@ mx-auto
 flex
 items-center
 justify-center
+gap-4
 mt-5
-max-w-[430px]
-mx-auto
+w-full
 ">
   {/* LEFT - CIRCLE */}
 
-<div className="relative w-40 h-40 shrink-0">
+<div className="relative w-32 h-32 shrink-0">
 
   <ResponsiveContainer width="100%" height="100%">
     <PieChart>
       <Pie
         data={girlsChartData}
         dataKey="value"
-        innerRadius={45}
-        outerRadius={70}
+       innerRadius={35}
+outerRadius={55}
       >
         {girlsChartData.map((item, i) => (
   <Cell
@@ -1049,7 +1049,7 @@ mx-auto
       Total
     </span>
 
-    <span className="text-2xl font-bold">
+   <span className="text-xl font-bold">
       {girlsBeds}
     </span>
   </div>
@@ -1067,7 +1067,7 @@ mx-auto
 
   {/* RIGHT STATS */}
 
-  <div className="space-y-4 min-w-[180px]">
+<div className="space-y-4 min-w-[140px]">
 
   {girlsChartData.map((item) => (
 
