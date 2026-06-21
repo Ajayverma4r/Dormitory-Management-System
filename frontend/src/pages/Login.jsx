@@ -27,75 +27,98 @@ function Login() {
   };
 
   return (
+    // OUTER WRAPPER: full viewport. This is the only element allowed to "grow".
     <div
-      className="min-h-screen relative bg-cover bg-center overflow-hidden"
+      className="h-screen w-full relative bg-cover bg-center overflow-hidden"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       <div className="absolute inset-0 bg-black/55"></div>
 
       {/*
-        OUTER WRAPPER: fills viewport, just for centering.
-        This is allowed to scale — it's only background canvas.
+        FULL-WIDTH ROW (NOT centered, NOT max-w capped).
+        This is the key change: left and right are now independently
+        positioned within the FULL screen width, not floating together
+        as a centered pair. That's what keeps the left panel pinned left.
       */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
+      <div className="relative z-10 h-full w-full flex flex-col lg:flex-row">
 
+        {/* ============ LEFT PANEL ============ */}
         {/*
-          CONTENT GROUP: this is the fix.
-          - Removed `max-w-[1400px]` + `justify-between` (which caused the variable gap bug)
-          - Replaced with a FIXED-WIDTH inline-flex group using justify-center + a fixed gap
-          - w-fit + the two fixed child widths means this group is the SAME pixel width
-            on every screen size. Only the background around it changes.
+          - Fixed width (w-[560px]) — same px width on laptop AND large monitor.
+            Never shrinks, never re-centers, because it's a flex-shrink-0 child
+            of a full-width row, not a child of a centered w-fit group.
+          - h-full — stretches to exactly the viewport height on any screen.
+          - relative — so the curve (absolute) is positioned against THIS panel,
+            not the whole page.
         */}
-        <div className="w-fit flex flex-col lg:flex-row items-center justify-center gap-x-20">
+        <div className="hidden lg:flex relative flex-shrink-0 w-[560px] h-full flex-col justify-center text-white pl-20 pr-10">
 
-          {/* LEFT SIDE — fixed width, never changes */}
-          <div className="hidden lg:flex flex-col justify-center text-white w-[520px] relative flex-shrink-0">
-            <div
-              className="absolute -left-40 -top-40 -bottom-40 w-[520px]
-                         bg-gradient-to-b from-[#0a0f2c]/90 to-[#0a0f2c]/70 rounded-r-[300px]"
-            />
+          {/*
+            CURVE SHAPE — FIXED.
+            inset-y-0 (top-0 + bottom-0) instead of -top-40/-bottom-40.
+            This guarantees the shape touches the top AND bottom edges of the
+            panel (which is h-full = full viewport height) on EVERY screen
+            height: 768px laptop, 900px, 1080px, 1440px — always edge to edge.
+            left-0 anchors it to the panel's left edge (= screen's left edge).
+            The rounded-r-[300px] is what creates the curve bulge on the right
+            side only — it doesn't affect top/bottom attachment at all.
+          */}
+          <div
+            className="absolute inset-y-0 left-0 w-full
+                       bg-gradient-to-b from-[#0a0f2c]/90 to-[#0a0f2c]/70
+                       rounded-r-[300px] -z-10"
+          />
 
-            <div className="relative z-10">
-              <img src={leoniaLogo} alt="Leonia" className="w-56 mb-6" />
+          {/* Content sits above the curve, fixed padding from the left edge (pl-20 above) */}
+          <div className="relative z-10">
+            <img src={leoniaLogo} alt="Leonia" className="w-56 mb-6" />
 
-              <h1 className="text-4xl font-bold leading-tight mb-4">
-                Bed Management
-                <br />
-                System
-              </h1>
+            <h1 className="text-4xl font-bold leading-tight mb-4">
+              Bed Management
+              <br />
+              System
+            </h1>
 
-              <div className="w-16 h-1 bg-purple-500 rounded-full mb-6"></div>
+            <div className="w-16 h-1 bg-purple-500 rounded-full mb-6"></div>
 
-              <p className="text-lg text-gray-300 mb-10">
-                One System.
-                <br />
-                Complete Control.
-              </p>
+            <p className="text-lg text-gray-300 mb-10">
+              One System.
+              <br />
+              Complete Control.
+            </p>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-2 text-center">
-                  <FaBed className="text-purple-400 text-3xl mx-auto mb-3" />
-                  <p className="text-sm">
-                    Bed
-                    <br /> Management
-                  </p>
-                </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-2 text-center">
+                <FaBed className="text-purple-400 text-3xl mx-auto mb-3" />
+                <p className="text-sm">
+                  Bed
+                  <br /> Management
+                </p>
+              </div>
 
-                <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
-                  <FaChartLine className="text-blue-400 text-3xl mx-auto mb-3" />
-                  <p className="text-sm">Occupancy Tracking</p>
-                </div>
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
+                <FaChartLine className="text-blue-400 text-3xl mx-auto mb-3" />
+                <p className="text-sm">Occupancy Tracking</p>
+              </div>
 
-                <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
-                  <FaShieldAlt className="text-cyan-400 text-3xl mx-auto mb-3" />
-                  <p className="text-sm">Secure Access</p>
-                </div>
+              <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-5 text-center">
+                <FaShieldAlt className="text-cyan-400 text-3xl mx-auto mb-3" />
+                <p className="text-sm">Secure Access</p>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* RIGHT SIDE LOGIN — fixed width, never changes */}
-          <div className="w-[420px] flex-shrink-0">
+        {/* ============ RIGHT PANEL (LOGIN FORM) ============ */}
+        {/*
+          flex-1 — takes up ALL remaining width after the fixed left panel.
+          items-center justify-center — centers the card WITHIN that remaining
+          space. This is the part that makes large monitors look intentional:
+          extra width goes here as natural breathing room around a centered
+          card, exactly like Linear/Stripe/Okta — not as a layout shift.
+        */}
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="w-[420px] max-w-[90vw] flex-shrink-0">
             <div className="bg-[#0e1228]/70 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl p-6">
 
               <h2 className="text-white text-3xl font-bold text-center mb-2">
