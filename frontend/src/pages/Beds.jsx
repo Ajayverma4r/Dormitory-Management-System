@@ -957,48 +957,143 @@ console.log(
 const searchResults = beds
   .filter((bed) => {
 
-    if (!searchTerm.trim()) {
-      return false;
-    }
+    // Must belong to current page (boys/girls)
+    if (bed.gender_type !== type) return false;
 
-    const query =
-      searchTerm.toLowerCase();
+    // Must have a search term
+    if (!searchTerm.trim()) return false;
+
+    // Respect all active filters (same as filteredBeds)
+    if (
+      statusFilter &&
+      bed.status !== statusFilter
+    ) return false;
+
+    if (
+      summaryFilter !== "all" &&
+      bed.status !== summaryFilter
+    ) return false;
+
+    if (
+      typeFilter &&
+      bed.location_type !== typeFilter
+    ) return false;
+
+    if (
+      floorFilter &&
+      bed.floor !== floorFilter
+    ) return false;
+
+    if (
+      roomFilter &&
+      bed.room !== roomFilter
+    ) return false;
+
+    // Match against all searchable fields
+    const query = searchTerm.toLowerCase();
 
     return (
+      bed.bed_number
+        ?.toLowerCase()
+        .includes(query)
 
-      bed.gender_type === type &&
+      ||
 
-      (
+      bed.guest?.name
+        ?.toLowerCase()
+        .includes(query)
 
-        bed.bed_number
-          ?.toLowerCase()
-          .includes(query)
+      ||
 
-        ||
+      bed.guest?.empId
+        ?.toLowerCase()
+        .includes(query)
 
-        bed.guest?.name
-          ?.toLowerCase()
-          .includes(query)
+      ||
 
-        ||
+      bed.room
+        ?.toLowerCase()
+        .includes(query)
 
-        bed.guest?.empId
-          ?.toLowerCase()
-          .includes(query)
+      ||
 
-      )
+      bed.floor
+        ?.toLowerCase()
+        .includes(query)
 
+      ||
+
+      bed.location_type
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.location
+        ?.toLowerCase()
+        .includes(query)
     );
 
   })
   .slice(0, 10);
   
 
-  const filteredBeds = beds.filter((bed) => {
+ const filteredBeds = beds.filter((bed) => {
 
   if (bed.gender_type !== type)
     return false;
 
+  // GLOBAL SEARCH — works as an additional filter on top of all others
+  if (searchTerm.trim()) {
+
+    const query =
+      searchTerm.toLowerCase();
+
+    const matchesSearch =
+
+      bed.bed_number
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.guest?.name
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.guest?.empId
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.room
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.floor
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.location_type
+        ?.toLowerCase()
+        .includes(query)
+
+      ||
+
+      bed.location
+        ?.toLowerCase()
+        .includes(query);
+
+    if (!matchesSearch)
+      return false;
+  }
   if (
     statusFilter &&
     bed.status !== statusFilter
@@ -1030,6 +1125,7 @@ const searchResults = beds
     return false;
 
   return true;
+
 });
 
 // PAGINATION
@@ -1231,17 +1327,14 @@ const totalPages =
       <div
         key={bed.id}
 
-       onClick={() => {
-
-  setSelectedBed(bed);
-
-  setShowSearchResults(false);
-
-  setSearchTerm(
-    bed.guest?.name ||
-    bed.bed_number
-  );
-}}
+        onClick={() => {
+          setSelectedBed(bed);
+          setShowSearchResults(false);
+          setSearchTerm(
+            bed.guest?.name ||
+            bed.bed_number
+          );
+        }}
 
         className="
           px-4
@@ -1252,16 +1345,39 @@ const totalPages =
         "
       >
 
+        {/* LINE 1: Bed number — always visible */}
         <div className="font-medium">
           {bed.bed_number}
         </div>
 
+        {/* LINE 2: Location context — type • room • floor */}
         <div className="
           text-xs
-          text-gray-500
+          text-gray-400
+          mt-0.5
         ">
-          {bed.guest?.name || "No Name"} • {bed.guest?.empId || "-"}
+          {[
+            bed.location_type,
+            bed.room,
+            bed.floor,
+          ]
+            .filter(Boolean)
+            .join(" • ")}
         </div>
+
+        {/* LINE 3: Guest info — only shown when occupied */}
+        {bed.guest?.name && (
+          <div className="
+            text-xs
+            text-gray-500
+            mt-0.5
+          ">
+            {bed.guest.name}
+            {bed.guest.empId
+              ? ` • ${bed.guest.empId}`
+              : ""}
+          </div>
+        )}
 
       </div>
 

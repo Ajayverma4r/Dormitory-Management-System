@@ -415,7 +415,7 @@ const girlsChartData = [
       tracking-wider
       text-gray-500
     ">
-      Leonia Dormitory Management System
+      Leonia Dormitory Management System v1
     </p>
 
     <h1 className="
